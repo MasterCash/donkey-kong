@@ -3,10 +3,12 @@ Class to control mario
 """
 import pygame 
 from utils import Spritesheet
+from game import GameObject
 
 
-class Mario: 
+class Mario(GameObject): 
     def __init__(self):
+        GameObject.__init__(self)
         self._sheet = Spritesheet('mario')
         
         self._sprites = { 
@@ -25,18 +27,15 @@ class Mario:
         self.x = self.x + 1
         self.y = self.y + 1
         
-
-    def draw(self, window): 
-        """ Method used for drawing sprites to the screen """
-        window.blit(self._currentSprite, (self.x, self.y))
-
-
     def collisionCheck(self, otherObj): 
         """ Checks for collision with another spirte """
         return False
 
-    @property 
-    def position(self): 
+    def getPositionAndSize(self): 
         """ Returns the current position, and dimension of the thing """
         return (self.x, self.y, 0, 0) 
+
+    def getSprite(self): 
+        """ Returns the current sprite for the game object """
+        return self._currentSprite
     

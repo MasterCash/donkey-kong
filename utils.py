@@ -24,5 +24,13 @@ class Spritesheet(object):
         "Loads a strip of images and returns them as a list"
         tups = [(rect[0]+rect[2]*x, rect[1], rect[2], rect[3])
                 for x in range(image_count)]
-
         return self.images_at(tups)
+
+
+def AbstractMethod(method):
+    def default_abstract_method(*args, **kwargs):
+        raise NotImplementedError('{0} NEEDS to implement the "{1}" method!'.format(args[0].__class__.__name__, method.__name__))
+
+    default_abstract_method.__name__ = method.__name__    
+    return default_abstract_method
+
