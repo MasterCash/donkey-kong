@@ -4,9 +4,9 @@ Game Manager
 import pygame 
 import os
 import uuid
-from utils import AbstractMethod
+from utils import AbstractMethod, Singleton 
 
-
+@Singleton
 class GameManager: 
     """ Class to manage the state of the game """
     def __init__(self): 
