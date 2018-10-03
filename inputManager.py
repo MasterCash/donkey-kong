@@ -13,7 +13,7 @@ class InputManager:
   
     def __init__(self):
         self._keyFuncDict = {}
-
+        self.keysPressed = []
 
     def listenFor(self, keys, func):
         for key in keys:
@@ -28,15 +28,14 @@ class InputManager:
         print("Stop Listening Called")
   
     def check(self):
-        #if pygame.event.peek(KEYDOWN):
-        pygame.event.clear(KEYDOWN)
         pressed = pygame.key.get_pressed()
         for key in self._keyFuncDict:
             if pressed[key]:
                 for func in self._keyFuncDict[key]:
                     func(key)
-      #for key, func in self._keyFuncPairs:
-      #   if pressed[key]: 
-      #       func(key)
 
-          
+    def checkWithEvents(self):
+        for key in self.keysPressed:
+            if key in self.keyFuncDict:
+                for func in self._keyFuncDict[key]:
+                    func(key)
