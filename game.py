@@ -21,13 +21,23 @@ class GameManager:
         self._players = []
         self._toRemove = []
 
+        self._levelManager = None
+
+
     def play(self): 
         """ Main Game Loop """ 
+        if self._levelManager is None: 
+           raise Exception("No Level Manager")
+
         while True: 
+            for event in pygame.event.get():
+                print("event")
+            
             self._clock.tick(60)
             self._handleEvents() 
 
-            self._window.fill((255, 255, 255)) # White background
+            # Draw the current level
+            self._levelManager.drawLevel(self._window)
 
             # Update Everything 
             for i, obj in enumerate(self._objects): 
@@ -46,7 +56,7 @@ class GameManager:
                 self._drawGameObject(player, i)
 
             pygame.display.flip() # Show most recent drawn items on the screen
-
+            print("Done\n\n\n\n")
 
     def addPlayer(self, player): 
         """ Adds a player to the game """ 
@@ -56,7 +66,12 @@ class GameManager:
         """ Adds an object to the game """
         self._objects.append(obj)
 
-
+    def addLevelManager(self, obj): 
+        """ Sets the thing used for generating levels """
+        if isinstance(obj, GameLevelManager):
+            self._levelManager = obj
+        return 
+    
     def _handleEvents(self): 
         """ Handles events from PyGame """
         for event in pygame.event.get(): 
@@ -122,7 +137,6 @@ class GameObject:
     def getSprite(self): 
         pass
 
-
     def destroy(self): 
         self.__remove = True
 
@@ -135,4 +149,19 @@ class GameObject:
         return self.__id
 
 
+class GameLevelManager: 
+    """
+    'Interface' for a Level Manager 
+    """
+    def __init__(self): 
+        pass
 
+    @AbstractMethod 
+    def drawLevel(self, screen): 
+        pass 
+    
+    @AbstractMethod 
+    def advanceLevel(self): 
+        pass 
+
+    
