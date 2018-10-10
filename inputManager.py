@@ -10,7 +10,7 @@ from eventManager import Events, EventManager
 from collections import deque
 
 @Singleton
-class InputManager:
+class __InputManagerClass:
   
     def __init__(self):
         self._keyFuncDict = {}
@@ -47,3 +47,5 @@ class InputManager:
     def removeKey(self, key):
         if key in self.keysPressed:
             self.keysPressed.remove(key)
+
+InputManager = __InputManagerClass()
