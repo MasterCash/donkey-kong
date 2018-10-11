@@ -65,7 +65,6 @@ class LevelManager(GameLevelManager):
             lastX = 0
             for x in range(w, width + w, w): 
                 self.platforms.add(Platform(x, y, self._platform))
-                #screen.blit(self._platform, (x, y))
                 y = y - 1
                 lastX = x
 
@@ -77,7 +76,6 @@ class LevelManager(GameLevelManager):
         def drawRtoLPlatform(y): 
             lastX = 0
             for x in range(width - (2 * w), 0 - w, w * -1): 
-             #   screen.blit(self._platform, (x, y))
                 self.platforms.add(Platform(x, y, self._platform))
                 y = y - 1
                 lastX = x
@@ -92,13 +90,11 @@ class LevelManager(GameLevelManager):
         lastX = 0
         for x in range(0, int(width/2), w): 
             self.platforms.add(Platform(x, y, self._platform))
-            #screen.blit(self._platform, (x, y))
             lastX = x
 
         # Angled section of first platform
         for x in range(lastX + w, width, w):
             self.platforms.add(Platform(x, y, self._platform))
-            #screen.blit(self._platform, (x, y))
             y = y - 1
             lastX = x
 
@@ -121,13 +117,11 @@ class LevelManager(GameLevelManager):
         y = y - (4 * h) + 2
         for x in range(0 - w, width + w, w): 
             self.platforms.add(Platform(x, y, self._platform))
-         #   screen.blit(self._platform, (x, y))
         
         # Princess Peach Platform
         y = y - (4 * h)
         for x in range(int(width/2.5), int(width/2.5) + (3 * w), w):
             self.platforms.add(Platform(x, y, self._platform))
-            #screen.blit(self._platform, (x, y))
             lastX = x
         
         # Ladder to Princess Peach 

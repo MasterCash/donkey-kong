@@ -36,9 +36,6 @@ class GameManager:
         if self._levelManager is None: 
            raise Exception("No Level Manager")
 
-        # Give needed information to the level manager
-        self._levelManager.setWindowInformation(self._windowWidth, self._windowHeight)
-
         while True: 
             self._clock.tick(60)
             self._handleEvents() 
@@ -50,9 +47,8 @@ class GameManager:
 
             for player in self._players: 
                 hits = pygame.sprite.spritecollide(player, self._levelManager.platforms, False)
-                #for hit in hits: 
-                    #player.change('y', player.y - 40)
-                    #player.y = player.y - 40
+                for hit in hits: 
+                    player.y = hit.rect.top - (player.rect.size[0]) + 1
 
             # Draw everything
             self._levelManager.draw(self._window)
@@ -76,6 +72,8 @@ class GameManager:
         """ Sets the thing used for generating levels """
         if isinstance(obj, GameLevelManager):
             self._levelManager = obj
+            self._levelManager.setWindowInformation(self._windowWidth, self._windowHeight)
+
         return 
     
     def _handleEvents(self): 
