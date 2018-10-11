@@ -4,8 +4,10 @@ Game Manager
 import pygame 
 import os
 import uuid
-from utils import AbstractMethod, DefaultMethod, Singleton, SpriteWrapper
+from utils import AbstractMethod, DefaultMethod, Singleton
 from eventManager import Events, EventManager
+from types import MethodType
+
 
 @Singleton
 class GameManager: 
@@ -34,18 +36,26 @@ class GameManager:
         if self._levelManager is None: 
            raise Exception("No Level Manager")
 
+        # Give needed information to the level manager
+        self._levelManager.setWindowInformation(self._windowWidth, self._windowHeight)
+
         while True: 
             self._clock.tick(60)
             self._handleEvents() 
 
-            # Draw the current level
-            self._levelManager.drawLevel(self._window, self._windowWidth, self._windowHeight)
-
             # Update Everything 
             self._objects.update()
             self._players.update()
+            self._levelManager.update()
+
+            for player in self._players: 
+                hits = pygame.sprite.spritecollide(player, self._levelManager.platforms, False)
+                for hit in hits: 
+                    #player.change('y', player.y - 40)
+                    player.y = player.y - 40
 
             # Draw everything
+            self._levelManager.draw(self._window)
             for obj in self._objects: 
                 obj.draw(self._window)
 
@@ -56,11 +66,11 @@ class GameManager:
 
     def addPlayer(self, player): 
         """ Adds a player to the game """ 
-        self._players.add(SpriteWrapper(player))
+        self._players.add(_MakeSprite(player))
 
     def addObject(self, obj): 
         """ Adds an object to the game """
-        self._objects.add(SpriteWrapper(obj))
+        self._objects.add(_MakeSprite(obj))
 
     def addLevelManager(self, obj): 
         """ Sets the thing used for generating levels """
@@ -72,26 +82,47 @@ class GameManager:
         """ Handles events from PyGame """
         EventManager.handlePyGameEvents()
 
-        # Remove objects
-        for index in self._toRemove: 
-            if len(self._objects) > index and self._objects[index].shouldBeRemoved: 
-                del self._objects[index] 
-            elif len(self._players) > index and self._players[index].shouldBeRemoved: 
-                del self._players[index] 
-
-        self._toRemove = [] 
-
     def _quit(self, data): 
         pygame.quit()
         os._exit(0)
 
-    
-class GameObject: 
+
+
+def _MakeSprite(obj): 
+    """ Method for transforming a sprite object into something that can be drawn """
+    # New update method
+    obj._update = obj.update 
+    def update(self): 
+        self._update() 
+    obj.update = MethodType(update, obj)
+
+    # New Draw Method 
+    def draw(self, screen): 
+        self.image = self.getSprite() 
+        self.rect = self.image.get_rect() 
+        self.rect.x = self.x 
+        self.rect.y = self.y 
+        
+        screen.blit(self.image, (self.rect.x, self.rect.y)) 
+        self.drawExtra(screen) 
+
+    obj.draw = MethodType(draw, obj)
+
+    obj.image = obj.getSprite() 
+    obj.rect = obj.image.get_rect() 
+    obj.rect.x = obj.x 
+    obj.rect.y = obj.y 
+
+    return obj
+
+
+class GameObject(pygame.sprite.Sprite): 
     """ 
     Class for a generic Game Object
     Defines abstract methods so they have to be implemented 
     """
     def __init__(self): 
+        super().__init__()
         self.__remove = False
         self.__id = uuid.uuid4()
 

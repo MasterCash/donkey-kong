@@ -5,10 +5,9 @@ import pygame
 from utils import Spritesheet
 from game import GameObject
 
-
 class Princess(GameObject): 
     def __init__(self): 
-        GameObject.__init__(self)
+        super().__init__()
         self._sheet = Spritesheet('princess')
 
         self._sprites = { 

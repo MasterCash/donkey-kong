@@ -6,9 +6,10 @@ from utils import Spritesheet
 from game import GameObject
 from levelManager import LevelManager
 
+
 class Mario(GameObject): 
     def __init__(self):
-        GameObject.__init__(self)
+        super().__init__()
         self._sheet = Spritesheet('mario')
         
         self._sprites = { 
@@ -20,13 +21,13 @@ class Mario(GameObject):
         self._currentSprite = self._sprites['run_left2']
         self.x = 100
         self.y = 100
-        
 
     def update(self): 
         """ Method used for updating state of a sprite/object """
         #self.x = self.x + 1
         self.y = self.y + 1
-        
+        self._prevY = self.y
+
     def collisionCheck(self, otherObj): 
         """ Checks for collision with another spirte """
         return False
