@@ -6,6 +6,11 @@ from utils import Spritesheet
 from game import GameObject
 from spriteManager import SpriteManager
 
+class BarrelType(enum):
+    NORMAL = 0
+    EXPLOSIVE = 1
+    OIL = 2
+
 
 class Barrel(GameObject): 
     def __init__(self):
@@ -34,7 +39,7 @@ class Barrel(GameObject):
         #self.x = self.x - 1
         self.y = self.y + 1
         self.spriteManager.animate(10)
-        
+
     def collisionCheck(self, otherObj): 
         """ Checks for collision with another spirte """
         return False
