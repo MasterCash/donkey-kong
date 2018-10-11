@@ -4,7 +4,7 @@ Game Manager
 import pygame 
 import os
 import uuid
-from utils import AbstractMethod, DefaultMethod, Singleton 
+from utils import AbstractMethod, DefaultMethod, Singleton, SpriteWrapper
 from eventManager import Events, EventManager
 
 @Singleton
@@ -20,8 +20,8 @@ class GameManager:
 
         self._clock = pygame.time.Clock()
 
-        self._objects = []
-        self._players = []
+        self._objects = pygame.sprite.Group()
+        self._players = pygame.sprite.Group()
         self._toRemove = []
         
         EventManager.subscribe(Events.QUIT, self._quit)
@@ -42,30 +42,25 @@ class GameManager:
             self._levelManager.drawLevel(self._window, self._windowWidth, self._windowHeight)
 
             # Update Everything 
-            for i, obj in enumerate(self._objects): 
-                self._updateGameObject(obj, i)
+            self._objects.update()
+            self._players.update()
 
-            for i, player in enumerate(self._players): 
-                self._updateGameObject(player, i)
+            # Draw everything
+            for obj in self._objects: 
+                obj.draw(self._window)
 
-            # TODO: Collision checking, etc...
-
-            # Draw sprites 
-            for i, obj in enumerate(self._objects): 
-                self._drawGameObject(obj, i)
-            
-            for i, player in enumerate(self._players): 
-                self._drawGameObject(player, i)
+            for player in self._players: 
+                player.draw(self._window)
 
             pygame.display.flip() # Show most recent drawn items on the screen
 
     def addPlayer(self, player): 
         """ Adds a player to the game """ 
-        self._players.append(player)
+        self._players.add(SpriteWrapper(player))
 
     def addObject(self, obj): 
         """ Adds an object to the game """
-        self._objects.append(obj)
+        self._objects.add(SpriteWrapper(obj))
 
     def addLevelManager(self, obj): 
         """ Sets the thing used for generating levels """
@@ -86,34 +81,6 @@ class GameManager:
 
         self._toRemove = [] 
 
-
-    def _updateGameObject(self, obj, i): 
-        """ Updates a game object """ 
-        if not isinstance(obj, GameObject): 
-            return 
-
-        if obj.shouldBeRemoved: 
-            self._toRemove.append(i)
-            return
-
-        obj.update() 
-
-    def _drawGameObject(self, obj, i): 
-        """ Draws a game object """
-        if not isinstance(obj, GameObject): 
-            return 
-
-        if obj.shouldBeRemoved: 
-            self._toRemove.append(i)
-            return 
-            
-        pos = obj.getPositionAndSize()
-        sprite = obj.getSprite() 
-        
-        self._window.blit(sprite, (pos[0], pos[1]))
-
-        obj.drawExtra(self._window) 
-
     def _quit(self, data): 
         pygame.quit()
         os._exit(0)
@@ -131,10 +98,6 @@ class GameObject:
     @AbstractMethod 
     def update(self): 
         pass 
-
-    @AbstractMethod 
-    def getPositionAndSize(self): 
-        pass
 
     @AbstractMethod 
     def getSprite(self): 

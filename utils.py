@@ -1,5 +1,6 @@
 import pygame 
 
+
 class Spritesheet(object):
     def __init__(self, filename):
         self.sheet = pygame.image.load('assets/sprites/{0}_sheet.png'.format(filename)).convert()
@@ -55,5 +56,30 @@ class Singleton:
     def Reset(self):
         """ Clears a singleton object, only used in tests """
         self._instance = None
+
+
+class SpriteWrapper(pygame.sprite.Sprite): 
+    """ Wrapper around game objects to make them sprites 
+        This abstracts away pygame stuff when writing code for a game object
+    """
+    def __init__(self, obj): 
+        super().__init__()
+        self.__obj = obj
+
+    def update(self): 
+        if self.__obj.shouldBeRemoved: 
+            self.kill()
+            return 
+
+        self.__obj.update()
+        self.image = self.__obj.getSprite()
+        self.rect = self.image.get_rect()
+        self.rect.x = self.__obj.x
+        self.rect.y = self.__obj.y 
+    
+    def draw(self, screen): 
+        screen.blit(self.image, (self.rect.x, self.rect.y))
+        self.__obj.drawExtra(screen)
+
 
 

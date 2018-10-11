@@ -52,5 +52,6 @@ class Princess(GameObject):
 
 
     def drawExtra(self, screen): 
+        """ Used for drawing the help words """
         if self.__isScreaming: 
             screen.blit(self._sprites['help'], (self.x + 35, self.y - 10))

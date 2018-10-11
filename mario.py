@@ -4,7 +4,7 @@ Class to control mario
 import pygame 
 from utils import Spritesheet
 from game import GameObject
-
+from levelManager import LevelManager
 
 class Mario(GameObject): 
     def __init__(self):
@@ -25,16 +25,11 @@ class Mario(GameObject):
     def update(self): 
         """ Method used for updating state of a sprite/object """
         #self.x = self.x + 1
-        #self.y = self.y + 1
-        pass
+        self.y = self.y + 1
         
     def collisionCheck(self, otherObj): 
         """ Checks for collision with another spirte """
         return False
-
-    def getPositionAndSize(self): 
-        """ Returns the current position, and dimension of the thing """
-        return (self.x, self.y, 0, 0) 
 
     def getSprite(self): 
         """ Returns the current sprite for the game object """

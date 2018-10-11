@@ -4,12 +4,21 @@ from utils import Singleton
 from game import GameLevelManager 
 from utils import Spritesheet
 
+
+class Platform(pygame.sprite.Sprite):
+    def __init__(self, x, y, sprite): 
+        super().__init__()
+        self.image = sprite
+
+        
 @Singleton
 class LevelManager(GameLevelManager): 
     def __init__(self): 
         GameLevelManager.__init__(self)
         self.__currentLevel = 0
 
+        self.platforms = pygame.sprite.Group()
+        
         self._sheet = Spritesheet('level')
         self._platform = self._sheet.sprite_at((0, 1, 32, 16))
         self._ladder = self._sheet.sprite_at((33, 1, 16, 8))
@@ -123,4 +132,4 @@ class LevelManager(GameLevelManager):
         """ Returns the current level """
         return self.__currentLevel
 
-    
+
