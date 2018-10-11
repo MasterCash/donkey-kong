@@ -45,3 +45,4 @@ class Barrel(GameObject):
     def getSprite(self):
         """ Returns the current sprite for the game object """
         return self.spriteManager.currentSprite()
+
