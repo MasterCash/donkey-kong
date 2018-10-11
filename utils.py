@@ -34,6 +34,11 @@ def AbstractMethod(method):
     default_abstract_method.__name__ = method.__name__    
     return default_abstract_method
 
+def DefaultMethod(method): 
+    def default_method(*args, **kwargs): 
+        pass 
+    default_method.__name__ = method.__name__ 
+    return default_method
 
 class Singleton:
     def __init__(self, decorated):

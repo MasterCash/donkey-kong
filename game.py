@@ -4,7 +4,7 @@ Game Manager
 import pygame 
 import os
 import uuid
-from utils import AbstractMethod, Singleton 
+from utils import AbstractMethod, DefaultMethod, Singleton 
 from eventManager import Events, EventManager
 
 @Singleton
@@ -12,7 +12,9 @@ class GameManager:
     """ Class to manage the state of the game """
     def __init__(self): 
         pygame.init()
-        self._window = pygame.display.set_mode((720, 720))
+        self._windowWidth = 544
+        self._windowHeight = 600
+        self._window = pygame.display.set_mode((self._windowWidth, self._windowHeight))
         pygame.display.set_caption('Donkey Kong')
         pygame.display.set_icon(pygame.image.load('assets/icon.png'))
 
@@ -33,14 +35,11 @@ class GameManager:
            raise Exception("No Level Manager")
 
         while True: 
-            for event in pygame.event.get():
-                print("event")
-            
             self._clock.tick(60)
             self._handleEvents() 
 
             # Draw the current level
-            self._levelManager.drawLevel(self._window)
+            self._levelManager.drawLevel(self._window, self._windowWidth, self._windowHeight)
 
             # Update Everything 
             for i, obj in enumerate(self._objects): 
@@ -59,7 +58,6 @@ class GameManager:
                 self._drawGameObject(player, i)
 
             pygame.display.flip() # Show most recent drawn items on the screen
-            print("Done\n\n\n\n")
 
     def addPlayer(self, player): 
         """ Adds a player to the game """ 
@@ -111,8 +109,10 @@ class GameManager:
             
         pos = obj.getPositionAndSize()
         sprite = obj.getSprite() 
-
+        
         self._window.blit(sprite, (pos[0], pos[1]))
+
+        obj.drawExtra(self._window) 
 
     def _quit(self, data): 
         pygame.quit()
@@ -138,6 +138,10 @@ class GameObject:
 
     @AbstractMethod 
     def getSprite(self): 
+        pass
+
+    @DefaultMethod 
+    def drawExtra(self, screen): 
         pass
 
     def destroy(self): 
@@ -166,5 +170,6 @@ class GameLevelManager:
     @AbstractMethod 
     def advanceLevel(self): 
         pass 
+        
 
     
