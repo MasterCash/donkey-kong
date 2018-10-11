@@ -26,7 +26,6 @@ class Mario(GameObject):
         """ Method used for updating state of a sprite/object """
         #self.x = self.x + 1
         self.y = self.y + 1
-        self._prevY = self.y
 
     def collisionCheck(self, otherObj): 
         """ Checks for collision with another spirte """

@@ -50,9 +50,9 @@ class GameManager:
 
             for player in self._players: 
                 hits = pygame.sprite.spritecollide(player, self._levelManager.platforms, False)
-                for hit in hits: 
+                #for hit in hits: 
                     #player.change('y', player.y - 40)
-                    player.y = player.y - 40
+                    #player.y = player.y - 40
 
             # Draw everything
             self._levelManager.draw(self._window)
@@ -123,7 +123,6 @@ class GameObject(pygame.sprite.Sprite):
     """
     def __init__(self): 
         super().__init__()
-        self.__remove = False
         self.__id = uuid.uuid4()
 
     @AbstractMethod 
@@ -137,13 +136,6 @@ class GameObject(pygame.sprite.Sprite):
     @DefaultMethod 
     def drawExtra(self, screen): 
         pass
-
-    def destroy(self): 
-        self.__remove = True
-
-    @property 
-    def shouldBeRemoved(self): 
-        return self.__remove
 
     @property
     def id(self): 

@@ -13,6 +13,11 @@ class Platform(pygame.sprite.Sprite):
         self.rect.x = x 
         self.rect.y = y
 
+class Ladder(pygame.sprite.Sprite): 
+    def __init__(self, x, y, sprite): 
+        super().__init__()
+        
+
         
 @Singleton
 class LevelManager(GameLevelManager): 
