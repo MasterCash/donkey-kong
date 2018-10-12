@@ -106,6 +106,7 @@ def _MakeSprite(obj):
 
     obj.draw = MethodType(draw, obj)
 
+    # Initial setup of stuff for drawing
     obj.image = obj.getSprite() 
     obj.rect = obj.image.get_rect() 
     obj.rect.x = obj.x 
