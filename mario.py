@@ -24,6 +24,7 @@ class Mario(GameObject):
         self.spriteManager.useSprites([
             'run_left2',
             'stand_left',
+            'run_left1',
             'run_left1'
         ])
         self.x = 600
