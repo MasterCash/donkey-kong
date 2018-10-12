@@ -12,14 +12,19 @@ class BarrelType(enum):
     OIL = 2
 
 
+<<<<<<< HEAD
 class Barrel(GameObject): 
     def __init__(self):
         GameObject.__init__(self)
         self.spriteManager = SpriteManager()
-
+        self._type = bType
+        self._speed = 10
         self._sheet = Spritesheet('barrel')
-        
-        self._sprites = { 
+
+        self._sprites = {
+            'normal_roll1': self._sheet.sprite_at((112,0,24,20))
+            'normal_roll2': self._sheet.sprite_at((160,0,24,20))
+            'normal_roll3': self._sheet.sprite_at((208,0,24,20))
             'fall_1': self._sheet.sprite(290, 0, 40, 20), 
             'fall_2': self._sheet.sprite(340, 0, 40, 20)
         }#I current do not have access to any image software so I can't measure anything
