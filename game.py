@@ -6,6 +6,7 @@ import os
 import uuid
 from utils import AbstractMethod, Singleton 
 from eventManager import Events, EventManager
+form inputManager import InputManger
 
 @Singleton
 class GameManager: 
@@ -63,6 +64,7 @@ class GameManager:
     def _handleEvents(self): 
         """ Handles events from PyGame """
         EventManager.handlePyGameEvents()
+        InputManager.check()
 
         # Remove objects
         for index in self._toRemove: 
