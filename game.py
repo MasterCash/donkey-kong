@@ -7,6 +7,7 @@ import uuid
 from utils import AbstractMethod, DefaultMethod, Singleton
 from eventManager import Events, EventManager
 from types import MethodType
+from inputManager import InputManager
 
 
 @Singleton
@@ -79,6 +80,7 @@ class GameManager:
     def _handleEvents(self): 
         """ Handles events from PyGame """
         EventManager.handlePyGameEvents()
+        InputManager.check()
 
     def _quit(self, data): 
         pygame.quit()
