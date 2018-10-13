@@ -3,7 +3,7 @@ Class for the princess
 """
 import pygame 
 from utils import Spritesheet
-from game import GameObject
+from framework import GameObject
 
 class Princess(GameObject): 
     def __init__(self): 
@@ -39,18 +39,10 @@ class Princess(GameObject):
             self.ticks = -180 # ~3 seconds
             self.__isScreaming = False
         
-    def collissionCheck(self, otherObject): 
-        """ No collissions """
-        return False 
-
-    def getPositionAndSize(self): 
-        return (self.x, self.y, 30, 44)
-    
     def getSprite(self): 
         return self._currentSprite
-
 
     def drawExtra(self, screen): 
         """ Used for drawing the help words """
         if self.__isScreaming: 
-            screen.blit(self._sprites['help'], (self.x + 35, self.y - 10))
+            screen.draw(self._sprites['help'], self.x + 35, self.y - 10)

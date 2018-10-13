@@ -3,15 +3,16 @@ from utils import Spritesheet
 
 
 class SpriteManager:
-    
-    
+    """ Used for animating sprites on a thingy """
     def __init__(self):
         return
+
     #makes the sprites in sheet 
     def addSprites(self, sprites):
         self._sprites = sprites
         self._counter = 0 #counts the number of frames between each animation
         return
+
     #converts the (unordered) dictionary to an ordered array based on animation var
     def useSprites(self, animation):
         self._currentSpriteName = animation[0]
@@ -21,7 +22,6 @@ class SpriteManager:
         
         for x in animation:
             self._spriteArray.append(self._sprites[x])
-
 
 
     def animate(self, counter):

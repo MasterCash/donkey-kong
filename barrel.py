@@ -3,7 +3,7 @@ Class for barrels
 """
 import pygame 
 from utils import Spritesheet
-from game import GameObject
+from framework import GameObject
 from spriteManager import SpriteManager
 
 

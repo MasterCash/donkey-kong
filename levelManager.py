@@ -3,23 +3,23 @@ import json
 from utils import Singleton
 from game import GameLevelManager 
 from utils import Spritesheet
+from framework import GameSprite, SpriteGroup
 
 
-class Platform(pygame.sprite.Sprite):
+class Platform(GameSprite):
     def __init__(self, x, y, sprite): 
         super().__init__()
-        self.image = sprite
-        self.rect = self.image.get_rect()
-        self.rect.x = x 
-        self.rect.y = y
-
-class Ladder(pygame.sprite.Sprite): 
-    def __init__(self, x, y, sprite): 
-        super().__init__()
+        self.x = x 
+        self.y = y
         self.image = sprite 
-        self.rect = self.image.get_rect()
-        self.rect.x = x 
-        self.rect.y = y
+
+
+class Ladder(GameSprite): 
+    def __init__(self, x, y, sprite): 
+        super().__init__()
+        self.x = x 
+        self.y = y
+        self.image = sprite 
 
         
 @Singleton
@@ -28,8 +28,8 @@ class LevelManager(GameLevelManager):
         GameLevelManager.__init__(self)
         self.__currentLevel = 0
 
-        self.platforms = pygame.sprite.Group()
-        self.ladders = pygame.sprite.Group() 
+        self.platforms = SpriteGroup()
+        self.ladders = SpriteGroup() 
 
         self._sheet = Spritesheet('level')
         self._platform = self._sheet.sprite(0, 1, 32, 16)

@@ -3,9 +3,9 @@ Class to control mario
 """
 import pygame 
 from utils import Spritesheet
-from game import GameObject
+#from game import GameObject
 from spriteManager import SpriteManager
-
+from framework import GameObject
 
 class Mario(GameObject): 
     def __init__(self):
@@ -21,7 +21,7 @@ class Mario(GameObject):
         }
 
         self.spriteManager.addSprites(self._sprites)
-        # self._currentSprite = self._sprites['run_left2']
+        
         self.spriteManager.useSprites([
             'run_left2',
             'stand_left',
