@@ -16,7 +16,10 @@ class Platform(pygame.sprite.Sprite):
 class Ladder(pygame.sprite.Sprite): 
     def __init__(self, x, y, sprite): 
         super().__init__()
-        
+        self.image = sprite 
+        self.rect = self.image.get_rect()
+        self.rect.x = x 
+        self.rect.y = y
 
         
 @Singleton
@@ -31,6 +34,7 @@ class LevelManager(GameLevelManager):
         self._sheet = Spritesheet('level')
         self._platform = self._sheet.sprite_at((0, 1, 32, 16))
         self._ladder = self._sheet.sprite_at((33, 1, 16, 8))
+        self._invisbleLadder = self._sheet.sprite_at((50, 1, 16, 8))
 
         self._princessSheet = Spritesheet('princess')
         self._princess = self._princessSheet.sprite_at((0, 0, 30, 44))
@@ -58,9 +62,23 @@ class LevelManager(GameLevelManager):
     def buildLevel(self): 
         height = self._windowHeight
         width = self._windowWidth
-
+        
         w = 32 # Sprite width
         h = 16 # Sprite height
+
+        def drawLadder(x, y): 
+            targetY = y - (int((4*h)/8) * 8) + h-2
+            lastY = 0
+            for y1 in range(y-6, targetY, -8):
+                self.ladders.add(Ladder(x, y1, self._ladder))
+                lastY = y1
+
+            # Invisble ladder hitbox on top of the platform
+            targetY = lastY - (int((3*h)/8) * 8) + h-2
+            for y1 in range(lastY - 6, targetY, -8): 
+                self.ladders.add(Ladder(x, y1, self._invisbleLadder))
+
+
         def drawLtoRPlatform(y): 
             lastX = 0
             for x in range(w, width + w, w): 
@@ -70,7 +88,7 @@ class LevelManager(GameLevelManager):
 
             # Add ladder to next platform
             x = lastX - 2*w
-            #drawLadder(x, y)
+            drawLadder(x, y)
             return y 
 
         def drawRtoLPlatform(y): 
@@ -82,7 +100,7 @@ class LevelManager(GameLevelManager):
 
             # Add ladder to next platform
             x = lastX + 1.5*w
-            #drawLadder(x, y)
+            drawLadder(x, y)
             return y
 
         # Flat section of first platform
@@ -98,7 +116,7 @@ class LevelManager(GameLevelManager):
             y = y - 1
             lastX = x
 
-        #drawLadder(lastX - (2*w), y) # Ladder from first platform
+        drawLadder(lastX - (2*w), y) # Ladder from first platform
 
         # Draw other platforms
         y = y - (4 * h) + 2
@@ -126,17 +144,17 @@ class LevelManager(GameLevelManager):
         
         # Ladder to Princess Peach 
         x = lastX
-        #drawLadder(x, y + (4 * h) - 2)
+        drawLadder(x, y + (4 * h) - 2)
 
         # Next Level ladders
         x = width/4 + w
-        #drawLadder(x, y + (4 * h) - 2)
-        #drawLadder(x,  y + h - 2)
-        #drawLadder(x, y - (2 * h) - 2)
+        drawLadder(x, y + (4 * h) - 2)
+        drawLadder(x,  y + h - 2)
+        drawLadder(x, y - (2 * h) - 2)
         x = x + w
-        #drawLadder(x, y + (4 * h) - 2)
-        #drawLadder(x,  y + h - 2)
-        #drawLadder(x, y - (2 * h) - 2)
+        drawLadder(x, y + (4 * h) - 2)
+        drawLadder(x,  y + h - 2)
+        drawLadder(x, y - (2 * h) - 2)
 
 
     def draw(self, screen): 
@@ -149,6 +167,7 @@ class LevelManager(GameLevelManager):
         h = 16 # Sprite height
         
         self.platforms.draw(screen)
+        self.ladders.draw(screen)
     
 
 
