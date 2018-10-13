@@ -32,12 +32,9 @@ class LevelManager(GameLevelManager):
         self.ladders = pygame.sprite.Group() 
 
         self._sheet = Spritesheet('level')
-        self._platform = self._sheet.sprite_at((0, 1, 32, 16))
-        self._ladder = self._sheet.sprite_at((33, 1, 16, 8))
-        self._invisbleLadder = self._sheet.sprite_at((50, 1, 16, 8))
-
-        self._princessSheet = Spritesheet('princess')
-        self._princess = self._princessSheet.sprite_at((0, 0, 30, 44))
+        self._platform = self._sheet.sprite(0, 1, 32, 16)
+        self._ladder = self._sheet.sprite(33, 1, 16, 8)
+        self._invisbleLadder = self._sheet.sprite(50, 1, 16, 8)
 
         # Read levels from the levels file
         with open('assets/levels.json', 'r') as f:
