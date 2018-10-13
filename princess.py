@@ -11,10 +11,10 @@ class Princess(GameObject):
         self._sheet = Spritesheet('princess')
 
         self._sprites = { 
-            'standing': self._sheet.sprite_at((0, 0, 30, 44)), 
-            'dance1': self._sheet.sprite_at((50, 0, 30, 44)), 
-            'dance2': self._sheet.sprite_at((96, 0, 30, 44)), 
-            'help': self._sheet.sprite_at((240, 10, 46, 16))
+            'standing': self._sheet.sprite(0, 0, 30, 44), 
+            'dance1': self._sheet.sprite(50, 0, 30, 44), 
+            'dance2': self._sheet.sprite(96, 0, 30, 44), 
+            'help': self._sheet.sprite(240, 10, 46, 16)
         }
 
         self._currentSprite = self._sprites['standing']

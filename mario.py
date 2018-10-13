@@ -15,10 +15,11 @@ class Mario(GameObject):
         self._sheet = Spritesheet('mario')
         
         self._sprites = { 
-            'stand_left': self._sheet.sprite_at((0, 20, 24, 32)),
-            'run_left1': self._sheet.sprite_at((46, 20, 30, 32)), 
-            'run_left2': self._sheet.sprite_at((94, 22, 30, 30))
+            'stand_left': self._sheet.sprite(0, 20, 24, 32),
+            'run_left1': self._sheet.sprite(46, 20, 30, 32), 
+            'run_left2': self._sheet.sprite(94, 22, 30, 30)
         }
+
         self.spriteManager.addSprites(self._sprites)
         # self._currentSprite = self._sprites['run_left2']
         self.spriteManager.useSprites([
