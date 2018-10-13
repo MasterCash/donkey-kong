@@ -1,5 +1,6 @@
 import pygame 
 
+
 class Spritesheet(object):
     def __init__(self, filename):
         self.sheet = pygame.image.load('assets/sprites/{0}_sheet.png'.format(filename)).convert()
@@ -34,6 +35,12 @@ def AbstractMethod(method):
     default_abstract_method.__name__ = method.__name__    
     return default_abstract_method
 
+def DefaultMethod(method): 
+    def default_method(*args, **kwargs): 
+        pass 
+    default_method.__name__ = method.__name__ 
+    return default_method
+
 
 class Singleton:
     def __init__(self, decorated):
@@ -50,5 +57,7 @@ class Singleton:
     def Reset(self):
         """ Clears a singleton object, only used in tests """
         self._instance = None
+
+
 
 

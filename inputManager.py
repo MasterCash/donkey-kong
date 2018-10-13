@@ -2,7 +2,6 @@
 # Input Manager #
 #################
 import pygame
-from pygame.locals import *
 import queue
 #from enums import PlayerState
 from utils import Singleton
@@ -11,7 +10,6 @@ from collections import deque
 
 @Singleton
 class __InputManagerClass:
-  
     def __init__(self):
         self._keyFuncDict = {}
         self.keysPressed = []
@@ -28,7 +26,7 @@ class __InputManagerClass:
     
     def unsubscribe(self, keys, func):
         for key in keys:
-            self._keyFunDic[key].remove(func)
+            self._keyFuncDict[key].remove(func)
         print("Stop Listening Called")
   
     def check(self):
