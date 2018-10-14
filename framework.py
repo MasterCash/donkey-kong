@@ -10,6 +10,46 @@ import pygame
 import uuid
 from utils import AbstractMethod, DefaultMethod, Singleton
 
+class Image(object):
+    def __init__(self, sheet, x, y, width, height):
+        self.rect = pygame.Rect((x, y, width, height))
+        self._image = pygame.Surface(self.rect.size).convert()
+        self._image.blit(sheet, (0, 0), self.rect)
+        self._image.set_colorkey((0, 0, 0, 255)) # Set transparency
+
+    def flip(self):
+        """ Flips an image """
+        self._image = pygame.transform.flip(self._image, True, False)
+        self.rect = self._image.get_rect()
+        return self
+
+    @property
+    def image(self):
+        return self._image
+
+    @property
+    def width(self):
+        """ Width of the sprite """
+        return self.rect.size[0]
+
+    @property
+    def height(self):
+        """ Height of the sprite """
+        return self.rect.size[1]
+
+class SpriteSheet(object):
+    """ Used for loading sprites from a sprite sheet """
+    def __init__(self, filename):
+        self.sheet = pygame.image.load('assets/sprites/{0}_sheet.png'.format(filename)).convert()
+
+    def sprite(self, x, y, width, height):
+        """ Loads image from x, y, x+width, y+height """
+        return Image(self.sheet, x, y, width, height)
+
+    def spriteFlipped(self, x, y, width, height):
+        """ Returns a sprite, but flipped horizontally """
+        return self.sprite(x, y, width, height).flip()
+
 
 class GameSprite(pygame.sprite.Sprite):
     """ Sprite class that represents a sprite """
@@ -27,7 +67,7 @@ class GameSprite(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
-        screen.draw(self.image, self.x, self.y)
+        screen.draw(self, self.x, self.y)
 
     @DefaultMethod
     def getSprite(self):
@@ -45,7 +85,11 @@ class GameSprite(pygame.sprite.Sprite):
 
     @image.setter
     def image(self, img):
-        self._image = img
+        if isinstance(img, Image):
+            self._image = img.image
+        else:
+            self._image = img
+
         self.rect = self._image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
@@ -203,7 +247,10 @@ class Screen:
 
     def draw(self, sprite, x, y):
         """ Draws a sprite on the screen """
-        self._display.blit(sprite, (x, y))
+        if hasattr(sprite, 'image'):
+            self._display.blit(sprite.image, (x, y))
+        else:
+            self._display.blit(sprite, (x, y))
 
     def fill(self, color):
         """ Fills the screen with a color """

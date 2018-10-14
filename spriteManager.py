@@ -1,5 +1,5 @@
 import pygame
-from utils import Spritesheet
+from framework import SpriteSheet
 
 
 class SpriteManager:

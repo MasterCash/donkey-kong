@@ -29,7 +29,7 @@ class __InputManagerClass:
             self._keyFuncDict[key].remove(func)
         print("Stop Listening Called")
 
-    def check(self):
+    def handleInput(self):
         for key in self.keysPressed:
             self._keysQueued.append(key)
         for key in self._keysQueued:

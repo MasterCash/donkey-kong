@@ -2,8 +2,8 @@ import pygame
 import json
 from utils import Singleton
 from game import GameLevelManager
-from utils import Spritesheet
-from framework import GameSprite, SpriteGroup
+#from utils import SpriteSheet
+from framework import GameSprite, SpriteGroup, SpriteSheet
 
 class Platform(GameSprite):
     def __init__(self, x, y, sprite):
@@ -30,7 +30,7 @@ class LevelManager(GameLevelManager):
         self.platforms = SpriteGroup()
         self.ladders = SpriteGroup()
 
-        self._sheet = Spritesheet('level')
+        self._sheet = SpriteSheet('level')
         self._platform = self._sheet.sprite(0, 1, 32, 16)
         self._ladder = self._sheet.sprite(33, 1, 16, 8)
         self._invisbleLadder = self._sheet.sprite(50, 1, 16, 8)

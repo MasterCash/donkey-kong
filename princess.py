@@ -2,13 +2,13 @@
 Class for the princess
 """
 import pygame
-from utils import Spritesheet
-from framework import GameObject
+#from utils import SpriteSheet
+from framework import GameObject, SpriteSheet
 
 class Princess(GameObject):
     def __init__(self):
         super().__init__()
-        self._sheet = Spritesheet('princess')
+        self._sheet = SpriteSheet('princess')
 
         self._sprites = {
             'standing': self._sheet.sprite(0, 0, 30, 44),
