@@ -156,13 +156,7 @@ class LevelManager(GameLevelManager):
 
     def draw(self, screen): 
         """ Draw method just like other game sprites """
-        height = self._windowHeight
-        width = self._windowWidth
-        
         screen.fill((1, 1, 1)) # Background color
-        w = 32 # Sprite width
-        h = 16 # Sprite height
-        
         self.platforms.draw(screen)
         self.ladders.draw(screen)
     

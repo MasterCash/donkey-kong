@@ -13,7 +13,7 @@ from levelManager import LevelManager
 game = Game.GameManager()
 game.addPlayer(Mario())
 game.addObject(Princess())
-#game.addObject(Barrel())
+game.addObject(Barrel())
 game.addLevelManager(LevelManager())
 game.play()
 

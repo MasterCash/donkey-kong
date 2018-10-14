@@ -44,19 +44,22 @@ class GameManager:
     def addPlayer(self, player): 
         """ Adds a player to the game """ 
         self._players.add(player)
+        return self
 
     def addObject(self, obj): 
         """ Adds an object to the game """
         self._objects.add(obj)
+        return self
 
     def addLevelManager(self, obj): 
         """ Sets the thing used for generating levels """
         if not isinstance(obj, GameLevelManager):
-            return 
+            return self
         
         self._levelManager = obj
         self._levelManager.setWindowInformation(self._window.width, self._window.height)
-    
+        return self 
+
     def _handleEvents(self): 
         """ Handles events from PyGame """
         EventManager.handlePyGameEvents()
