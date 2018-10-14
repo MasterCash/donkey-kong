@@ -1,4 +1,3 @@
-import pygame
 import json
 from utils import Singleton
 from game import GameLevelManager

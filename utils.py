@@ -1,6 +1,3 @@
-import pygame
-from types import MethodType
-
 def AbstractMethod(method):
     """ Decorator for forcing children to implement a method """
     def default_abstract_method(*args, **kwargs):

@@ -1,21 +1,20 @@
 """
 Game Manager
 """
-import pygame
 import os
 import uuid
 from utils import AbstractMethod, DefaultMethod, Singleton
-from eventManager import Events, EventManager
+#from eventManager import Events, EventManager
 from inputManager import InputManager
 from collisionDetector import CollisionDetector, CollisionTypes
-from framework import SpriteGroup, Window, Clock, GameLevelManager
+from framework import SpriteGroup, Window, Clock, GameLevelManager, Events
 
 @Singleton
 class GameManager:
     """ Class to manage the state of the game """
     def __init__(self):
         self._window = Window(544, 600).setTitle('Donkey Kong').setIcon('assets/icon.png')
-        EventManager.subscribe(Events.QUIT, self._quit)
+        Events.subscribe(Events.QUIT, self._quit)
 
         self._objects = SpriteGroup()
         self._players = SpriteGroup()
@@ -66,7 +65,7 @@ class GameManager:
 
     def _handleEvents(self):
         """ Handles events from PyGame """
-        EventManager.handleEvents()
+        Events.handleEvents()
         InputManager.handleInput()
 
     def _update(self):

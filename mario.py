@@ -1,12 +1,8 @@
 """
 Class to control mario
 """
-import pygame
-#from utils import SpriteSheet
-from framework import SpriteSheet
-#from game import GameObject
 from spriteManager import SpriteManager
-from framework import GameObject, Clock
+from framework import GameObject, Clock, SpriteSheet, Keys
 from inputManager import InputManager
 from enum import Enum
 from collisionDetector import CollisionTypes, CollisionDirection
@@ -46,15 +42,17 @@ class Mario(GameObject):
             'run_left1',
             'run_left1'
         ])
+
         self.x = 300
         self.y = 300
         self.state = PlayerState.IDLE
         self._isAtLadder = False
 
         InputManager.subscribe(
-            [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_SPACE, pygame.K_DOWN],
+            [Keys.LEFT, Keys.RIGHT, Keys.DOWN, Keys.SPACE],
             self._marioKeyPress
         )
+
 
     def update(self):
 
@@ -97,16 +95,17 @@ class Mario(GameObject):
 
     def _marioKeyPress(self, key):
         def __str__(self):
-          return "MarioKeyPress"
-        if key == pygame.K_LEFT or key == pygame.K_a:
+            return "MarioKeyPress"
+
+        if key == Keys.LEFT or key == Keys.A:
             self.state = PlayerState.MOVELEFT
-        elif key == pygame.K_RIGHT or key == pygame.K_d:
+        elif key == Keys.RIGHT or key == Keys.D:
             self.state = PlayerState.MOVERIGHT
-        elif key == pygame.K_DOWN or key == pygame.K_s:
+        elif key == Keys.DOWN or key == Keys.S:
             print("key down")
             if self._isAtLadder:
                 self.state = PlayerState.LADDER
-        elif key is pygame.K_SPACE:
+        elif key is Keys.SPACE:
             print("Mario Jumped")
         else:
             print(key)

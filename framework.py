@@ -9,6 +9,8 @@ that everything else uses
 import pygame
 import uuid
 from utils import AbstractMethod, DefaultMethod, Singleton
+from enum import Enum
+
 
 class Image(object):
     def __init__(self, sheet, x, y, width, height):
@@ -143,6 +145,11 @@ class GameSprite(pygame.sprite.Sprite):
     def left(self, l):
         """ Sets where the left side of the sprite is """
         self.x = l
+
+
+def SpriteCollision(sprite, spriteGroup, kill=False):
+    """ Checks for collission between a sprite and a sprite group """
+    return pygame.sprite.spritecollide(sprite, spriteGroup, kill)
 
 
 class GameObject(GameSprite):
@@ -338,3 +345,76 @@ class __ClockClass:
         return self._delta
 
 Clock = __ClockClass() # Only instance of the clock class
+
+
+class Keys(Enum):
+    """ Enum wrapper for pygame keys """
+    LEFT = pygame.K_LEFT
+    RIGHT = pygame.K_RIGHT
+    DOWN = pygame.K_DOWN
+    SPACE = pygame.K_SPACE
+    W = pygame.K_w
+    A = pygame.K_a
+    S = pygame.K_s
+    D = pygame.K_d
+    Num_1 = pygame.K_1
+    Num_2 = pygame.K_2
+    Num_3 = pygame.K_3
+    Num_4 = pygame.K_4
+    Num_5 = pygame.K_5
+    Num_6 = pygame.K_6
+
+
+@Singleton
+class __EventManagerClass:
+    """ Handles events for the framework """
+    def __init__(self):
+        self._listeners = {}
+
+    def handleEvents(self):
+        """ Looks at pygame events and publishes them """
+        for event in pygame.event.get():
+            eventStr = self.__str(event.type)
+            if eventStr == self.QUIT:
+                self.publish(eventStr, None)
+            elif eventStr == self.KEYDOWN:
+                self.publish(eventStr, event.key)
+            elif eventStr == self.KEYUP:
+                self.publish(eventStr, event.key)
+
+    def subscribe(self, event, func):
+        """ Subscribes to event and executes func when event happens """
+        if event not in self._listeners:
+            self._listeners[event] = [func]
+        else:
+            self._listeners[event].append(func)
+
+    def publish(self, event, *data):
+        """ Dispatches an event and executes subscribers """
+        if event in self._listeners:
+            for func in self._listeners[event]:
+                func(*data)
+
+    def __str(self, k):
+        return "event_{0}".format(k)
+
+    """
+    Everything below this is an "Enum" value for this class
+    """
+    @property
+    def QUIT(self):
+        return self.__str(pygame.QUIT)
+
+    @property
+    def KEYDOWN(self):
+        return self.__str(pygame.KEYDOWN)
+
+    @property
+    def KEYUP(self):
+        return self.__str(pygame.KEYUP)
+
+    @property
+    def GAMEOVER(self):
+        return self.__str("GameOver")
+
+Events = __EventManagerClass()

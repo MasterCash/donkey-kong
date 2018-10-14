@@ -1,10 +1,9 @@
 """
 Class for managing and handling collisions
 """
-import pygame
 from utils import Singleton
 from enum import Enum
-from framework import SpriteGroup
+from framework import SpriteGroup, SpriteCollision
 
 class CollisionTypes(Enum):
     Ladder = 0
@@ -30,7 +29,7 @@ class __CollisionDetectorClass:
                 self.check(obj, objectGroup, collisionType)
             return
 
-        hits = pygame.sprite.spritecollide(obj1, objectGroup, False)
+        hits = SpriteCollision(obj1, objectGroup)
         for hit in hits:
             direction = self._detectDirection(obj1, hit)
             obj1.collision(collisionType, direction, hit)

@@ -1,7 +1,6 @@
 """
 Class for the princess
 """
-import pygame
 #from utils import SpriteSheet
 from framework import GameObject, SpriteSheet
 
