@@ -29,6 +29,7 @@ def AbstractMethod(method):
     default_abstract_method.__name__ = method.__name__    
     return default_abstract_method
 
+
 def DefaultMethod(method): 
     """ Decorator for a efault method that children can override (this does absolutely nothing by the way) """
     return method

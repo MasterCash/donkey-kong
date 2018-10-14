@@ -23,7 +23,6 @@ class GameManager:
 
         self._levelManager = None
 
-
     def play(self): 
         """ Main Game Loop """ 
         if self._levelManager is None: 

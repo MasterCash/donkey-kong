@@ -1,5 +1,5 @@
 """
-This is the file that should be ran when wanting to launch the game 
+This is the file that should be ran when wanting to launch the game
 """
 import pygame
 import os

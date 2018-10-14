@@ -16,19 +16,19 @@ class __InputManagerClass:
         self._keysQueued = deque()
         EventManager.subscribe(Events.KEYDOWN, self.addKey)
         EventManager.subscribe(Events.KEYUP, self.removeKey)
-        
+
     def subscribe(self, keys, func):
         for key in keys:
             if self._keyFuncDict.get(key, False) is False:
                 self._keyFuncDict[key] = [func]
             self._keyFuncDict[key].append(func)
         print("Listen For Called", key, str(func))
-    
+
     def unsubscribe(self, keys, func):
         for key in keys:
             self._keyFuncDict[key].remove(func)
         print("Stop Listening Called")
-  
+
     def check(self):
         for key in self.keysPressed:
             self._keysQueued.append(key)
