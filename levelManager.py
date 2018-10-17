@@ -66,7 +66,7 @@ class LevelManager(GameLevelManager):
                 lastY = y1
 
             # Invisble ladder hitbox on top of the platform
-            targetY = lastY - (int((3*h)/8) * 8) + h-2
+            targetY = lastY - (int((2.5*h)/8) * 8) + h-2
             for y1 in range(lastY - 6, targetY, -8):
                 self.ladders.add(Ladder(x, y1, self._invisbleLadder))
 

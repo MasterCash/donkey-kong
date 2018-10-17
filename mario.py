@@ -9,13 +9,14 @@ from collisionDetector import CollisionTypes, CollisionDirection
 
 class PlayerState(Enum):
     IDLE = 0
-    LADDER = 1
+    LADDER_DOWN = 1
     MOVELEFT = 2
     MOVERIGHT = 3
     JUMP = 4
     DEAD = 5
     ERROR = 6
     LADDER_IDLE = 7
+    LADDER_UP = 8
 
 
 movement = 100.0
@@ -30,7 +31,7 @@ class Mario(GameObject):
 
         self._sprites = {
             'stand_left': self._sheet.sprite(0, 20, 24, 32).flip(),
-            'run_left1': self._sheet.sprite(46, 20, 30, 32).flip(),
+            'run_left1': self._sheet.sprite(46, 20, 30, 32),
             'run_left2': self._sheet.sprite(94, 22, 30, 30).flip()
         }
 
@@ -49,7 +50,7 @@ class Mario(GameObject):
         self._isAtLadder = False
 
         InputManager.subscribe(
-            [Keys.LEFT, Keys.RIGHT, Keys.DOWN, Keys.SPACE],
+            [Keys.LEFT, Keys.RIGHT, Keys.DOWN, Keys.UP, Keys.SPACE],
             self._marioKeyPress
         )
 
@@ -59,7 +60,7 @@ class Mario(GameObject):
         """ Method used for updating state of a sprite/object """
         #self.x = self.x - 1
         if self._isAtLadder != True:
-            self.y = self.y + 1
+            self.y = self.y + 200 * Clock.timeDelta
 
         self._isAtLadder = False
 
@@ -69,8 +70,11 @@ class Mario(GameObject):
         elif self.state == PlayerState.MOVERIGHT:
             self.x += movement * Clock.timeDelta
             self.state = PlayerState.IDLE
-        elif self.state == PlayerState.LADDER:
+        elif self.state == PlayerState.LADDER_DOWN:
             self.y += movement * Clock.timeDelta
+            self.state = PlayerState.LADDER_IDLE
+        elif self.state == PlayerState.LADDER_UP:
+            self.y -= movement * Clock.timeDelta
             self.state = PlayerState.LADDER_IDLE
         elif self.state == PlayerState.LADDER_IDLE:
             pass
@@ -102,9 +106,11 @@ class Mario(GameObject):
         elif key == Keys.RIGHT or key == Keys.D:
             self.state = PlayerState.MOVERIGHT
         elif key == Keys.DOWN or key == Keys.S:
-            print("key down")
             if self._isAtLadder:
-                self.state = PlayerState.LADDER
+                self.state = PlayerState.LADDER_DOWN
+        elif key == Keys.UP:
+            if self._isAtLadder:
+                self.state = PlayerState.LADDER_UP
         elif key is Keys.SPACE:
             print("Mario Jumped")
         else:

@@ -352,6 +352,7 @@ class Keys(Enum):
     LEFT = pygame.K_LEFT
     RIGHT = pygame.K_RIGHT
     DOWN = pygame.K_DOWN
+    UP = pygame.K_UP
     SPACE = pygame.K_SPACE
     W = pygame.K_w
     A = pygame.K_a
