@@ -32,9 +32,11 @@ class Mario(GameObject):
             'stand_left': self._sheet.sprite(0, 20, 24, 32),
             'stand_right': self._sheet.sprite(0, 20, 24, 32).flip(),
             'run_left1': self._sheet.sprite(45, 20, 31, 32),
-            'run_left2': self._sheet.sprite(94, 22, 30, 31),
+            'run_left2': self._sheet.sprite(94, 21, 30, 32),
             'run_right1': self._sheet.sprite(45, 20, 31, 32).flip(),
-            'run_right2': self._sheet.sprite(94, 22, 30, 31).flip()
+            'run_right2': self._sheet.sprite(94, 21, 30, 32).flip(),
+            'ladder_up1': self._sheet.sprite(142, 20, 28, 32),
+            'ladder_up2': self._sheet.sprite(142, 20, 28, 32).flip()
         }
         self.spriteManager = SpriteManager(self._sprites)
         #self.spriteManager.addSprites(self._sprites)
@@ -42,7 +44,6 @@ class Mario(GameObject):
         self.spriteManager.useSprites([
             'stand_right'
         ], 10)
-
 
         self.x = 300
         self.y = 300
@@ -66,39 +67,41 @@ class Mario(GameObject):
             self.x -= movement * Clock.timeDelta
             self.state = PlayerState.IDLE
             self.spriteManager.useSprites([
-            'stand_left',
-            'run_left1',
-            'run_left2'
-        ], 10)
+                'run_left1',
+                'stand_left',
+                'run_left2'
+            ], 8)
         elif self.state == PlayerState.MOVERIGHT:
             self.x += movement * Clock.timeDelta
             self.state = PlayerState.IDLE
             self.spriteManager.useSprites([
-            'stand_right',
-            'run_right1',
-            'run_right2'
-        ], 10)
+                'run_right1',
+                'stand_right',
+                'run_right2'
+            ], 8)
         elif self.state == PlayerState.LADDER_DOWN:
             self.y += movement * Clock.timeDelta
             self.state = PlayerState.LADDER_IDLE
             self.spriteManager.useSprites([
-            'stand_right'
-        ], 10)
+                'ladder_up1',
+                'ladder_up2'
+            ], 10)
         elif self.state == PlayerState.LADDER_UP:
             self.y -= movement * Clock.timeDelta
             self.state = PlayerState.LADDER_IDLE
             self.spriteManager.useSprites([
-            'stand_right'
-        ], 10)
+                'ladder_up1',
+                'ladder_up2'
+            ], 10)
         elif self.state == PlayerState.LADDER_IDLE:
             self.spriteManager.useSprites([
-            'stand_right'
-        ], 10)
-            pass
+                'ladder_up1'
+            ], 10)
+
         else:
             self.state = PlayerState.IDLE
             #if self.spriteManager.currentAnimation == ['stand_left','run_left1','run_left2'] or self.spriteManager.currentAnimation == ['stand_left']:
-            if self.spriteManager.currentAnimation[0] == 'stand_left':
+            if 'stand_left' in self.spriteManager.currentAnimation:
                 self.spriteManager.useSprites(['stand_left'], 10)
             else:
                 self.spriteManager.useSprites(['stand_right'], 10)
@@ -129,7 +132,7 @@ class Mario(GameObject):
         def __str__(self):
             return "MarioKeyPress"
 
-        if (key == Keys.LEFT or key == Keys.A) and self.state != PlayerState.LADDER_IDLE:
+        if (key == Keys.LEFT or key == Keys.A) and self.state not in (PlayerState.LADDER_IDLE, PlayerState.LADDER_DOWN, PlayerState.LADDER_UP):
             self.state = PlayerState.MOVELEFT
         elif (key == Keys.RIGHT or key == Keys.D) and self.state != PlayerState.LADDER_IDLE:
             self.state = PlayerState.MOVERIGHT
