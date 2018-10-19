@@ -108,12 +108,12 @@ class GameSprite(pygame.sprite.Sprite):
     @property
     def top(self):
         """ Top of the sprite """
-        return self.x
+        return self.y
 
     @top.setter
     def top(self, t):
         """ Sets where the top side of the sprite is """
-        self.x = t
+        self.y = t
 
     @property
     def bottom(self):

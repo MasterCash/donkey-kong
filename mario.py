@@ -31,10 +31,10 @@ class Mario(GameObject):
         self._sprites = {
             'stand_left': self._sheet.sprite(0, 20, 24, 32),
             'stand_right': self._sheet.sprite(0, 20, 24, 32).flip(),
-            'run_left1': self._sheet.sprite(46, 20, 30, 32),
-            'run_left2': self._sheet.sprite(94, 22, 30, 30),
-            'run_right1': self._sheet.sprite(46, 20, 30, 32).flip(),
-            'run_right2': self._sheet.sprite(94, 22, 30, 30).flip()
+            'run_left1': self._sheet.sprite(45, 20, 31, 32),
+            'run_left2': self._sheet.sprite(94, 22, 30, 31),
+            'run_right1': self._sheet.sprite(45, 20, 31, 32).flip(),
+            'run_right2': self._sheet.sprite(94, 22, 30, 31).flip()
         }
         self.spriteManager = SpriteManager(self._sprites)
         #self.spriteManager.addSprites(self._sprites)
@@ -117,14 +117,12 @@ class Mario(GameObject):
 
         elif collisionType == CollisionTypes.Platform:
             if self._isAtLadder == False:
-                self.y = obj.y - self.height + 1
+                self.bottom = obj.top + 1
 
         elif collisionType == CollisionTypes.Immovable:
-            print(obj.__class__.__name__)
-            name = obj.__class__.__name__
-            if name == "Platform":
-                self.bottom = obj.y
-                self.state = PlayerState.IDLE
+            self.state = PlayerState.IDLE
+            if not obj.isTopOfLadder:
+                self.bottom = obj.top
 
 
     def _marioKeyPress(self, key):

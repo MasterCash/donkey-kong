@@ -19,6 +19,21 @@ class Ladder(GameSprite):
         self.y = y
         self.image = sprite
 
+class InvisiblePlatform(GameSprite):
+    def __init__(self, x, y, sprite, isTopOfLadder = False):
+        super().__init__()
+        self.x = x
+        self.y = y
+        self.image = sprite
+        self.isTopOfLadder = isTopOfLadder
+
+class InvisibleLadder(GameSprite):
+    def __init__(self, x, y, sprite):
+        super().__init__()
+        self.x = x
+        self.y = y
+        self.image = sprite
+
 
 @Singleton
 class LevelManager(GameLevelManager):
@@ -33,9 +48,8 @@ class LevelManager(GameLevelManager):
         self._sheet = SpriteSheet('level')
         self._platform = self._sheet.sprite(0, 1, 32, 16)
         self._ladder = self._sheet.sprite(33, 1, 16, 8)
-        self._invisbleLadder = self._sheet.sprite(50, 1, 16, 8)
-        self._immovablePlatform = self._sheet.sprite(0, 18, 32, 16)
-        self._marioLadderBlock = self._sheet.sprite(38, 13, 1, 8)
+        self._invisibleLadder = self._sheet.sprite(50, 1, 16, 8)
+        self._invisiblePlatform = self._sheet.sprite(0, 18, 32, 16)
 
         # Read levels from the levels file
         with open('assets/levels.json', 'r') as f:
@@ -64,19 +78,17 @@ class LevelManager(GameLevelManager):
         def drawLadder(x, y):
             targetY = y - (int((4*h)/8) * 8) + h-2
             lastY = 0
-            ladderNumber = 1
-            self.immovables.add(Platform(x, y+3, self._immovablePlatform))
+            self.immovables.add(InvisiblePlatform(x, y-1, self._invisiblePlatform)) # Invisible platform on bottom of ladder
             for y1 in range(y-6, targetY, -8):
                 self.ladders.add(Ladder(x, y1, self._ladder))
-                #if ladderNumber >= 2:
-                #    self.immovables.add(Ladder(x-2, y1, self._marioLadderBlock))
-                ladderNumber = ladderNumber + 1
                 lastY = y1
 
-            # Invisble ladder hitbox on top of the platform
+            # Invisible ladder hitbox on top of the platform
             targetY = lastY - (int((2.5*h)/8) * 8) + h-2
             for y1 in range(lastY - 6, targetY, -8):
-                self.ladders.add(Ladder(x, y1, self._invisbleLadder))
+                self.ladders.add(InvisibleLadder(x, y1, self._ladder))
+
+            self.immovables.add(InvisiblePlatform(x, targetY - 40, self._invisiblePlatform, True)) # Invisible platform on top of the ladder
 
         def drawLtoRPlatform(y):
             lastX = 0
@@ -87,7 +99,7 @@ class LevelManager(GameLevelManager):
 
             # Add ladder to next platform
             x = lastX - 2*w
-            drawLadder(x, y)
+            drawLadder(x, y+3)
             return y
 
         def drawRtoLPlatform(y):
@@ -99,7 +111,7 @@ class LevelManager(GameLevelManager):
 
             # Add ladder to next platform
             x = lastX + 1.5*w
-            drawLadder(x, y)
+            drawLadder(x, y+3)
             return y
 
         # Flat section of first platform
