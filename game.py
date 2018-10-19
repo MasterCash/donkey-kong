@@ -79,6 +79,7 @@ class GameManager:
         """ Checks for collisions """
         CollisionDetector.check(self._players, self._levelManager.ladders, CollisionTypes.Ladder)
         CollisionDetector.check(self._players, self._levelManager.platforms, CollisionTypes.Platform)
+        CollisionDetector.check(self._players, self._levelManager.immovables, CollisionTypes.Immovable)
         CollisionDetector.check(self._players, self._enemies, CollisionTypes.Enemy)
 
     def _draw(self):

@@ -9,6 +9,7 @@ class CollisionTypes(Enum):
     Ladder = 0
     Platform = 1
     Enemy = 2
+    Immovable = 3
 
 class CollisionDirection(Enum):
     Left = 0
