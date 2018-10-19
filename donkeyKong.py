@@ -1,6 +1,7 @@
 from framework import GameObject, Clock, SpriteSheet, Keys
 from inputManager import InputManager
 from spriteManager import SpriteManager
+from barrelSpawner import BarrelSpawner
 
 roll_standard_barrel = ['get_barrel', 'holding_standard', 'roll_barrel']
 
@@ -8,6 +9,8 @@ class DonkeyKong(GameObject):
     """ Controls animations for Donkey Kong """
     def __init__(self):
         super().__init__()
+
+        self._spawner = BarrelSpawner()
 
         self._sheet = SpriteSheet('donkey_kong')
         self._sprites = {
@@ -41,6 +44,7 @@ class DonkeyKong(GameObject):
             if self.ticks == 189:
                 self.ticks = -90
                 self._spriteManager.useSprites(['standing'], 10)
+                self._spawner.spawnStandardBarrel()
 
 
     def getSprite(self):
