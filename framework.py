@@ -12,6 +12,24 @@ from utils import AbstractMethod, DefaultMethod, Singleton
 from enum import Enum
 
 
+class Text(object):
+    def __init__(self, text, fontFamily='Courier New', fontSize=20, color=(255, 255, 255)):
+        self._text = str(text)
+        self._color = color
+        self._font = pygame.font.SysFont(fontFamily, fontSize)
+
+    @property
+    def text(self):
+        return self._text
+
+    def setText(self, text):
+        self._text = str(text)
+
+    @property
+    def image(self):
+        return self._font.render(self._text, False, self._color)
+
+
 class Image(object):
     def __init__(self, sheet, x, y, width, height):
         self.rect = pygame.Rect((x, y, width, height))

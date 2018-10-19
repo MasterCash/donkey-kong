@@ -1,7 +1,9 @@
-from framework import GameObject, Clock, SpriteSheet, Keys
+from framework import GameObject, Clock, SpriteSheet, Keys, Text
 from inputManager import InputManager
 from spriteManager import SpriteManager
 from barrelSpawner import BarrelSpawner
+import random
+import pygame
 
 roll_standard_barrel = ['get_barrel', 'holding_standard', 'roll_barrel']
 
@@ -33,9 +35,12 @@ class DonkeyKong(GameObject):
         self.y = 120
         self.ticks = -90
 
+        # Variables related to spawning barrels
         self._isRollingBarrel = False
         self._rollBarrelType = 0
         self._rollStartTickCount = 0
+        self._barrelSpawnTimer = 0
+        self._countdownTimer = Text('0')
 
         InputManager.subscribe(
             [Keys.Num_1, Keys.Num_2, Keys.Num_3, Keys.Num_4],
@@ -45,6 +50,8 @@ class DonkeyKong(GameObject):
     def update(self):
         self._spriteManager.animate()
         self.ticks = self.ticks + 1
+        if self._barrelSpawnTimer != 0:
+            self._barrelSpawnTimer = self._barrelSpawnTimer - 1
 
         if self._isRollingBarrel:
             # Wait until 40 ticks happen to roll the barrel
@@ -66,7 +73,7 @@ class DonkeyKong(GameObject):
 
     def _keyPress(self, key):
         """ Handle Donkey Kong key press """
-        if self._isRollingBarrel:
+        if self._isRollingBarrel or self._barrelSpawnTimer != 0:
             return
 
         self._isRollingBarrel = True
@@ -91,6 +98,11 @@ class DonkeyKong(GameObject):
 
     def _spawnBarrel(self):
         """ Spawns the correct barrel """
+        if self._barrelSpawnTimer != 0:
+            return
+
+        self._barrelSpawnTimer = random.randint(60, 120) # New random barrel spawn timer
+
         if self._rollBarrelType == 1:
             self._spawner.spawnStandardBarrel()
 
@@ -101,3 +113,8 @@ class DonkeyKong(GameObject):
     def drawExtra(self, screen):
         """ Draw the barrell stack """
         screen.draw(self.__barrelStack, 0, 120)
+
+        # Display timer if counting down
+        if self._barrelSpawnTimer != 0:
+            self._countdownTimer.setText(self._barrelSpawnTimer)
+            screen.draw(self._countdownTimer, 5, 93)
