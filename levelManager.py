@@ -28,11 +28,13 @@ class LevelManager(GameLevelManager):
 
         self.platforms = SpriteGroup()
         self.ladders = SpriteGroup()
+        self.immovables = SpriteGroup()
 
         self._sheet = SpriteSheet('level')
         self._platform = self._sheet.sprite(0, 1, 32, 16)
         self._ladder = self._sheet.sprite(33, 1, 16, 8)
         self._invisbleLadder = self._sheet.sprite(50, 1, 16, 8)
+        self._immovablePlatform = self._sheet.sprite(0, 18, 32, 16)
 
         # Read levels from the levels file
         with open('assets/levels.json', 'r') as f:
@@ -61,6 +63,7 @@ class LevelManager(GameLevelManager):
         def drawLadder(x, y):
             targetY = y - (int((4*h)/8) * 8) + h-2
             lastY = 0
+            self.immovables.add(Platform(x,  y+5, self._immovablePlatform))
             for y1 in range(y-6, targetY, -8):
                 self.ladders.add(Ladder(x, y1, self._ladder))
                 lastY = y1
@@ -152,6 +155,7 @@ class LevelManager(GameLevelManager):
         screen.fill((1, 1, 1)) # Background color
         self.platforms.draw(screen)
         self.ladders.draw(screen)
+        self.immovables.draw(screen)
 
     def advanceLevel(self):
         """ Moves to the next level """

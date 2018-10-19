@@ -43,7 +43,7 @@ class Mario(GameObject):
             'stand_right'
         ], 10)
 
-        
+
         self.x = 300
         self.y = 300
         self.state = PlayerState.IDLE
@@ -100,13 +100,13 @@ class Mario(GameObject):
         else:
             self.state = PlayerState.IDLE
             #if self.spriteManager.currentAnimation == ['stand_left','run_left1','run_left2'] or self.spriteManager.currentAnimation == ['stand_left']:
-            if self.spriteManager.currentAnimation[0] == 'stand_left':   
+            if self.spriteManager.currentAnimation[0] == 'stand_left':
                 self.spriteManager.useSprites(['stand_left'], 10)
             else:
                 self.spriteManager.useSprites(['stand_right'], 10)
 
         self.spriteManager.animate()
-    
+
 
     def collision(self, collisionType, direction, obj):
         """ Mario collided with something """
@@ -120,6 +120,9 @@ class Mario(GameObject):
         elif collisionType == CollisionTypes.Platform:
             if self._isAtLadder == False:
                 self.y = obj.y - self.height + 1
+
+        elif collisionType == CollisionTypes.Immovable:
+            self.bottom = obj.y
 
 
     def _marioKeyPress(self, key):
