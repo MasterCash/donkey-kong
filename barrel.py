@@ -9,7 +9,6 @@ from spriteManager import SpriteManager
 class Barrel(GameObject):
     def __init__(self):
         GameObject.__init__(self)
-        self.spriteManager = SpriteManager()
 
         self._sheet = SpriteSheet('barrel')
 
@@ -18,12 +17,13 @@ class Barrel(GameObject):
             'fall_2': self._sheet.sprite(340, 0, 40, 20)
         }#I current do not have access to any image software so I can't measure anything
          #so sprites are technically pretty close to accurate but idk
-        self.spriteManager.addSprites(self._sprites)
-        # self._currentSprite = self._sprites['run_left2']
+        #self.spriteManager.addSprites(self._sprites)
+        self.spriteManager = SpriteManager(self._sprites)
+
         self.spriteManager.useSprites([
             'fall_1',
             'fall_2'
-        ])
+        ], 10)
         self.x = 200
         self.y = 100
 
@@ -32,7 +32,7 @@ class Barrel(GameObject):
         """ Method used for updating state of a sprite/object """
         #self.x = self.x - 1
         self.y = self.y + 1
-        self.spriteManager.animate(10)
+        self.spriteManager.animate()
 
     def collisionCheck(self, otherObj):
         """ Checks for collision with another spirte """
