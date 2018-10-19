@@ -35,6 +35,7 @@ class LevelManager(GameLevelManager):
         self._ladder = self._sheet.sprite(33, 1, 16, 8)
         self._invisbleLadder = self._sheet.sprite(50, 1, 16, 8)
         self._immovablePlatform = self._sheet.sprite(0, 18, 32, 16)
+        self._marioLadderBlock = self._sheet.sprite(38, 13, 1, 8)
 
         # Read levels from the levels file
         with open('assets/levels.json', 'r') as f:
@@ -63,9 +64,13 @@ class LevelManager(GameLevelManager):
         def drawLadder(x, y):
             targetY = y - (int((4*h)/8) * 8) + h-2
             lastY = 0
-            self.immovables.add(Platform(x,  y+5, self._immovablePlatform))
+            ladderNumber = 1
+            self.immovables.add(Platform(x, y+3, self._immovablePlatform))
             for y1 in range(y-6, targetY, -8):
                 self.ladders.add(Ladder(x, y1, self._ladder))
+                #if ladderNumber >= 2:
+                #    self.immovables.add(Ladder(x-2, y1, self._marioLadderBlock))
+                ladderNumber = ladderNumber + 1
                 lastY = y1
 
             # Invisble ladder hitbox on top of the platform

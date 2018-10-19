@@ -56,11 +56,9 @@ class Mario(GameObject):
 
 
     def update(self):
-
         """ Method used for updating state of a sprite/object """
-        #self.x = self.x - 1
         if self._isAtLadder != True:
-            self.y = self.y + 200 * Clock.timeDelta
+            self.y = self.y + (movement * 2) * Clock.timeDelta # Gravity
 
         self._isAtLadder = False
 
@@ -122,16 +120,20 @@ class Mario(GameObject):
                 self.y = obj.y - self.height + 1
 
         elif collisionType == CollisionTypes.Immovable:
-            self.bottom = obj.y
+            print(obj.__class__.__name__)
+            name = obj.__class__.__name__
+            if name == "Platform":
+                self.bottom = obj.y
+                self.state = PlayerState.IDLE
 
 
     def _marioKeyPress(self, key):
         def __str__(self):
             return "MarioKeyPress"
 
-        if key == Keys.LEFT or key == Keys.A:
+        if (key == Keys.LEFT or key == Keys.A) and self.state != PlayerState.LADDER_IDLE:
             self.state = PlayerState.MOVELEFT
-        elif key == Keys.RIGHT or key == Keys.D:
+        elif (key == Keys.RIGHT or key == Keys.D) and self.state != PlayerState.LADDER_IDLE:
             self.state = PlayerState.MOVERIGHT
         elif key == Keys.DOWN or key == Keys.S:
             if self._isAtLadder:
