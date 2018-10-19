@@ -1,12 +1,12 @@
 #################
 # Input Manager #
 #################
-import pygame
 import queue
 #from enums import PlayerState
 from utils import Singleton
-from eventManager import Events, EventManager
+#from eventManager import Events, EventManager
 from collections import deque
+from framework import Keys, Events
 
 @Singleton
 class __InputManagerClass:
@@ -14,28 +14,30 @@ class __InputManagerClass:
         self._keyFuncDict = {}
         self.keysPressed = []
         self._keysQueued = deque()
-        EventManager.subscribe(Events.KEYDOWN, self.addKey)
-        EventManager.subscribe(Events.KEYUP, self.removeKey)
-        
+        Events.subscribe(Events.KEYDOWN, self.addKey)
+        Events.subscribe(Events.KEYUP, self.removeKey)
+
     def subscribe(self, keys, func):
-        for key in keys:
+        for keyEnum in keys:
+            key = keyEnum.value
             if self._keyFuncDict.get(key, False) is False:
                 self._keyFuncDict[key] = [func]
             self._keyFuncDict[key].append(func)
         print("Listen For Called", key, str(func))
-    
+
     def unsubscribe(self, keys, func):
         for key in keys:
             self._keyFuncDict[key].remove(func)
         print("Stop Listening Called")
-  
-    def check(self):
+
+    def handleInput(self):
         for key in self.keysPressed:
             self._keysQueued.append(key)
+
         for key in self._keysQueued:
             if key in self._keyFuncDict:
                 for func in self._keyFuncDict[key]:
-                    func(key)
+                    func(Keys(key)) # Convert the value back to an enum with Keys(#)
         self._keysQueued.clear()
 
     def addKey(self, key):
