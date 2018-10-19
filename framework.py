@@ -350,10 +350,12 @@ class __ClockClass:
     def __init__(self):
         self._clock = pygame.time.Clock()
         self._delta = 0.0
+        self.fps = 60
 
     def forceFPS(self, fps):
         """ Forces a certain FPS """
-        t = self._clock.tick(fps)
+        self.fps = fps
+        t = self._clock.tick(self.fps)
         self._delta = t / 1000.0
 
     @property

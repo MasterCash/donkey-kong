@@ -116,5 +116,5 @@ class DonkeyKong(GameObject):
 
         # Display timer if counting down
         if self._barrelSpawnTimer != 0:
-            self._countdownTimer.setText(self._barrelSpawnTimer)
-            screen.draw(self._countdownTimer, 5, 93)
+            self._countdownTimer.setText('%1.1f' % (self._barrelSpawnTimer / Clock.fps))
+            screen.draw(self._countdownTimer, 2, 93)
