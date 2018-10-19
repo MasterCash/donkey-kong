@@ -3,13 +3,13 @@ from framework import SpriteSheet
 
 class SpriteManager:
     """ Used for animating sprites on a thingy """
-    #makes the sprites in sheet 
+    #makes the sprites in sheet
     def __init__(self, sprites):
         self._sprites = sprites
         self.currentAnimation = []
         return
     #converts the dictionary to an ordered array based on animation var
-    def useSprites(self, animation, tick):
+    def useSprites(self, animation, tick = 10):
         if self.currentAnimation == animation:
             return
         self.currentAnimation = animation
@@ -30,7 +30,7 @@ class SpriteManager:
         #Animates every 'tick' frames, use 1 to animate every frame, higher values update less often
         self._counter += 1
         if self._counter == self._tick:
-            
+
             #increments to the next frame of movement in current animation
             if self._location == len(self._spriteArray) - 1:
                 self._currentSprite = self._spriteArray[0]
@@ -38,7 +38,7 @@ class SpriteManager:
             else:
                 self._currentSprite = self._spriteArray[self._location+1]
                 self._location += 1
-            
+
             self._counter = 0
         else:
             pass

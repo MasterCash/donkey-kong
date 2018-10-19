@@ -33,18 +33,66 @@ class DonkeyKong(GameObject):
         self.y = 120
         self.ticks = -90
 
-        self.isRollingBarrel = False
+        self._isRollingBarrel = False
+        self._rollBarrelType = 0
+        self._rollStartTickCount = 0
+
+        InputManager.subscribe(
+            [Keys.Num_1, Keys.Num_2, Keys.Num_3, Keys.Num_4],
+            self._keyPress
+        )
 
     def update(self):
         self._spriteManager.animate()
-
         self.ticks = self.ticks + 1
-        if self.ticks > 90 and self.ticks < 190:
+
+        if self._isRollingBarrel:
+            # Wait until 40 ticks happen to roll the barrel
+            if self.ticks == 40 :
+                self._spawnBarrel()
+            elif self.ticks == 50:
+                # Stop rolling animation
+                self._isRollingBarrel = False
+                self._spriteManager.useSprites(['standing'])
+                self.ticks = 0
+
+        elif self.ticks > 90 and self.ticks < 190:
+            # Occasionally scream
             self._spriteManager.useSprites(['angry1', 'angry2'], 10)
             if self.ticks == 189:
                 self.ticks = -90
                 self._spriteManager.useSprites(['standing'], 10)
-                self._spawner.spawnStandardBarrel()
+
+
+    def _keyPress(self, key):
+        """ Handle Donkey Kong key press """
+        if self._isRollingBarrel:
+            return
+
+        self._isRollingBarrel = True
+        self.ticks = 0
+
+        animation = ['get_barrel', 'standing', 'roll_barrel']
+
+        if key == Keys.Num_1:
+            self._rollBarrelType = 1
+            animation[1] = 'holding_standard'
+        elif key == Keys.Num_2:
+            self._rollBarrelType = 2
+            animation[1] = 'holding_blue'
+        elif key == Keys.Num_3:
+            self._rollBarrelType = 3
+            animation[1] = 'holding_explosive'
+        elif key == Keys.Num_4:
+            self._rollBarrelType = 4
+            animation[1] = 'holding_other'
+
+        self._spriteManager.useSprites(animation, 20)
+
+    def _spawnBarrel(self):
+        """ Spawns the correct barrel """
+        if self._rollBarrelType == 1:
+            self._spawner.spawnStandardBarrel()
 
 
     def getSprite(self):
