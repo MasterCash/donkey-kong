@@ -38,6 +38,7 @@ class Mario(GameObject):
             'ladder_up1': self._sheet.sprite(142, 20, 28, 32),
             'ladder_up2': self._sheet.sprite(142, 20, 28, 32).flip()
         }
+
         self.spriteManager = SpriteManager(self._sprites)
         #self.spriteManager.addSprites(self._sprites)
 
