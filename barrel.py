@@ -8,6 +8,12 @@ from spriteManager import SpriteManager
 from enum import Enum
 
 class BarrelType(Enum):
+import pygame
+
+from game import GameObject
+from utils import Spritesheet
+
+class BarrelType(enum):
     NORMAL = 0
     EXPLOSIVE = 1
     OIL = 2
