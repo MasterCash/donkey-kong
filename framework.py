@@ -15,9 +15,8 @@ from enum import Enum
 class Image(object):
     def __init__(self, sheet, x, y, width, height):
         self.rect = pygame.Rect((x, y, width, height))
-        self._image = pygame.Surface(self.rect.size).convert()
+        self._image = pygame.Surface(self.rect.size, pygame.SRCALPHA)
         self._image.blit(sheet, (0, 0), self.rect)
-        self._image.set_colorkey((0, 0, 0, 255)) # Set transparency
 
     def flip(self):
         """ Flips an image """
@@ -42,7 +41,7 @@ class Image(object):
 class SpriteSheet(object):
     """ Used for loading sprites from a sprite sheet """
     def __init__(self, filename):
-        self.sheet = pygame.image.load('assets/sprites/{0}_sheet.png'.format(filename)).convert()
+        self.sheet = pygame.image.load('assets/sprites/{0}_sheet.png'.format(filename))
 
     def sprite(self, x, y, width, height):
         """ Loads image from x, y, x+width, y+height """
