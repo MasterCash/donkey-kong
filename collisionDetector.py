@@ -11,6 +11,10 @@ class CollisionTypes(Enum):
     Enemy = 2
     Immovable = 3
 
+class CollectionTypes(Enum):
+    Player = 0
+    Enemy = 1
+
 class CollisionDirection(Enum):
     Left = 0
     Right = 1
@@ -38,11 +42,11 @@ class __CollisionDetectorClass:
             direction = self._detectDirection(obj1, hit)
             obj1.collision(collisionType, direction, hit)
 
-    def checkCollection(self, collectible, objectGroup):
+    def checkCollection(self, collectible, objectGroup, collectionType):
         """ Check if a collectible was collected """
         if isinstance(collectible, SpriteGroup):
             for collectibleItem in collectible:
-                self.checkCollection(collectibleItem, objectGroup)
+                self.checkCollection(collectibleItem, objectGroup, collectionType)
             return
 
         if not isinstance(collectible, GameCollectible):
@@ -51,8 +55,8 @@ class __CollisionDetectorClass:
         hits = SpriteCollision(collectible, objectGroup)
         for hit in hits:
             if isinstance(hit, GameObject):
-                collectible.onCollect(hit, hit.__class__.__name__.lower())
-                hit.collectedItem(collectible, collectible.__class__.__name__.lower())
+                collectible.onCollect(hit, collectionType)
+                hit.collectedItem(collectible, collectionType)
 
 
     def _detectDirection(self, obj1, obj2):

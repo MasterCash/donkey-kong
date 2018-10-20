@@ -25,9 +25,8 @@ class FlamingOilContainer(GameCollectible):
         self.x = 10
         self.y = 504
 
-
-    def onCollect(self, collectedBy, name):
-        print("Collected by {0}".format(name))
+    def onCollect(self, collectedBy, collectionType):
+        print("Collected by {0}".format(collectionType))
 
     def getSprite(self):
         """ Gets the latest sprite """

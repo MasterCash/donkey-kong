@@ -5,7 +5,7 @@ import os
 import uuid
 from utils import AbstractMethod, DefaultMethod, Singleton
 from inputManager import InputManager
-from collisionDetector import CollisionDetector, CollisionTypes
+from collisionDetector import CollisionDetector, CollisionTypes, CollectionTypes
 from framework import SpriteGroup, Window, Clock, GameLevelManager, Events, Sound, GameCollectible
 
 @Singleton
@@ -94,8 +94,8 @@ class GameManager:
         CollisionDetector.check(self._players, self._levelManager.immovables, CollisionTypes.Immovable)
         CollisionDetector.check(self._players, self._enemies, CollisionTypes.Enemy)
 
-        CollisionDetector.checkCollection(self._collectibles, self._players)
-        CollisionDetector.checkCollection(self._collectibles, self._enemies)
+        CollisionDetector.checkCollection(self._collectibles, self._players, CollectionTypes.Player)
+        CollisionDetector.checkCollection(self._collectibles, self._enemies, CollectionTypes.Enemy)
 
     def _draw(self):
         """ Draws everything on the window """
