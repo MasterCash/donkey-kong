@@ -1,7 +1,7 @@
 import json
 from utils import Singleton
 from game import GameLevelManager
-#from utils import SpriteSheet
+from spriteManager import SpriteManager
 from framework import GameSprite, SpriteGroup, SpriteSheet
 
 class Platform(GameSprite):
@@ -50,6 +50,16 @@ class LevelManager(GameLevelManager):
         self._ladder = self._sheet.sprite(33, 1, 16, 8)
         self._invisibleLadder = self._sheet.sprite(50, 1, 16, 8)
         self._invisiblePlatform = self._sheet.sprite(0, 18, 16, 8)
+
+        # Sprite Manager for the flaming barrel
+        self._flamingBarrel = SpriteManager({
+            'flame1': self._sheet.sprite(0, 42, 32, 64),
+            'flame2': self._sheet.sprite(48, 42, 32, 64),
+            'flame3': self._sheet.sprite(96, 42, 32, 64),
+            'flame4': self._sheet.sprite(144, 42, 32, 64),
+            'no_flame': self._sheet.sprite(192, 42, 32, 64)
+        })
+        self._flamingBarrel.useSprites(['flame1', 'flame2', 'flame3', 'flame4'])
 
         # Read levels from the levels file
         with open('assets/levels.json', 'r') as f:
@@ -173,6 +183,7 @@ class LevelManager(GameLevelManager):
         self.platforms.draw(screen)
         self.ladders.draw(screen)
         self.immovables.draw(screen)
+        screen.draw(self._flamingBarrel.animate(), 32, 100)
 
     def advanceLevel(self):
         """ Moves to the next level """
