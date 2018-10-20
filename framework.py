@@ -12,6 +12,23 @@ from utils import AbstractMethod, DefaultMethod, Singleton
 from enum import Enum
 
 
+class Sound(object):
+    def __init__(self, file):
+        self._file = 'assets/sounds/{0}.wav'.format(file)
+        self._sound = pygame.mixer.Sound(self._file)
+
+    def play(self):
+        self._sound.play(0)
+
+    def playNTimes(self, n):
+        self._sound.play(n)
+
+    def loop(self):
+        self._sound.play(-1)
+
+    def stop(self):
+        self._sound.stop()
+
 class Text(object):
     def __init__(self, text, fontFamily='Courier New', fontSize=20, color=(255, 255, 255)):
         self._text = str(text)

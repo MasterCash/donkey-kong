@@ -7,7 +7,7 @@ from utils import AbstractMethod, DefaultMethod, Singleton
 #from eventManager import Events, EventManager
 from inputManager import InputManager
 from collisionDetector import CollisionDetector, CollisionTypes
-from framework import SpriteGroup, Window, Clock, GameLevelManager, Events
+from framework import SpriteGroup, Window, Clock, GameLevelManager, Events, Sound
 
 @Singleton
 class GameManager:
@@ -21,6 +21,9 @@ class GameManager:
         self._enemies = SpriteGroup()
 
         self._levelManager = None
+
+        self._backgroundMusic = Sound('background')
+        self._backgroundMusic.loop()
 
     def play(self):
         """ Main Game Loop """

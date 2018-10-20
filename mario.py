@@ -2,7 +2,7 @@
 Class to control mario
 """
 from spriteManager import SpriteManager
-from framework import GameObject, Clock, SpriteSheet, Keys
+from framework import GameObject, Clock, SpriteSheet, Keys, Sound
 from inputManager import InputManager
 from enum import Enum
 from collisionDetector import CollisionTypes, CollisionDirection
@@ -56,6 +56,7 @@ class Mario(GameObject):
             self._marioKeyPress
         )
 
+        self._walkingSound = Sound('walking')
 
     def update(self):
         """ Method used for updating state of a sprite/object """
@@ -72,6 +73,7 @@ class Mario(GameObject):
                 'stand_left',
                 'run_left2'
             ], 8)
+            self._walkingSound.play()
         elif self.state == PlayerState.MOVERIGHT:
             self.x += movement * Clock.timeDelta
             self.state = PlayerState.IDLE
@@ -80,6 +82,7 @@ class Mario(GameObject):
                 'stand_right',
                 'run_right2'
             ], 8)
+            self._walkingSound.play()
         elif self.state == PlayerState.LADDER_DOWN:
             self.y += movement * Clock.timeDelta
             self.state = PlayerState.LADDER_IDLE
@@ -101,11 +104,12 @@ class Mario(GameObject):
 
         else:
             self.state = PlayerState.IDLE
-            #if self.spriteManager.currentAnimation == ['stand_left','run_left1','run_left2'] or self.spriteManager.currentAnimation == ['stand_left']:
             if 'stand_left' in self.spriteManager.currentAnimation:
                 self.spriteManager.useSprites(['stand_left'], 10)
             else:
                 self.spriteManager.useSprites(['stand_right'], 10)
+
+            self._walkingSound.stop()
 
         self.spriteManager.animate()
 
