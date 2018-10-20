@@ -3,7 +3,7 @@ Class for managing and handling collisions
 """
 from utils import Singleton
 from enum import Enum
-from framework import SpriteGroup, SpriteCollision
+from framework import SpriteGroup, SpriteCollision, GameCollectible, GameObject
 
 class CollisionTypes(Enum):
     Ladder = 0
@@ -30,10 +30,30 @@ class __CollisionDetectorClass:
                 self.check(obj, objectGroup, collisionType)
             return
 
+        if not isinstance(obj1, GameObject):
+            return
+
         hits = SpriteCollision(obj1, objectGroup)
         for hit in hits:
             direction = self._detectDirection(obj1, hit)
             obj1.collision(collisionType, direction, hit)
+
+    def checkCollection(self, collectible, objectGroup):
+        """ Check if a collectible was collected """
+        if isinstance(collectible, SpriteGroup):
+            for collectibleItem in collectible:
+                self.checkCollection(collectibleItem, objectGroup)
+            return
+
+        if not isinstance(collectible, GameCollectible):
+            return
+
+        hits = SpriteCollision(collectible, objectGroup)
+        for hit in hits:
+            if isinstance(hit, GameObject):
+                collectible.onCollect(hit, hit.__class__.__name__.lower())
+                hit.collectedItem(collectible, collectible.__class__.__name__.lower())
+
 
     def _detectDirection(self, obj1, obj2):
         """ Gets the direction of the collision """

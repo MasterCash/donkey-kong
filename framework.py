@@ -191,9 +191,14 @@ class GameObject(GameSprite):
     def __init__(self):
         super().__init__()
         self.__id = uuid.uuid4() # Something to uniquely identify every game object
+        self.__ableToCollect = []
 
-    @AbstractMethod
+    @DefaultMethod
     def update(self):
+        pass
+
+    @DefaultMethod
+    def collectedItem(self, item, name):
         pass
 
     @DefaultMethod
@@ -209,9 +214,27 @@ class GameObject(GameSprite):
         super(GameObject, self).draw(screen)
         self.drawExtra(screen)
 
+    @DefaultMethod
+    def ableToCollect(self, items):
+        """ Marks what the game object can collect """
+        if not isinstance(items, list):
+            items = [items]
+        self.__ableToCollect = items
+
     @property
     def id(self):
         return self.__id
+
+
+class GameCollectible(GameObject):
+    """ Something Collectible, like a hammer or the flaming oil can """
+    def __init__(self):
+        super().__init__()
+
+    @DefaultMethod
+    def onCollect(self, collectedBy, name):
+        collectedBy.collectedItem(self)
+        self.kill()
 
 
 class GameLevelManager:
