@@ -200,8 +200,12 @@ class GameObject(GameSprite):
         self.__id = uuid.uuid4() # Something to uniquely identify every game object
         self.__isDying = False
 
-    @AbstractMethod
+    @DefaultMethod
     def update(self):
+        pass
+
+    @DefaultMethod
+    def collectedItem(self, item, collectionType):
         pass
 
     @DefaultMethod
@@ -231,6 +235,17 @@ class GameObject(GameSprite):
             self.__isDying = True
             return func(self)
         return death_wrapper
+
+
+class GameCollectible(GameObject):
+    """ Something Collectible, like a hammer or the flaming oil can """
+    def __init__(self):
+        super().__init__()
+
+    @DefaultMethod
+    def onCollect(self, collectedBy, collectionType):
+        collectedBy.collectedItem(self)
+        self.kill()
 
 
 class GameLevelManager:
