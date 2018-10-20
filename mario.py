@@ -173,3 +173,4 @@ class Mario(GameObject):
         self.state = PlayerState.DEAD
         self.spriteManager.useSprites(['death1'], 10)
         self.ticks = 0
+        self._walkingSound.stop()

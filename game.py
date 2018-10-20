@@ -43,7 +43,6 @@ class GameManager:
             Clock.forceFPS(60)
 
             # Game Routine
-            #if self.state == GameState.Playing:
             self._checkForDeath()
             self._handleEvents()
             self._update()
