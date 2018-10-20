@@ -4,10 +4,9 @@ Game Manager
 import os
 import uuid
 from utils import AbstractMethod, DefaultMethod, Singleton
-#from eventManager import Events, EventManager
 from inputManager import InputManager
-from collisionDetector import CollisionDetector, CollisionTypes
-from framework import SpriteGroup, Window, Clock, GameLevelManager, Events, Sound
+from collisionDetector import CollisionDetector, CollisionTypes, CollectionTypes
+from framework import SpriteGroup, Window, Clock, GameLevelManager, Events, Sound, GameCollectible
 
 @Singleton
 class GameManager:
@@ -19,6 +18,7 @@ class GameManager:
         self._objects = SpriteGroup()
         self._players = SpriteGroup()
         self._enemies = SpriteGroup()
+        self._collectibles = SpriteGroup()
 
         self._levelManager = None
 
@@ -57,6 +57,14 @@ class GameManager:
         self._enemies.add(enemy)
         return self
 
+    def addCollectible(self, collectible):
+        """ Adds a collectible item to the game """
+        if not isinstance(collectible, GameCollectible):
+            return self
+
+        self._collectibles.add(collectible)
+        return self
+
     def addLevelManager(self, obj):
         """ Sets the thing used for generating levels """
         if not isinstance(obj, GameLevelManager):
@@ -76,6 +84,7 @@ class GameManager:
         self._objects.update()
         self._players.update()
         self._enemies.update()
+        self._collectibles.update()
         self._levelManager.update()
 
     def _collisionCheck(self):
@@ -85,12 +94,16 @@ class GameManager:
         CollisionDetector.check(self._players, self._levelManager.immovables, CollisionTypes.Immovable)
         CollisionDetector.check(self._players, self._enemies, CollisionTypes.Enemy)
 
+        CollisionDetector.checkCollection(self._collectibles, self._players, CollectionTypes.Player)
+        CollisionDetector.checkCollection(self._collectibles, self._enemies, CollectionTypes.Enemy)
+
     def _draw(self):
         """ Draws everything on the window """
         self._levelManager.draw(self._window)
         self._objects.draw(self._window)
-        self._players.draw(self._window)
+        self._collectibles.draw(self._window)
         self._enemies.draw(self._window)
+        self._players.draw(self._window)
 
     def _quit(self, data):
         """ Closes the window """
