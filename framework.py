@@ -59,6 +59,12 @@ class Image(object):
         self.rect = self._image.get_rect()
         return self
 
+    def rotate(self, angle):
+        """ Rotates an image """
+        self._image = pygame.transform.rotate(self._image, -1 * angle)
+        self.rect = self._image.get_rect()
+        return self
+
     @property
     def image(self):
         return self._image
@@ -95,6 +101,7 @@ class GameSprite(pygame.sprite.Sprite):
         self.y = 0
         self.image = pygame.Surface([0, 0])
         self.rect = self.image.get_rect()
+        self.__isDying = False
 
     def draw(self, screen):
         """ Draws the object on the screen """
@@ -111,8 +118,8 @@ class GameSprite(pygame.sprite.Sprite):
         return self.image
 
     @DefaultMethod
-    def die(self):
-        """ Removes the sprite """
+    def remove(self):
+        """ Remove the sprite """
         self.kill()
 
     @property
@@ -191,6 +198,7 @@ class GameObject(GameSprite):
     def __init__(self):
         super().__init__()
         self.__id = uuid.uuid4() # Something to uniquely identify every game object
+        self.__isDying = False
 
     @DefaultMethod
     def update(self):
@@ -216,6 +224,17 @@ class GameObject(GameSprite):
     @property
     def id(self):
         return self.__id
+
+    @property
+    def isDying(self):
+        return self.__isDying
+
+    @staticmethod
+    def deathMethod(func):
+        def death_wrapper(self):
+            self.__isDying = True
+            return func(self)
+        return death_wrapper
 
 
 class GameCollectible(GameObject):
