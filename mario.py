@@ -17,6 +17,7 @@ class PlayerState(Enum):
     ERROR = 6
     LADDER_IDLE = 7
     LADDER_UP = 8
+    DEAD1 = 9
 
 
 movement = 100.0
@@ -36,11 +37,16 @@ class Mario(GameObject):
             'run_right1': self._sheet.sprite(45, 20, 31, 32).flip(),
             'run_right2': self._sheet.sprite(94, 21, 30, 32).flip(),
             'ladder_up1': self._sheet.sprite(142, 20, 28, 32),
-            'ladder_up2': self._sheet.sprite(142, 20, 28, 32).flip()
+            'ladder_up2': self._sheet.sprite(142, 20, 28, 32).flip(),
+            'death1': self._sheet.sprite(716, 20, 32, 32),
+            'death2': self._sheet.sprite(764, 20, 32, 32),
+            'death3': self._sheet.sprite(764, 20, 32, 32).rotate(90),
+            'death4': self._sheet.sprite(764, 20, 32, 32).flip(),
+            'death5': self._sheet.sprite(764, 20, 32, 32).rotate(-90),
+            'death6': self._sheet.sprite(812, 20, 32, 32)
         }
 
         self.spriteManager = SpriteManager(self._sprites)
-        #self.spriteManager.addSprites(self._sprites)
 
         self.spriteManager.useSprites([
             'stand_right'
@@ -50,6 +56,7 @@ class Mario(GameObject):
         self.y = 300
         self.state = PlayerState.IDLE
         self._isAtLadder = False
+        self.ticks = 0
 
         InputManager.subscribe(
             [Keys.LEFT, Keys.RIGHT, Keys.DOWN, Keys.UP, Keys.SPACE],
@@ -101,7 +108,6 @@ class Mario(GameObject):
             self.spriteManager.useSprites([
                 'ladder_up1'
             ], 10)
-
         else:
             self.state = PlayerState.IDLE
             if 'stand_left' in self.spriteManager.currentAnimation:
@@ -110,9 +116,6 @@ class Mario(GameObject):
                 self.spriteManager.useSprites(['stand_right'], 10)
 
             self._walkingSound.stop()
-
-        self.spriteManager.animate()
-
 
     def collision(self, collisionType, direction, obj):
         """ Mario collided with something """
@@ -131,7 +134,6 @@ class Mario(GameObject):
             self.state = PlayerState.IDLE
             if not obj.isTopOfLadder:
                 self.bottom = obj.top
-
 
     def _marioKeyPress(self, key):
         def __str__(self):
@@ -154,4 +156,20 @@ class Mario(GameObject):
 
     def getSprite(self):
         """ Returns the current sprite for the game object """
-        return self.spriteManager.currentSprite()
+        if self.isDying:
+            self.ticks = self.ticks + 1
+            if self.ticks == 30:
+                self.spriteManager.useSprites(['death2', 'death3', 'death4', 'death5'], 10)
+            elif self.ticks == 100:
+                self.spriteManager.useSprites(['death6'])
+            elif self.ticks == 150:
+                self.remove()
+
+        return self.spriteManager.animate()
+
+    @GameObject.deathMethod
+    def die(self):
+        """ Play the death animation """
+        self.state = PlayerState.DEAD
+        self.spriteManager.useSprites(['death1'], 10)
+        self.ticks = 0

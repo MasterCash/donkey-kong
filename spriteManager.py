@@ -24,13 +24,10 @@ class SpriteManager:
             self._spriteArray.append(self._sprites[x])
         return
 
-
-
     def animate(self):
         #Animates every 'tick' frames, use 1 to animate every frame, higher values update less often
         self._counter += 1
         if self._counter == self._tick:
-
             #increments to the next frame of movement in current animation
             if self._location == len(self._spriteArray) - 1:
                 self._currentSprite = self._spriteArray[0]
@@ -40,9 +37,8 @@ class SpriteManager:
                 self._location += 1
 
             self._counter = 0
-        else:
-            pass
-        return
+
+        return self._currentSprite
 
     def currentSprite(self):
         return self._currentSprite
