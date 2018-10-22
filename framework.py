@@ -12,16 +12,56 @@ from utils import AbstractMethod, DefaultMethod, Singleton
 from enum import Enum
 
 
+class Sound(object):
+    def __init__(self, file):
+        self._file = 'assets/sounds/{0}.wav'.format(file)
+        self._sound = pygame.mixer.Sound(self._file)
+
+    def play(self):
+        self._sound.play(0)
+
+    def playNTimes(self, n):
+        self._sound.play(n)
+
+    def loop(self):
+        self._sound.play(-1)
+
+    def stop(self):
+        self._sound.stop()
+
+class Text(object):
+    def __init__(self, text, fontFamily='Courier New', fontSize=20, color=(255, 255, 255)):
+        self._text = str(text)
+        self._color = color
+        self._font = pygame.font.SysFont(fontFamily, fontSize)
+
+    @property
+    def text(self):
+        return self._text
+
+    def setText(self, text):
+        self._text = str(text)
+
+    @property
+    def image(self):
+        return self._font.render(self._text, False, self._color)
+
+
 class Image(object):
     def __init__(self, sheet, x, y, width, height):
         self.rect = pygame.Rect((x, y, width, height))
-        self._image = pygame.Surface(self.rect.size).convert()
+        self._image = pygame.Surface(self.rect.size, pygame.SRCALPHA)
         self._image.blit(sheet, (0, 0), self.rect)
-        self._image.set_colorkey((0, 0, 0, 255)) # Set transparency
 
     def flip(self):
         """ Flips an image """
         self._image = pygame.transform.flip(self._image, True, False)
+        self.rect = self._image.get_rect()
+        return self
+
+    def rotate(self, angle):
+        """ Rotates an image """
+        self._image = pygame.transform.rotate(self._image, -1 * angle)
         self.rect = self._image.get_rect()
         return self
 
@@ -42,7 +82,7 @@ class Image(object):
 class SpriteSheet(object):
     """ Used for loading sprites from a sprite sheet """
     def __init__(self, filename):
-        self.sheet = pygame.image.load('assets/sprites/{0}_sheet.png'.format(filename)).convert()
+        self.sheet = pygame.image.load('assets/sprites/{0}_sheet.png'.format(filename))
 
     def sprite(self, x, y, width, height):
         """ Loads image from x, y, x+width, y+height """
@@ -61,6 +101,7 @@ class GameSprite(pygame.sprite.Sprite):
         self.y = 0
         self.image = pygame.Surface([0, 0])
         self.rect = self.image.get_rect()
+        self.__isDying = False
 
     def draw(self, screen):
         """ Draws the object on the screen """
@@ -77,8 +118,8 @@ class GameSprite(pygame.sprite.Sprite):
         return self.image
 
     @DefaultMethod
-    def die(self):
-        """ Removes the sprite """
+    def remove(self):
+        """ Remove the sprite """
         self.kill()
 
     @property
@@ -109,12 +150,12 @@ class GameSprite(pygame.sprite.Sprite):
     @property
     def top(self):
         """ Top of the sprite """
-        return self.x
+        return self.y
 
     @top.setter
     def top(self, t):
         """ Sets where the top side of the sprite is """
-        self.x = t
+        self.y = t
 
     @property
     def bottom(self):
@@ -157,9 +198,14 @@ class GameObject(GameSprite):
     def __init__(self):
         super().__init__()
         self.__id = uuid.uuid4() # Something to uniquely identify every game object
+        self.__isDying = False
 
-    @AbstractMethod
+    @DefaultMethod
     def update(self):
+        pass
+
+    @DefaultMethod
+    def collectedItem(self, item, collectionType):
         pass
 
     @DefaultMethod
@@ -178,6 +224,28 @@ class GameObject(GameSprite):
     @property
     def id(self):
         return self.__id
+
+    @property
+    def isDying(self):
+        return self.__isDying
+
+    @staticmethod
+    def deathMethod(func):
+        def death_wrapper(self):
+            self.__isDying = True
+            return func(self)
+        return death_wrapper
+
+
+class GameCollectible(GameObject):
+    """ Something Collectible, like a hammer or the flaming oil can """
+    def __init__(self):
+        super().__init__()
+
+    @DefaultMethod
+    def onCollect(self, collectedBy, collectionType):
+        collectedBy.collectedItem(self)
+        self.kill()
 
 
 class GameLevelManager:
@@ -333,10 +401,12 @@ class __ClockClass:
     def __init__(self):
         self._clock = pygame.time.Clock()
         self._delta = 0.0
+        self.fps = 60
 
     def forceFPS(self, fps):
         """ Forces a certain FPS """
-        t = self._clock.tick(fps)
+        self.fps = fps
+        t = self._clock.tick(self.fps)
         self._delta = t / 1000.0
 
     @property

@@ -3,11 +3,17 @@ Game Manager
 """
 import os
 import uuid
+from enum import Enum
 from utils import AbstractMethod, DefaultMethod, Singleton
-#from eventManager import Events, EventManager
 from inputManager import InputManager
-from collisionDetector import CollisionDetector, CollisionTypes
-from framework import SpriteGroup, Window, Clock, GameLevelManager, Events
+from collisionDetector import CollisionDetector, CollisionTypes, CollectionTypes
+from framework import SpriteGroup, Window, Clock, GameLevelManager, Events, Sound, GameCollectible
+
+class GameState(Enum):
+    MainMenu = 0
+    Playing = 1
+    Paused = 2
+    DeathScreen = 3
 
 @Singleton
 class GameManager:
@@ -19,8 +25,14 @@ class GameManager:
         self._objects = SpriteGroup()
         self._players = SpriteGroup()
         self._enemies = SpriteGroup()
+        self._collectibles = SpriteGroup()
 
         self._levelManager = None
+
+        self._backgroundMusic = Sound('background')
+        self._backgroundMusic.loop()
+
+        self.state = GameState.Playing
 
     def play(self):
         """ Main Game Loop """
@@ -31,12 +43,11 @@ class GameManager:
             Clock.forceFPS(60)
 
             # Game Routine
+            self._checkForDeath()
             self._handleEvents()
-
             self._update()
             self._collisionCheck()
             self._draw()
-
             self._window.flip()
 
     def addPlayer(self, player):
@@ -54,6 +65,14 @@ class GameManager:
         self._enemies.add(enemy)
         return self
 
+    def addCollectible(self, collectible):
+        """ Adds a collectible item to the game """
+        if not isinstance(collectible, GameCollectible):
+            return self
+
+        self._collectibles.add(collectible)
+        return self
+
     def addLevelManager(self, obj):
         """ Sets the thing used for generating levels """
         if not isinstance(obj, GameLevelManager):
@@ -65,28 +84,66 @@ class GameManager:
 
     def _handleEvents(self):
         """ Handles events from PyGame """
+        if self.state == GameState.DeathScreen:
+            return
+
         Events.handleEvents()
         InputManager.handleInput()
 
     def _update(self):
         """ Updates everything """
+        if self.state == GameState.DeathScreen:
+            return
+
         self._objects.update()
         self._players.update()
         self._enemies.update()
+        self._collectibles.update()
         self._levelManager.update()
 
     def _collisionCheck(self):
         """ Checks for collisions """
+        if self.state == GameState.DeathScreen:
+            return
+
         CollisionDetector.check(self._players, self._levelManager.ladders, CollisionTypes.Ladder)
         CollisionDetector.check(self._players, self._levelManager.platforms, CollisionTypes.Platform)
+        CollisionDetector.check(self._players, self._levelManager.immovables, CollisionTypes.Immovable)
         CollisionDetector.check(self._players, self._enemies, CollisionTypes.Enemy)
+
+        CollisionDetector.checkCollection(self._collectibles, self._players, CollectionTypes.Player)
+        CollisionDetector.checkCollection(self._collectibles, self._enemies, CollectionTypes.Enemy)
 
     def _draw(self):
         """ Draws everything on the window """
         self._levelManager.draw(self._window)
         self._objects.draw(self._window)
+        self._collectibles.draw(self._window)
         self._players.draw(self._window)
-        self._enemies.draw(self._window)
+
+        if self.state != GameState.DeathScreen:
+            self._enemies.draw(self._window)
+
+    def _checkForDeath(self):
+        death = False
+
+        # Check death of a player
+        for player in self._players:
+            if player.isDying:
+                death = True
+                break
+
+        # Check death of an enemy
+        if death == False:
+            for enemy in self._enemies:
+                if enemy.isDying:
+                    death = True
+                    break
+
+        if death:
+            self.state = GameState.DeathScreen
+        else:
+            self.state = GameState.Playing
 
     def _quit(self, data):
         """ Closes the window """

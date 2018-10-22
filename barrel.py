@@ -37,6 +37,7 @@ class Barrel(GameObject):
             'fall_1',
             'fall_2'
         ], 10)
+
         self.x = 200
         self.y = 100
 
