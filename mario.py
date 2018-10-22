@@ -52,8 +52,8 @@ class Mario(GameObject):
             'stand_right'
         ], 10)
 
-        self.x = 30
-        self.y = 30
+        self.x = 60
+        self.y = 480
         self.state = PlayerState.IDLE
         self._isAtLadder = False
         self.ticks = 0
