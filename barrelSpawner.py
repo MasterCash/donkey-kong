@@ -4,7 +4,7 @@ interfacing between the Donkey Kong player/sprite
 and the Game Manager in order to add the correct type
 of barrel to the game
 """
-from barrel import Barrel
+from barrel import Barrel, BarrelType
 from game import GameManager
 
 class BarrelSpawner:
@@ -12,6 +12,16 @@ class BarrelSpawner:
         self.__game = GameManager() # GameManager is a singleton so this works
 
 
-    def spawnStandardBarrel(self):
+    def spawnBarrel(self, barrelType):
         """ Spawns a new barrel """
-        self.__game.addEnemy(Barrel())
+        if barrelType == 1:
+            self.__game.addEnemy(Barrel(BarrelType.NORMAL))
+        elif barrelType == 2:
+            self.__game.addEnemy(Barrel(BarrelType.FIRE))
+        elif barrelType == 3:
+            self.__game.addEnemy(Barrel(BarrelType.EXPLOSIVE))
+        elif barrelType == 4:
+            self.__game.addEnemy(Barrel(BarrelType.OIL))
+            
+            
+            

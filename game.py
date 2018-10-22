@@ -113,6 +113,10 @@ class GameManager:
 
         CollisionDetector.checkCollection(self._collectibles, self._players, CollectionTypes.Player)
         CollisionDetector.checkCollection(self._collectibles, self._enemies, CollectionTypes.Enemy)
+        CollisionDetector.check(self._enemies, self._levelManager.ladders, CollisionTypes.Ladder)
+        CollisionDetector.check(self._enemies, self._levelManager.platforms, CollisionTypes.Platform)
+        CollisionDetector.check(self._enemies, self._levelManager.immovables, CollisionTypes.Immovable)
+      
 
     def _draw(self):
         """ Draws everything on the window """
