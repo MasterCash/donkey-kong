@@ -28,6 +28,7 @@ class Mario(GameObject):
         super().__init__()
 
         self._sheet = SpriteSheet('mario')
+        self.lives = 900
 
         self._sprites = {
             'stand_left': self._sheet.sprite(0, 20, 24, 32),
@@ -163,13 +164,18 @@ class Mario(GameObject):
             elif self.ticks == 100:
                 self.spriteManager.useSprites(['death6'])
             elif self.ticks == 150:
-                self.remove()
+                self.x = 60
+                self.y = 540
+                self.state = PlayerState.IDLE
+                self.isDying = False
+                #self.remove()
 
         return self.spriteManager.animate()
 
     @GameObject.deathMethod
     def die(self):
         """ Play the death animation """
+        self.lives = self.lives - 1
         self.state = PlayerState.DEAD
         self.spriteManager.useSprites(['death1'], 10)
         self.ticks = 0

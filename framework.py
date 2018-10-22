@@ -229,6 +229,10 @@ class GameObject(GameSprite):
     def isDying(self):
         return self.__isDying
 
+    @isDying.setter
+    def isDying(self, val):
+        self.__isDying = val
+
     @staticmethod
     def deathMethod(func):
         def death_wrapper(self):
