@@ -103,8 +103,7 @@ class DonkeyKong(GameObject):
 
         self._barrelSpawnTimer = random.randint(60, 120) # New random barrel spawn timer
 
-        if self._rollBarrelType == 1:
-            self._spawner.spawnStandardBarrel()
+        self._spawner.spawnBarrel(self._rollBarrelType)
 
 
     def getSprite(self):
