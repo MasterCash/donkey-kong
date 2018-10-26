@@ -22,10 +22,10 @@ class BarrelDir(Enum):
     RIGHT = 0
     LEFT = 1
 
-class Barrel(GameObject): 
+class Barrel(GameObject):
     def __init__(self, barrelType):
         GameObject.__init__(self)
-        self._speed = 10
+        self._speed = 2
         self._sheet = SpriteSheet('barrel')
         self.type = barrelType
 
@@ -33,28 +33,28 @@ class Barrel(GameObject):
             'normal_roll1': self._sheet.sprite(112, 0, 24, 20),
             'normal_roll2': self._sheet.sprite(160, 0, 24, 20),
             'normal_roll3': self._sheet.sprite(208, 0, 24, 20),
-            'normal_fall1': self._sheet.sprite(290, 0, 40, 20), 
+            'normal_fall1': self._sheet.sprite(290, 0, 40, 20),
             'normal_fall2': self._sheet.sprite(340, 0, 40, 20),
-            'normal_fall3': self._sheet.sprite(290, 0, 40, 20).flip(), 
+            'normal_fall3': self._sheet.sprite(290, 0, 40, 20).flip(),
             'normal_fall4': self._sheet.sprite(340, 0, 40, 20).flip(),
             'fire_roll1': self._sheet.sprite(112, 22, 24, 20),
             'fire_roll2': self._sheet.sprite(160, 22, 24, 20),
             'fire_roll3': self._sheet.sprite(208, 22, 24, 20),
-            'fire_fall1': self._sheet.sprite(290, 22, 40, 20), 
+            'fire_fall1': self._sheet.sprite(290, 22, 40, 20),
             'fire_fall2': self._sheet.sprite(340, 22, 40, 20),
-            'fire_fall3': self._sheet.sprite(290, 22, 40, 20).flip(), 
+            'fire_fall3': self._sheet.sprite(290, 22, 40, 20).flip(),
             'fire_fall4': self._sheet.sprite(340, 22, 40, 20).flip(),
             'exp_roll1': self._sheet.sprite(112, 44, 24, 20),
             'exp_roll2': self._sheet.sprite(160, 44, 24, 20),
             'exp_roll3': self._sheet.sprite(208, 44, 24, 20),
-            'exp_fall1': self._sheet.sprite(290, 44, 40, 20), 
+            'exp_fall1': self._sheet.sprite(290, 44, 40, 20),
             'exp_fall2': self._sheet.sprite(340, 44, 40, 20),
-            'exp_fall3': self._sheet.sprite(290, 44, 40, 20).flip(), 
+            'exp_fall3': self._sheet.sprite(290, 44, 40, 20).flip(),
             'exp_fall4': self._sheet.sprite(340, 44, 40, 20).flip(),
             'oil_roll1': self._sheet.sprite(112, 66, 24, 20),
             'oil_roll2': self._sheet.sprite(160, 66, 24, 20),
             'oil_roll3': self._sheet.sprite(208, 66, 24, 20),
-            'oil_fall1': self._sheet.sprite(290, 66, 40, 20), 
+            'oil_fall1': self._sheet.sprite(290, 66, 40, 20),
             'oil_fall2': self._sheet.sprite(340, 66, 40, 20),
             'oil_fall3': self._sheet.sprite(290, 66, 40, 20).flip(),
             'oil_fall4': self._sheet.sprite(340, 66, 40, 20).flip()
@@ -68,7 +68,7 @@ class Barrel(GameObject):
 
         self.x = 320
         self.y = 130
-        
+
         self.state = BarrelState.FALL
         self.dir = BarrelDir.RIGHT
         self.isLadder = False
@@ -82,16 +82,15 @@ class Barrel(GameObject):
                     self.x -= self._sprites[str(self.type) + '_fall1'].height
                     self.dir = BarrelDir.RIGHT
                 elif self.dir == BarrelDir.RIGHT:
-                    self.x += 5
+                    self.x += self._speed
                     self.dir = BarrelDir.LEFT
-                    
-                
+
                 self.state = BarrelState.FALL
             elif self.dir == BarrelDir.RIGHT:
-                self.x += 1
+                self.x += self._speed
                 self.setSprites()
-            else: 
-                self.x -= 1
+            else:
+                self.x -= self._speed
                 self.setSprites()
             self.y += 1
         elif self.state == BarrelState.FALL:
@@ -101,6 +100,7 @@ class Barrel(GameObject):
                 self.y += 1
                 self.setSprites()
         self.spriteManager.animate()
+
     def setSprites(self):
         if self.state == BarrelState.MOVE:
             if self.dir == BarrelDir.RIGHT:
@@ -127,7 +127,7 @@ class Barrel(GameObject):
                     str(self.type) + '_fall3',
                     str(self.type) + '_fall4',
                 ], 10)
-            
+
 
     def collision(self, collisionType, direction, obj):
         """ Checks for collision with another spirte """
