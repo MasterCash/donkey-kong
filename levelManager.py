@@ -144,7 +144,7 @@ class LevelManager(GameLevelManager):
 
         # Top platform
         y = y - (4 * h) + 2
-        for x in range(0 - w, width + w, w):
+        for x in range(0 - w, width - w, w):
             self.platforms.add(Platform(x, y, self._platform))
 
         # Princess Peach Platform
