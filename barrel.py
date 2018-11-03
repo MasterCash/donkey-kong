@@ -26,14 +26,10 @@ class BarrelDir(Enum):
     RIGHT = 0
     LEFT = 1
 
-# Barrel Class.
 class Barrel(GameObject):
     def __init__(self, barrelType):
         GameObject.__init__(self)
-        # Speed of the barrel Currently not used.
-        # TODO: either use speed or remove it.
-        self._speed = 10
-        # Sprite sheet of the barrel.
+        self._speed = 2
         self._sheet = SpriteSheet('barrel')
         # Type of barrel being handled. Given when Created.
         self.type = barrelType
@@ -118,19 +114,16 @@ class Barrel(GameObject):
                     self.x -= self._sprites[str(self.type) + '_fall1'].height
                     self.dir = BarrelDir.RIGHT
                 elif self.dir == BarrelDir.RIGHT:
-                    self.x += 5
+                    self.x += self._speed
                     self.dir = BarrelDir.LEFT
                 # Change the state to falling because we are on a ladder.
                 self.state = BarrelState.FALL
             # Barrel is moving right, move right.
             elif self.dir == BarrelDir.RIGHT:
-                self.x += 1
-                # Update the sprites.
+                self.x += self._speed
                 self.setSprites()
-            # Barrel is moving left, move left.
             else:
-                self.x -= 1
-                # Update the sprites.
+                self.x -= self._speed
                 self.setSprites()
             # Gravity, always falling down.
             self.y += 1

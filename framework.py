@@ -229,6 +229,10 @@ class GameObject(GameSprite):
     def isDying(self):
         return self.__isDying
 
+    @isDying.setter
+    def isDying(self, val):
+        self.__isDying = val
+
     @staticmethod
     def deathMethod(func):
         def death_wrapper(self):
@@ -399,12 +403,15 @@ class Window:
 @Singleton
 class __ClockClass:
     def __init__(self):
-        self._clock = pygame.time.Clock()
+        self._clock = None
         self._delta = 0.0
         self.fps = 60
 
     def forceFPS(self, fps):
         """ Forces a certain FPS """
+        if (self._clock is None):
+            self._clock = pygame.time.Clock()
+
         self.fps = fps
         t = self._clock.tick(self.fps)
         self._delta = t / 1000.0

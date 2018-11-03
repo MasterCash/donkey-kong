@@ -101,7 +101,7 @@ class DonkeyKong(GameObject):
         if self._barrelSpawnTimer != 0:
             return
 
-        self._barrelSpawnTimer = random.randint(60, 120) # New random barrel spawn timer
+        self._barrelSpawnTimer = random.randint(30, 120) # New random barrel spawn timer
 
         self._spawner.spawnBarrel(self._rollBarrelType)
 

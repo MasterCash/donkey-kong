@@ -21,6 +21,8 @@ class PlayerState(Enum):
 
 
 movement = 100.0
+jump_height = 30
+jump_speed = 300 # Actually 100
 
 
 class Mario(GameObject):
@@ -28,6 +30,9 @@ class Mario(GameObject):
         super().__init__()
 
         self._sheet = SpriteSheet('mario')
+        self.lives = 900
+        self._jumpCount = 15
+        self._isJumping = False
 
         self._sprites = {
             'stand_left': self._sheet.sprite(0, 20, 24, 32),
@@ -52,8 +57,8 @@ class Mario(GameObject):
             'stand_right'
         ], 10)
 
-        self.x = 30
-        self.y = 30
+        self.x = 60
+        self.y = 550
         self.state = PlayerState.IDLE
         self._isAtLadder = False
         self.ticks = 0
@@ -67,10 +72,21 @@ class Mario(GameObject):
 
     def update(self):
         """ Method used for updating state of a sprite/object """
-        if self._isAtLadder != True:
+        if self._isAtLadder != True and not self._isJumping:
             self.y = self.y + (movement * 2) * Clock.timeDelta # Gravity
 
         self._isAtLadder = False
+
+        if self._isJumping:
+            if self._jumpCount >= -15:
+                neg = 1
+                if self._jumpCount < 0:
+                    neg = -1
+                self.y = self.y - (self._jumpCount ** 2) * 0.025 * neg
+                self._jumpCount = self._jumpCount - 1
+            else:
+                self._isJumping = False
+                self._jumpCount = 15
 
         if self.state == PlayerState.MOVELEFT:
             self.x -= movement * Clock.timeDelta
@@ -127,7 +143,7 @@ class Mario(GameObject):
             self._isAtLadder = True
 
         elif collisionType == CollisionTypes.Platform:
-            if self._isAtLadder == False:
+            if self._isAtLadder == False and not self._isJumping:
                 self.bottom = obj.top + 1
 
         elif collisionType == CollisionTypes.Immovable:
@@ -150,9 +166,10 @@ class Mario(GameObject):
             if self._isAtLadder:
                 self.state = PlayerState.LADDER_UP
         elif key is Keys.SPACE:
-            print("Mario Jumped")
-        else:
-            print(key)
+            if not self._isJumping:
+                self._isJumping = True
+        #else:
+            #print(key)
 
     def getSprite(self):
         """ Returns the current sprite for the game object """
@@ -163,13 +180,18 @@ class Mario(GameObject):
             elif self.ticks == 100:
                 self.spriteManager.useSprites(['death6'])
             elif self.ticks == 150:
-                self.remove()
+                self.x = 60
+                self.y = 540
+                self.state = PlayerState.IDLE
+                self.isDying = False
+                #self.remove()
 
         return self.spriteManager.animate()
 
     @GameObject.deathMethod
     def die(self):
         """ Play the death animation """
+        self.lives = self.lives - 1
         self.state = PlayerState.DEAD
         self.spriteManager.useSprites(['death1'], 10)
         self.ticks = 0
