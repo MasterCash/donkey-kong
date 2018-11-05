@@ -11,7 +11,7 @@ class BarrelSpawner:
     def __init__(self):
         self.__game = GameManager() # GameManager is a singleton so this works
 
-
+    # Spawns a barrel based on the type given by Donkey Kong.
     def spawnBarrel(self, barrelType):
         """ Spawns a new barrel """
         if barrelType == 1:
@@ -21,7 +21,7 @@ class BarrelSpawner:
         elif barrelType == 3:
             self.__game.addEnemy(Barrel(BarrelType.EXPLOSIVE))
         elif barrelType == 4:
-            self.__game.addEnemy(Barrel(BarrelType.OIL))
-            
-            
-            
+            self.__game.addEnemy(Barrel(BarrelType.GOO))
+
+
+
