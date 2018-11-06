@@ -43,9 +43,6 @@ class GameManager:
 
         while True:
             Clock.forceFPS(60)
-            if(menuOut == False):
-                menu.menu()
-                menuOut = True
             # Game Routine
             self._checkForDeath()
             self._handleEvents()

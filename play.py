@@ -3,6 +3,7 @@ This is the file that should be ran when wanting to launch the game
 """
 import os
 import game as Game
+import menu
 from mario import Mario
 from barrel import Barrel
 from princess import Princess
@@ -18,4 +19,5 @@ game.addObject(Princess())
 game.addObject(DonkeyKong())
 game.addCollectible(FlamingOilContainer())
 game.addLevelManager(LevelManager())
+menu.menu()
 game.play()
