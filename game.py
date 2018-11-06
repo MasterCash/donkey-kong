@@ -3,6 +3,7 @@ Game Manager
 """
 import os
 import uuid
+import menu
 from enum import Enum
 from utils import AbstractMethod, DefaultMethod, Singleton
 from inputManager import InputManager
@@ -36,12 +37,15 @@ class GameManager:
 
     def play(self):
         """ Main Game Loop """
+        menuOut = False
         if self._levelManager is None:
            raise Exception("No Level Manager")
 
         while True:
             Clock.forceFPS(60)
-
+            if(menuOut == False):
+                menu.menu()
+                menuOut = True
             # Game Routine
             self._checkForDeath()
             self._handleEvents()
