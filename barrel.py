@@ -1,7 +1,8 @@
 """
 Class for barrels
 """
-from framework import GameObject, SpriteSheet
+import math
+from framework import GameObject, SpriteSheet, Clock
 from spriteManager import SpriteManager
 from enum import Enum
 from collisionDetector import CollisionTypes
@@ -29,7 +30,7 @@ class BarrelDir(Enum):
 class Barrel(GameObject):
     def __init__(self, barrelType):
         GameObject.__init__(self)
-        self._speed = 2
+        self._speed = 20
         self._sheet = SpriteSheet('barrel')
         # Type of barrel being handled. Given when Created.
         self.type = barrelType
@@ -114,19 +115,17 @@ class Barrel(GameObject):
                     self.x -= self._sprites[str(self.type) + '_fall1'].height
                     self.dir = BarrelDir.RIGHT
                 elif self.dir == BarrelDir.RIGHT:
-                    self.x += self._speed
+                    self.x += 5
                     self.dir = BarrelDir.LEFT
                 # Change the state to falling because we are on a ladder.
                 self.state = BarrelState.FALL
             # Barrel is moving right, move right.
             elif self.dir == BarrelDir.RIGHT:
-                self.x += self._speed
+                self.x += self._speed * Clock.timeDelta
                 self.setSprites()
             else:
-                self.x -= self._speed
+                self.x -= self._speed * Clock.timeDelta
                 self.setSprites()
-            # Gravity, always falling down.
-            self.y += 1
         # If Falling.
         elif self.state == BarrelState.FALL:
             # If not on a ladder anymore.
@@ -134,9 +133,8 @@ class Barrel(GameObject):
                 # Change state to move.
                 self.state = BarrelState.MOVE
             else:
-                # Start Falling.
-                self.y += 1
                 self.setSprites()
+        self.y += (self._speed * 2) * Clock.timeDelta
         # Animate.
         self.spriteManager.animate()
 
@@ -148,25 +146,31 @@ class Barrel(GameObject):
                     str(self.type) + '_roll1',
                     str(self.type) + '_roll2',
                     str(self.type) + '_roll3'
-                    ], 10)
+                    ], self.animationSpeed())
             elif self.dir == BarrelDir.LEFT:
                 self.spriteManager.useSprites([
                     str(self.type) + '_roll3',
                     str(self.type) + '_roll2',
                     str(self.type) + '_roll1'
-                    ], 10)
+                    ], math.ceil(1/3 * self._speed))
         elif self.state == BarrelState.FALL:
             if self.dir == BarrelDir.LEFT:
                 self.spriteManager.useSprites([
                     str(self.type) + '_fall1',
                     str(self.type) + '_fall2',
-                ], 10)
+                ], math.ceil(1/3 * self._speed))
 
             elif self.dir == BarrelDir.RIGHT:
                 self.spriteManager.useSprites([
                     str(self.type) + '_fall3',
                     str(self.type) + '_fall4',
-                ], 10)
+                ], math.ceil(1/3 * self._speed))
+
+    def animationSpeed(self):
+        if self.state == BarrelState.MOVE:
+            return math.ceil((1000/((1/3*self._speed)**2))+2)
+        else:
+            return math.ceil(10/self._speed)
 
     # Collision Handling.
     def collision(self, collisionType, direction, obj):
