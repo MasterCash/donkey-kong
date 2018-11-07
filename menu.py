@@ -20,10 +20,10 @@ def menu():
     white=(255, 255, 255)
     black=(0, 0, 0)
     gray=(50, 50, 50)
-    red=(255, 0, 0)
+    red=(227, 73, 221)
     green=(0, 255, 0)
-    blue=(0, 0, 255)
-    yellow=(255, 255, 0)
+    blue=(31, 81, 255)
+    yellow=(237, 135, 35)
  
     # Game Fonts
     font = "Players.ttf"
