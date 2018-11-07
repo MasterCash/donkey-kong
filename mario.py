@@ -167,10 +167,10 @@ class Mario(GameObject):
             if self._isAtLadder:
                 self.state = PlayerState.LADDER_DOWN
         elif key == Keys.UP:
-            if self._isAtLadder:
+            if self._isAtLadder and not self._isJumping:
                 self.state = PlayerState.LADDER_UP
-        elif key is Keys.SPACE and self.state not in (PlayerState.LADDER_IDLE, PlayerState.LADDER_DOWN, PlayerState.LADDER_UP) and self._isOnGround == True:
-            if not self._isJumping:
+        elif key is Keys.SPACE and self.state not in (PlayerState.LADDER_IDLE, PlayerState.LADDER_DOWN, PlayerState.LADDER_UP):
+            if not self._isJumping and self._isOnGround:
                 self._isJumping = True
         #else:
             #print(key)
