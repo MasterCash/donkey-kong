@@ -29,7 +29,7 @@ class GameManager:
 
         self._levelManager = None
 
-        self._backgroundMusic = Sound('background')
+        self._backgroundMusic = Sound('06_Stage_1_BGM')
         self._backgroundMusic.loop()
 
         self.state = GameState.Playing

@@ -70,7 +70,7 @@ class Mario(GameObject):
             self._marioKeyPress
         )
 
-        self._walkingSound = Sound('walking')
+        self._walkingSound = Sound('15_SFX_Walking')
 
     def update(self):
         """ Method used for updating state of a sprite/object """
@@ -99,6 +99,7 @@ class Mario(GameObject):
                 'stand_left',
                 'run_left2'
             ], 8)
+            self._walkingSound.stop()
             self._walkingSound.play()
         elif self.state == PlayerState.MOVERIGHT:
             self.x += movement * Clock.timeDelta
@@ -108,6 +109,7 @@ class Mario(GameObject):
                 'stand_right',
                 'run_right2'
             ], 8)
+            self._walkingSound.stop()
             self._walkingSound.play()
         elif self.state == PlayerState.LADDER_DOWN:
             self.y += movement * Clock.timeDelta
