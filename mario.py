@@ -18,6 +18,7 @@ class PlayerState(Enum):
     LADDER_IDLE = 7
     LADDER_UP = 8
     DEAD1 = 9
+    ON_GROUND = 10
 
 
 movement = 100.0
@@ -61,6 +62,7 @@ class Mario(GameObject):
         self.y = 550
         self.state = PlayerState.IDLE
         self._isAtLadder = False
+        self._isOnGround = False
         self.ticks = 0
 
         InputManager.subscribe(
@@ -87,6 +89,7 @@ class Mario(GameObject):
             else:
                 self._isJumping = False
                 self._jumpCount = 15
+            self._isOnGround = False
 
         if self.state == PlayerState.MOVELEFT:
             self.x -= movement * Clock.timeDelta
@@ -144,6 +147,7 @@ class Mario(GameObject):
 
         elif collisionType == CollisionTypes.Platform:
             if self._isAtLadder == False and not self._isJumping:
+                self._isOnGround = True
                 self.bottom = obj.top + 1
 
         elif collisionType == CollisionTypes.Immovable:
@@ -165,7 +169,7 @@ class Mario(GameObject):
         elif key == Keys.UP:
             if self._isAtLadder:
                 self.state = PlayerState.LADDER_UP
-        elif key is Keys.SPACE:
+        elif key is Keys.SPACE and self.state not in (PlayerState.LADDER_IDLE, PlayerState.LADDER_DOWN, PlayerState.LADDER_UP) and self._isOnGround == True:
             if not self._isJumping:
                 self._isJumping = True
         #else:
