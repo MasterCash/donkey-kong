@@ -37,7 +37,6 @@ class GameManager:
 
     def play(self):
         """ Main Game Loop """
-        menuOut = False
         if self._levelManager is None:
            raise Exception("No Level Manager")
 
