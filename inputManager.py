@@ -21,14 +21,15 @@ class __InputManagerClass:
         for keyEnum in keys:
             key = keyEnum.value
             if self._keyFuncDict.get(key, False) is False:
-                self._keyFuncDict[key] = [func]
+                self._keyFuncDict[key] = []
             self._keyFuncDict[key].append(func)
-        print("Listen For Called", key, str(func))
+            print("Listen For Called", key, str(func))
 
     def unsubscribe(self, keys, func):
-        for key in keys:
+        for keyEnum in keys:
+            key = keyEnum.value
             self._keyFuncDict[key].remove(func)
-        print("Stop Listening Called")
+            print("Stop Listening Called", key, str(func))
 
     def handleInput(self):
         for key in self.keysPressed:
