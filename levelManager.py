@@ -34,6 +34,14 @@ class InvisibleLadder(GameSprite):
         self.y = y
         self.image = sprite
 
+class InvisibleWall(GameSprite):
+    # I don't know why i'm making this
+    def __init__(self, x, y, sprite):
+        super().__init__()
+        self.x = x
+        self.y = y
+        self.image = sprite
+
 
 @Singleton
 class LevelManager(GameLevelManager):
@@ -48,8 +56,9 @@ class LevelManager(GameLevelManager):
         self._sheet = SpriteSheet('level')
         self._platform = self._sheet.sprite(0, 1, 32, 16)
         self._ladder = self._sheet.sprite(33, 1, 16, 8)
-        self._invisibleLadder = self._sheet.sprite(50, 1, 16, 8)
-        self._invisiblePlatform = self._sheet.sprite(0, 18, 16, 8)
+        self._invisibleLadder = self._sheet.invisibleSprite(16, 8)
+        self._invisiblePlatform = self._sheet.invisibleSprite(16, 8)
+        self._invisibleWall = self._sheet.invisibleSprite(10, 600)
 
         # Read levels from the levels file
         with open('assets/levels.json', 'r') as f:
@@ -82,14 +91,13 @@ class LevelManager(GameLevelManager):
             for y1 in range(y-9, targetY, -8):
                 self.ladders.add(Ladder(x, y1, self._ladder))
                 lastY = y1
-
+                
             # Invisible ladder hitbox on top of the platform
             targetY = lastY - (int((2.5*h)/8) * 8) + h-2
             for y1 in range(lastY - 6, targetY, -8):
                 self.ladders.add(InvisibleLadder(x, y1, self._invisibleLadder))
-
+                
             self.immovables.add(InvisiblePlatform(x, targetY - 32, self._invisiblePlatform, True)) # Invisible platform on top of the ladder
-
         def drawLtoRPlatform(y):
             lastX = 0
             for x in range(w, width + w, w):

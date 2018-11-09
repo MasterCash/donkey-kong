@@ -82,6 +82,7 @@ class Image(object):
 class SpriteSheet(object):
     """ Used for loading sprites from a sprite sheet """
     def __init__(self, filename):
+        self.invisible = pygame.image.load('assets/sprites/invisible_sheet.png')
         self.sheet = pygame.image.load('assets/sprites/{0}_sheet.png'.format(filename))
 
     def sprite(self, x, y, width, height):
@@ -91,7 +92,10 @@ class SpriteSheet(object):
     def spriteFlipped(self, x, y, width, height):
         """ Returns a sprite, but flipped horizontally """
         return self.sprite(x, y, width, height).flip()
-
+        
+    def invisibleSprite(self, width, height):
+        """ Returns invisible sprite"""
+        return Image(self.invisible, 0, 0, width, height)
 
 class GameSprite(pygame.sprite.Sprite):
     """ Sprite class that represents a sprite """

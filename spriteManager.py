@@ -15,7 +15,7 @@ class SpriteManager:
         self.currentAnimation = animation
         self._currentSpriteName = animation[0]
         self._location = 0
-        self._tick = tick
+        self._tick = int(tick)
         self._currentSprite = self._sprites[self._currentSpriteName]
         self._spriteArray = []
         self._counter = 0 #counts the number of frames between each animation
