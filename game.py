@@ -3,7 +3,6 @@ Game Manager
 """
 import os
 import uuid
-import menu
 from enum import Enum
 from utils import AbstractMethod, DefaultMethod, Singleton
 from inputManager import InputManager
@@ -42,6 +41,7 @@ class GameManager:
 
         while True:
             Clock.forceFPS(60)
+
             # Game Routine
             self._checkForDeath()
             self._handleEvents()
