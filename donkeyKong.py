@@ -1,7 +1,7 @@
 from framework import GameObject, Clock, SpriteSheet, Keys, Text
 from inputManager import InputManager
 from spriteManager import SpriteManager
-from barrelSpawner import BarrelSpawner
+from enemySpawner import EnemySpawner
 import random
 import pygame
 
@@ -12,8 +12,8 @@ class DonkeyKong(GameObject):
     def __init__(self):
         super().__init__()
 
-        self._spawner = BarrelSpawner()
         self._isAI = False
+        self._spawner = EnemySpawner()
 
         self._sheet = SpriteSheet('donkey_kong')
         self._sprites = {
