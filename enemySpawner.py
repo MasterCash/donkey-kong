@@ -1,13 +1,13 @@
 """
-The barrel spawner is responsible for
+The enemy spawner is responsible for
 interfacing between the Donkey Kong player/sprite
 and the Game Manager in order to add the correct type
-of barrel to the game
+of barrel to the game. As well as the barrels generating a fire sprite
 """
 from barrel import Barrel, BarrelType
 from game import GameManager
 
-class BarrelSpawner:
+class EnemySpawner:
     def __init__(self):
         self.__game = GameManager() # GameManager is a singleton so this works
 
@@ -23,5 +23,8 @@ class BarrelSpawner:
         elif barrelType == 4:
             self.__game.addEnemy(Barrel(BarrelType.GOO))
 
+    def spawnFire(self):
+        """ Spawns a fire sprite to TERMINATE Mario once and for all """
+        pass
 
 
