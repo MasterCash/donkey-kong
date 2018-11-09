@@ -35,13 +35,12 @@ class InvisibleLadder(GameSprite):
         self.image = sprite
 
 class InvisibleWall(GameSprite):
-    # I don't know why i'm making this
-    def __init__(self, x, y, sprite):
+    def __init__(self, x, y, sprite, isLeft):
         super().__init__()
         self.x = x
         self.y = y
         self.image = sprite
-
+        self.isLeftWall = isLeft
 
 @Singleton
 class LevelManager(GameLevelManager):
@@ -52,13 +51,14 @@ class LevelManager(GameLevelManager):
         self.platforms = SpriteGroup()
         self.ladders = SpriteGroup()
         self.immovables = SpriteGroup()
+        self.walls = SpriteGroup()
 
         self._sheet = SpriteSheet('level')
         self._platform = self._sheet.sprite(0, 1, 32, 16)
         self._ladder = self._sheet.sprite(33, 1, 16, 8)
         self._invisibleLadder = self._sheet.invisibleSprite(16, 8)
         self._invisiblePlatform = self._sheet.invisibleSprite(16, 8)
-        self._invisibleWall = self._sheet.invisibleSprite(10, 600)
+        self._invisibleWall = self._sheet.invisibleSprite(2, 600)
 
         # Read levels from the levels file
         with open('assets/levels.json', 'r') as f:
@@ -150,6 +150,11 @@ class LevelManager(GameLevelManager):
         y = y - (4 * h) + 2
         y = drawLtoRPlatform(y)
 
+        # Draw Left Inv. Wall
+        self.walls.add(InvisibleWall(0, 0, self._invisibleWall, True))
+
+        #Draw Right Inv. Wall
+        self.walls.add(InvisibleWall(544, 0, self._invisibleWall, False))
         # Top platform
         y = y - (4 * h) + 2
         for x in range(0 - w, width - w, w):
@@ -181,6 +186,7 @@ class LevelManager(GameLevelManager):
         self.platforms.draw(screen)
         self.ladders.draw(screen)
         self.immovables.draw(screen)
+        self.walls.draw(screen)
 
     def advanceLevel(self):
         """ Moves to the next level """

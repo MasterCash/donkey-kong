@@ -152,6 +152,13 @@ class Mario(GameObject):
             self.state = PlayerState.IDLE
             if not obj.isTopOfLadder:
                 self.bottom = obj.top
+        elif collisionType == CollisionTypes.Wall:
+            self.state = PlayerState.IDLE
+            if obj.isLeftWall:
+                self.left = obj.right
+            else:
+                self.right = obj.left
+            print("collided with wall")
 
     def _marioKeyPress(self, key):
         def __str__(self):

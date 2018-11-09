@@ -10,6 +10,7 @@ class CollisionTypes(Enum):
     Platform = 1
     Enemy = 2
     Immovable = 3
+    Wall = 4
 
 class CollectionTypes(Enum):
     Player = 0
