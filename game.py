@@ -34,6 +34,8 @@ class GameManager:
 
         self.state = GameState.Playing
 
+        # TODO: Load dk scripts
+
     def play(self):
         """ Main Game Loop """
         if self._levelManager is None:

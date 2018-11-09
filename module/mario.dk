@@ -1,0 +1,11 @@
+[Player]
+Lives = 9
+
+[Sprites:"mario"]
+
+
+
+[Animations]
+
+[Collission:Barrel]
+print("poo");
