@@ -27,11 +27,11 @@ jump_speed = 300 # Actually 100
 
 
 class Mario(GameObject):
+    @GameObject.HasLives(3)
     def __init__(self):
         super().__init__()
 
         self._sheet = SpriteSheet('mario')
-        self.lives = 900
         self._jumpCount = 15
         self._isJumping = False
 
@@ -49,7 +49,8 @@ class Mario(GameObject):
             'death3': self._sheet.sprite(764, 20, 32, 32).rotate(90),
             'death4': self._sheet.sprite(764, 20, 32, 32).flip(),
             'death5': self._sheet.sprite(764, 20, 32, 32).rotate(-90),
-            'death6': self._sheet.sprite(812, 20, 32, 32)
+            'death6': self._sheet.sprite(812, 20, 32, 32),
+            'life': self._sheet.sprite(1629, 31, 14, 16).flip()
         }
 
         self.spriteManager = SpriteManager(self._sprites)
@@ -174,8 +175,6 @@ class Mario(GameObject):
         elif key is Keys.SPACE and self.state not in (PlayerState.LADDER_IDLE, PlayerState.LADDER_DOWN, PlayerState.LADDER_UP):
             if not self._isJumping and self._isOnGround:
                 self._isJumping = True
-        #else:
-            #print(key)
 
     def getSprite(self):
         """ Returns the current sprite for the game object """
@@ -190,15 +189,23 @@ class Mario(GameObject):
                 self.y = 540
                 self.state = PlayerState.IDLE
                 self.isDying = False
-                #self.remove()
+
+                print("Lives Left: " + str(self.lives))
+                if self.lives == 0:
+                    self.kill()
 
         return self.spriteManager.animate()
 
-    @GameObject.deathMethod
+    @GameObject.DeathMethod
     def die(self):
         """ Play the death animation """
-        self.lives = self.lives - 1
         self.state = PlayerState.DEAD
         self.spriteManager.useSprites(['death1'], 10)
         self.ticks = 0
         self._walkingSound.stop()
+
+    def drawExtra(self, screen):
+        """ Draw the number of lives remaining """
+        for i in range(self.lives):
+            screen.draw(self._sprites['life'], 10 + (i * 20), 10)
+
