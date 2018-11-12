@@ -92,7 +92,7 @@ class SpriteSheet(object):
     def spriteFlipped(self, x, y, width, height):
         """ Returns a sprite, but flipped horizontally """
         return self.sprite(x, y, width, height).flip()
-        
+
     def invisibleSprite(self, width, height):
         """ Returns invisible sprite"""
         return Image(self.invisible, 0, 0, width, height)
@@ -237,12 +237,27 @@ class GameObject(GameSprite):
     def isDying(self, val):
         self.__isDying = val
 
+    @property
+    def lives(self):
+        return self.__lives
+
     @staticmethod
-    def deathMethod(func):
-        def death_wrapper(self):
+    def DeathMethod(func):
+        def wrapper(self, *args, **kwargs):
             self.__isDying = True
-            return func(self)
-        return death_wrapper
+            self.__lives = self.__lives - 1
+            return func(self, *args, **kwargs)
+
+        return wrapper
+
+    @staticmethod
+    def HasLives(numberOfLives):
+        def decorator(func):
+            def wrapper(self, *args, **kwargs):
+                self.__lives = numberOfLives
+                return func(self, *args, **kwargs)
+            return wrapper
+        return decorator
 
 
 class GameCollectible(GameObject):
