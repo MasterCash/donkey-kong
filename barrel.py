@@ -30,7 +30,7 @@ class BarrelDir(Enum):
 class Barrel(GameObject):
     def __init__(self, barrelType):
         GameObject.__init__(self)
-        self._speed = 20
+        self._speed = 50
         self._sheet = SpriteSheet('barrel')
         # Type of barrel being handled. Given when Created.
         self.type = barrelType
@@ -152,7 +152,7 @@ class Barrel(GameObject):
                     str(self.type) + '_roll3',
                     str(self.type) + '_roll2',
                     str(self.type) + '_roll1'
-                    ], math.ceil(1/3 * self._speed))
+                    ],self.animationSpeed())
         elif self.state == BarrelState.FALL:
             if self.dir == BarrelDir.LEFT:
                 self.spriteManager.useSprites([
