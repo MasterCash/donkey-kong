@@ -137,8 +137,10 @@ class MenuBuilder:
             self.__handleKeyPress
         )
 
-def play(window):
-    print("play")
+def play(onPlay):
+    def wrapper(window):
+        onPlay(window)
+    return wrapper
 
 def controls(window):
     print("controls")
@@ -154,12 +156,12 @@ def exit(data):
     os._exit(0)
 
 
-def showMainMenu():
+def showMainMenu(onPlay):
     """ Creates the main menu """
     Events.subscribe(Events.QUIT, exit)
 
     menu = MenuBuilder()
-    menu.addOption("Play", play)
+    menu.addOption("Play", play(onPlay))
     menu.addOption("Controls", controls)
     menu.addOption("Credits", credits)
     menu.addOption("Exit", exit)

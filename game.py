@@ -40,6 +40,8 @@ class GameManager:
         if self._levelManager is None:
            raise Exception("No Level Manager")
 
+        Clock.resetDelta() # Fix large time delta
+
         while self.__playing:
             Clock.forceFPS(60)
 

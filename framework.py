@@ -441,6 +441,9 @@ class __ClockClass:
         t = self._clock.tick(self.fps)
         self._delta = t / 1000.0
 
+    def resetDelta(self):
+        self._delta = 0
+
     @property
     def timeDelta(self):
         """ Returns the detla time """
