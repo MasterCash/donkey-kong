@@ -7,6 +7,7 @@ from framework import GameObject, SpriteSheet, Clock
 from spriteManager import SpriteManager
 from enum import Enum
 from collisionDetector import CollisionTypes, CollisionDirection
+from effectSpawner import EffectSpawner
 
 # Enum to represent the type of code.
 class BarrelType(Enum):
@@ -77,7 +78,7 @@ class Barrel(GameObject):
         self.spriteManager = SpriteManager(self._sprites)
 
         # Initial Spawning Position.
-        self.x = 327
+        self.x = 127
         self.y = 160
 
         # Initalizing the state of the Barrel.
@@ -145,7 +146,7 @@ class Barrel(GameObject):
                     print ("IS COUNTING DOWN")
                     self.isFalling = False
                     self._ladderIgnore -= 1
-                elif random.randint(1, 100) > 60 and not self.hitWall:
+                elif False and random.randint(1, 100) > 60 and not self.hitWall:
                     print ("IS not lucky")
                     self._ladderIgnore = 6
                     self.isFalling = False
@@ -184,6 +185,7 @@ class Barrel(GameObject):
         """ Checks for collision with another spirte """
         # If we are hitting a platform.
         if collisionType == CollisionTypes.Platform:
+            self._lastPlatform = obj
             # And we are not on a ladder, stop falling.
             if not self.isFalling:
                 self.bottom = obj.top + 1
@@ -234,7 +236,7 @@ class Barrel(GameObject):
         if self.type == BarrelType.EXPLOSIVE:
             self.tick = random.randint(300, 1900)
         elif self.type == BarrelType.GOO:
-            self.tick = random.randint(300, 1900)
+            self.tick = random.randint(300, 900)
         else:
             self.tick = 0
 
@@ -245,10 +247,14 @@ class Barrel(GameObject):
             return
         # TODO: add explosion AOE
         if self.type == BarrelType.EXPLOSIVE:
+            print("Exploding!!")
+            EffectSpawner().spawnExplosion(self.x, self.y)
             self.state = BarrelState.DEAD
             self.kill()
         # TODO: change current platform state.
         elif self.type == BarrelType.GOO:
+            print("Gooing!!")
+            EffectSpawner().spawnGoo(self.x, self.y, self._lastPlatform)
             self.state = BarrelState.DEAD
             self.kill()
 
