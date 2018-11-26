@@ -142,9 +142,6 @@ class Mario(GameObject):
             self.die()
 
         elif collisionType == CollisionTypes.Ladder:
-            climbableright = obj.right-10
-            climbableleft = obj.left+10
-            if self.right >= climbableleft and self.left <= climbableright:
                 self._isAtLadder = True
 
         elif collisionType == CollisionTypes.Platform:
