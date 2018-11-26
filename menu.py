@@ -110,11 +110,11 @@ class MenuBuilder:
         index = self.__selectedIndex
         while searching:
             index = index + increment
-            if index >= max:
+            if index > max:
                 index = self.__selectedIndex
                 searching = False
 
-            if index <= 0:
+            if index < 0:
                 index = self.__selectedIndex
                 searching = False
 
