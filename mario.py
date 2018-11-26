@@ -142,7 +142,10 @@ class Mario(GameObject):
             self.die()
 
         elif collisionType == CollisionTypes.Ladder:
-            self._isAtLadder = True
+            climbableright = obj.right-10
+            climbableleft = obj.left+10
+            if self.right >= climbableleft and self.left <= climbableright:
+                self._isAtLadder = True
 
         elif collisionType == CollisionTypes.Platform:
             if self._isAtLadder == False and not self._isJumping:
@@ -158,7 +161,6 @@ class Mario(GameObject):
                 self.left = obj.right
             else:
                 self.right = obj.left
-            print("collided with wall")
 
     def _marioKeyPress(self, key):
         def __str__(self):

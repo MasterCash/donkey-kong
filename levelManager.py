@@ -58,8 +58,8 @@ class LevelManager(GameLevelManager):
         self._ladder = self._sheet.sprite(33, 1, 16, 8)
         self._invisibleLadder = self._sheet.invisibleSprite(16, 8)
         self._invisiblePlatform = self._sheet.invisibleSprite(16, 8)
-        self._invisibleWall = self._sheet.invisibleSprite(2, 600)
-
+        self._invisibleSideWall = self._sheet.invisibleSprite(1, 600)
+        self._invisibleEdgeWall = self._sheet.invisibleSprite(1,8) # Currently not used
         # Read levels from the levels file
         with open('assets/levels.json', 'r') as f:
             self._levels = json.load(f)
@@ -151,10 +151,10 @@ class LevelManager(GameLevelManager):
         y = drawLtoRPlatform(y)
 
         # Draw Left Inv. Wall
-        self.walls.add(InvisibleWall(0, 0, self._invisibleWall, True))
+        self.walls.add(InvisibleWall(0, 0, self._invisibleSideWall, True))
+        # Draw Right Inv. Wall
+        self.walls.add(InvisibleWall(544, 0, self._invisibleSideWall, False))
 
-        #Draw Right Inv. Wall
-        self.walls.add(InvisibleWall(544, 0, self._invisibleWall, False))
         # Top platform
         y = y - (4 * h) + 2
         for x in range(0 - w, width - w, w):
