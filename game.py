@@ -18,9 +18,8 @@ class GameState(Enum):
 @Singleton
 class GameManager:
     """ Class to manage the state of the game """
-    def __init__(self):
-        self._window = Window(544, 600).setTitle('Donkey Kong').setIcon('assets/icon.png')
-        Events.subscribe(Events.QUIT, self._quit)
+    def __init__(self, window):
+        self._window = window
 
         self._objects = SpriteGroup()
         self._players = SpriteGroup()
@@ -34,12 +33,14 @@ class GameManager:
 
         self.state = GameState.Playing
 
+        self.__playing = True
+
     def play(self):
         """ Main Game Loop """
         if self._levelManager is None:
            raise Exception("No Level Manager")
 
-        while True:
+        while self.__playing:
             Clock.forceFPS(60)
 
             # Game Routine
@@ -149,8 +150,3 @@ class GameManager:
             self._enemies.empty()
         else:
             self.state = GameState.Playing
-
-    def _quit(self, data):
-        """ Closes the window """
-        self._window.close()
-        os._exit(0)
