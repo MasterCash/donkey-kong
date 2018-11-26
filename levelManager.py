@@ -10,6 +10,24 @@ class Platform(GameSprite):
         self.x = x
         self.y = y
         self.image = sprite
+        self._next = None
+        self._previous = None
+
+    @property
+    def nextPlatform(self):
+        return self._next
+
+    @nextPlatform.setter
+    def nextPlatform(self, next):
+        self._next = next
+
+    @property
+    def previousPlatform(self):
+        return self._previous
+
+    @previousPlatform.setter
+    def previousPlatform(self, prev):
+        self._previous = prev
 
 
 class Ladder(GameSprite):
@@ -91,19 +109,30 @@ class LevelManager(GameLevelManager):
             for y1 in range(y-9, targetY, -8):
                 self.ladders.add(Ladder(x, y1, self._ladder))
                 lastY = y1
-                
+
             # Invisible ladder hitbox on top of the platform
             targetY = lastY - (int((2.5*h)/8) * 8) + h-2
             for y1 in range(lastY - 6, targetY, -8):
                 self.ladders.add(InvisibleLadder(x, y1, self._invisibleLadder))
-                
+
             self.immovables.add(InvisiblePlatform(x, targetY - 32, self._invisiblePlatform, True)) # Invisible platform on top of the ladder
+
         def drawLtoRPlatform(y):
+            platformsThisTime = []
+
             lastX = 0
             for x in range(w, width + w, w):
-                self.platforms.add(Platform(x, y, self._platform))
+                platformsThisTime.append(Platform(x, y, self._platform))
                 y = y - 1
                 lastX = x
+
+            for i in range(0, len(platformsThisTime)):
+                if i > 0:
+                    platformsThisTime[i].previousPlatform = platformsThisTime[i-1]
+                if i < (len(platformsThisTime) - 1):
+                    platformsThisTime[i].nextPlatform = platformsThisTime[i+1]
+
+                self.platforms.add(platformsThisTime[i])
 
             # Add ladder to next platform
             x = lastX - 2*w
@@ -111,11 +140,21 @@ class LevelManager(GameLevelManager):
             return y
 
         def drawRtoLPlatform(y):
+            platformsThisTime = []
+
             lastX = 0
             for x in range(width - (2 * w), 0 - w, w * -1):
-                self.platforms.add(Platform(x, y, self._platform))
+                platformsThisTime.append(Platform(x, y, self._platform))
                 y = y - 1
                 lastX = x
+
+            for i in range(0, len(platformsThisTime)):
+                if i > 0:
+                    platformsThisTime[i].previousPlatform = platformsThisTime[i-1]
+                if i < (len(platformsThisTime) - 1):
+                    platformsThisTime[i].nextPlatform = platformsThisTime[i+1]
+
+                self.platforms.add(platformsThisTime[i])
 
             # Add ladder to next platform
             x = lastX + 1.5*w
