@@ -48,11 +48,12 @@ class GameManager:
             # Game Routine
             self._checkForDeath()
             self._checkForVictory()
+            self._checkForLoss()
+
             self._handleEvents()
             self._update()
             self._collisionCheck()
             self._draw()
-            self._window.flip()
 
         return self._victory
 
@@ -134,6 +135,8 @@ class GameManager:
         if self.state != GameState.DeathScreen:
             self._enemies.draw(self._window)
 
+        self._window.flip()
+
     def _checkForDeath(self):
         death = False
 
@@ -169,6 +172,11 @@ class GameManager:
         self._playing = not self._victory
 
         return self._victory
+
+    def _checkForLoss(self):
+        if len(self._players) == 0:
+            self._victory = False
+            self._playing = False
 
     def _quit(self, data):
         """ Closes the window """
