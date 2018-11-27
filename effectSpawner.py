@@ -15,9 +15,11 @@ class EffectSpawner:
         self.__game.addEnemy(Explosion(barrel, rand))
     def spawnGoo(self, platform):
         rand = randint(200, 500)
-        self.__game.addEnemy(Goo(platform.nextPlatform, rand))
+        if platform.nextPlatform is not None:
+            self.__game.addEnemy(Goo(platform.nextPlatform, rand))
         self.__game.addEnemy(Goo(platform, rand))
-        self.__game.addEnemy(Goo(platform.previousPlatform, rand))
+        if platform.previousPlatform is not None:
+            self.__game.addEnemy(Goo(platform.previousPlatform, rand))
 
 
 class Explosion(GameObject):
