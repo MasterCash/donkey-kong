@@ -147,6 +147,12 @@ class Barrel(GameObject):
                 elif random.randint(1, 100) > 60 and not self.hitWall:
                     self._ladderIgnore = 6
                     self.isFalling = False
+                elif self.hitWall:
+                    if self.dir == BarrelDir.LEFT:
+                        self.dir = BarrelDir.RIGHT
+                    elif self.dir == BarrelDir.RIGHT:
+                        self.dir = BarrelDir.LEFT
+                    self.state = BarrelState.FALL
                 else:
                     # Change the direction so that when we stop falling,
                     # we are heading the oposite direction as before.
@@ -174,7 +180,6 @@ class Barrel(GameObject):
         if self.dirChanged:
             self.setSprites()
             self.dirChanged = False
-            self.hitWall = False
 
     # Collision Handling.
     def collision(self, collisionType, direction, obj):
@@ -201,12 +206,9 @@ class Barrel(GameObject):
                 self.dirChanged = True
                 self.isFalling = False
         elif collisionType == CollisionTypes.Wall:
+            print("Hit wall")
             self._ladderIgnore = 0
             self.hitWall = True
-            if direction == CollisionDirection.Right:
-                self.right = obj.left - 1
-            else:
-                self.left = obj.right + 1
             if not self.isFalling:
                 self.dirChanged = True
                 self.isFalling = True
