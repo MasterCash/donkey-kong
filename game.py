@@ -35,6 +35,7 @@ class GameManager:
         self.state = GameState.Playing
 
         self._playing = True
+        self._victory = False
 
     def play(self):
         """ Main Game Loop """
@@ -52,6 +53,8 @@ class GameManager:
             self._collisionCheck()
             self._draw()
             self._window.flip()
+
+        return self._victory
 
     def addPlayer(self, player):
         """ Adds a player to the game """
@@ -155,17 +158,17 @@ class GameManager:
             self.state = GameState.Playing
 
     def _checkForVictory(self):
-        victory = False
+        self._victory = False
 
         for player in self._players:
-            victory = self._levelManager.isLevelCompleted(player)
+            self._victory = self._levelManager.isLevelCompleted(player)
 
-            if victory:
+            if self._victory:
                 break
 
-        self._playing = not victory
+        self._playing = not self._victory
 
-        return victory
+        return self._victory
 
     def _quit(self, data):
         """ Closes the window """
