@@ -191,6 +191,22 @@ class GameSprite(pygame.sprite.Sprite):
         """ Sets where the left side of the sprite is """
         self.x = l
 
+    @property
+    def centerX(self):
+        return self.x + ((1/2) * self.width)
+
+    @centerX.setter
+    def centerX(self, x):
+        self.x = x - ((1/2) * self.width)
+
+    @property
+    def centerY(self):
+        return self.y + ((1/2) * self.height)
+
+    @centerY.setter
+    def centerY(self, y):
+        self.y = y - ((1/2) * self.height)
+
 
 def SpriteCollision(sprite, spriteGroup, kill=False):
     """ Checks for collission between a sprite and a sprite group """
