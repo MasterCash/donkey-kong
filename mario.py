@@ -146,7 +146,7 @@ class Mario(GameObject):
             self.die()
 
         elif collisionType == CollisionTypes.Ladder:
-            self._isAtLadder = True
+                self._isAtLadder = True
 
         elif collisionType == CollisionTypes.Platform:
             if self._isAtLadder == False and not self._isJumping:
@@ -157,6 +157,12 @@ class Mario(GameObject):
             self.state = PlayerState.IDLE
             if not obj.isTopOfLadder:
                 self.bottom = obj.top
+        elif collisionType == CollisionTypes.Wall:
+            self.state = PlayerState.IDLE
+            if obj.isLeftWall:
+                self.left = obj.right
+            else:
+                self.right = obj.left
 
     def _marioKeyPress(self, key):
         def __str__(self):
