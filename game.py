@@ -34,12 +34,14 @@ class GameManager:
 
         self.state = GameState.Playing
 
+        self._playing = True
+
     def play(self):
         """ Main Game Loop """
         if self._levelManager is None:
            raise Exception("No Level Manager")
 
-        while True:
+        while self._playing:
             Clock.forceFPS(60)
 
             # Game Routine
@@ -159,7 +161,11 @@ class GameManager:
             victory = self._levelManager.isLevelCompleted(player)
 
             if victory:
-                pass # TODO
+                break
+
+        self._playing = not victory
+
+        return victory
 
     def _quit(self, data):
         """ Closes the window """
