@@ -349,6 +349,9 @@ class SpriteGroup:
         """ Contains operator """
         return self.has(sprite)
 
+    def __len__(self):
+        return len(self._group)
+
 
 class Screen:
     """ Screen (pygame display) """

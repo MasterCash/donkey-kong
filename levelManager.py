@@ -78,9 +78,8 @@ class LevelManager(GameLevelManager):
         self._invisiblePlatform = self._sheet.invisibleSprite(16, 8)
         self._invisibleSideWall = self._sheet.invisibleSprite(1, 600)
         self._invisibleEdgeWall = self._sheet.invisibleSprite(1,8) # Currently not used
-        # Read levels from the levels file
-        with open('assets/levels.json', 'r') as f:
-            self._levels = json.load(f)
+
+        self._winningHeight = 0
 
         self._windowHeight = 0
         self._windowWidth = 0
@@ -205,6 +204,8 @@ class LevelManager(GameLevelManager):
             self.platforms.add(Platform(x, y, self._platform))
             lastX = x
 
+        self._winningHeight = y # Player must be at the peach platform to win
+
         # Ladder to Princess Peach
         x = lastX
         drawLadder(x, y + (4 * h) - 2)
@@ -233,7 +234,10 @@ class LevelManager(GameLevelManager):
 
     def isLevelCompleted(self, player):
         """ Checks if the level has been completed """
-        pass
+        if player.bottom <= self._winningHeight:
+            return True
+
+        return False
 
     @property
     def currentLevel(self):

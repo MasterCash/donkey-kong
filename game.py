@@ -34,21 +34,28 @@ class GameManager:
 
         self.state = GameState.Playing
 
+        self._playing = True
+        self._victory = False
+
     def play(self):
         """ Main Game Loop """
         if self._levelManager is None:
            raise Exception("No Level Manager")
 
-        while True:
+        while self._playing:
             Clock.forceFPS(60)
 
             # Game Routine
             self._checkForDeath()
+            self._checkForVictory()
+            self._checkForLoss()
+
             self._handleEvents()
             self._update()
             self._collisionCheck()
             self._draw()
-            self._window.flip()
+
+        return self._victory
 
     def addPlayer(self, player):
         """ Adds a player to the game """
@@ -118,7 +125,6 @@ class GameManager:
         CollisionDetector.check(self._enemies, self._levelManager.platforms, CollisionTypes.Platform)
         CollisionDetector.check(self._enemies, self._levelManager.immovables, CollisionTypes.Immovable)
 
-
     def _draw(self):
         """ Draws everything on the window """
         self._levelManager.draw(self._window)
@@ -128,6 +134,8 @@ class GameManager:
 
         if self.state != GameState.DeathScreen:
             self._enemies.draw(self._window)
+
+        self._window.flip()
 
     def _checkForDeath(self):
         death = False
@@ -147,9 +155,28 @@ class GameManager:
 
         if death:
             self.state = GameState.DeathScreen
-            self._enemies.empty()
+            if len(self._players) == 1:
+                self._enemies.empty()
         else:
             self.state = GameState.Playing
+
+    def _checkForVictory(self):
+        self._victory = False
+
+        for player in self._players:
+            self._victory = self._levelManager.isLevelCompleted(player)
+
+            if self._victory:
+                break
+
+        self._playing = not self._victory
+
+        return self._victory
+
+    def _checkForLoss(self):
+        if len(self._players) == 0:
+            self._victory = False
+            self._playing = False
 
     def _quit(self, data):
         """ Closes the window """
