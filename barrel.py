@@ -122,36 +122,32 @@ class Barrel(GameObject):
                 self.spriteManager.useSprites([
                     str(self.type) + '_fall1',
                     str(self.type) + '_fall2',
-                ], math.ceil(1/3 * self._speed))
+                ], self.animationSpeed())
 
             elif self.dir == BarrelDir.RIGHT:
                 self.spriteManager.useSprites([
                     str(self.type) + '_fall3',
                     str(self.type) + '_fall4',
-                ], math.ceil(1/3 * self._speed))
+                ], self.animationSpeed())
 
     def animationSpeed(self):
         if self.state == BarrelState.MOVE:
             return math.ceil((2000/((1/3*self._speed)**2))+2)
         else:
-            return math.ceil(10/self._speed)
+            return 5
 
 
     def move(self):
         if self.state == BarrelState.MOVE:
             # If the barrel is on a ladder.
             if self.isFalling:
-                print(" IS FALLING")
                 if self._ladderIgnore > 0 and not self.hitWall:
-                    print ("IS COUNTING DOWN")
                     self.isFalling = False
                     self._ladderIgnore -= 1
-                elif False and random.randint(1, 100) > 60 and not self.hitWall:
-                    print ("IS not lucky")
+                elif random.randint(1, 100) > 60 and not self.hitWall:
                     self._ladderIgnore = 6
                     self.isFalling = False
                 else:
-                    print ("Moving down")
                     # Change the direction so that when we stop falling,
                     # we are heading the oposite direction as before.
                     # it is falling down the ladder.
@@ -236,7 +232,7 @@ class Barrel(GameObject):
         if self.type == BarrelType.EXPLOSIVE:
             self.tick = random.randint(300, 1900)
         elif self.type == BarrelType.GOO:
-            self.tick = random.randint(300, 900)
+            self.tick = random.randint(300, 1900)
         else:
             self.tick = 0
 
@@ -248,13 +244,13 @@ class Barrel(GameObject):
         # TODO: add explosion AOE
         if self.type == BarrelType.EXPLOSIVE:
             print("Exploding!!")
-            EffectSpawner().spawnExplosion(self.x, self.y)
+            EffectSpawner().spawnExplosion(self)
             self.state = BarrelState.DEAD
             self.kill()
         # TODO: change current platform state.
         elif self.type == BarrelType.GOO:
             print("Gooing!!")
-            EffectSpawner().spawnGoo(self.x, self.y, self._lastPlatform)
+            EffectSpawner().spawnGoo(self._lastPlatform)
             self.state = BarrelState.DEAD
             self.kill()
 
