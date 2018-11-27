@@ -44,6 +44,7 @@ class GameManager:
 
             # Game Routine
             self._checkForDeath()
+            self._checkForVictory()
             self._handleEvents()
             self._update()
             self._collisionCheck()
@@ -150,6 +151,15 @@ class GameManager:
             self._enemies.empty()
         else:
             self.state = GameState.Playing
+
+    def _checkForVictory(self):
+        victory = False
+
+        for player in self._players:
+            victory = self._levelManager.isLevelCompleted(player)
+
+            if victory:
+                pass # TODO
 
     def _quit(self, data):
         """ Closes the window """

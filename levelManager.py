@@ -233,7 +233,7 @@ class LevelManager(GameLevelManager):
 
     def isLevelCompleted(self, player):
         """ Checks if the level has been completed """
-        pass
+        return False
 
     @property
     def currentLevel(self):
