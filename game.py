@@ -109,6 +109,7 @@ class GameManager:
         CollisionDetector.check(self._players, self._levelManager.ladders, CollisionTypes.Ladder)
         CollisionDetector.check(self._players, self._levelManager.platforms, CollisionTypes.Platform)
         CollisionDetector.check(self._players, self._levelManager.immovables, CollisionTypes.Immovable)
+        CollisionDetector.check(self._players, self._levelManager.walls, CollisionTypes.Wall )
         CollisionDetector.check(self._players, self._enemies, CollisionTypes.Enemy)
 
         CollisionDetector.checkCollection(self._collectibles, self._players, CollectionTypes.Player)

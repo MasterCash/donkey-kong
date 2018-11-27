@@ -10,6 +10,7 @@ class CollisionTypes(Enum):
     Platform = 1
     Enemy = 2
     Immovable = 3
+    Wall = 4
 
 class CollectionTypes(Enum):
     Player = 0
@@ -41,7 +42,7 @@ class __CollisionDetectorClass:
         for hit in hits:
             direction = self._detectDirection(obj1, hit)
             obj1.collision(collisionType, direction, hit)
-
+            
     def checkCollection(self, collectible, objectGroup, collectionType):
         """ Check if a collectible was collected """
         if isinstance(collectible, SpriteGroup):
