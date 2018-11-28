@@ -38,6 +38,8 @@ class __CollisionDetectorClass:
         if not isinstance(obj1, GameObject):
             return
 
+        obj1.name = type(obj1).__name__
+
         hits = SpriteCollision(obj1, objectGroup)
         for hit in hits:
             direction = self._detectDirection(obj1, hit)
