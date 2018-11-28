@@ -22,8 +22,9 @@ class PlayerState(Enum):
 
 
 movement = 100.0
-jump_height = 30
+jump_height = 15
 jump_speed = 300 # Actually 100
+
 
 
 class Mario(GameObject):
@@ -32,8 +33,7 @@ class Mario(GameObject):
         super().__init__()
 
         self._sheet = SpriteSheet('mario')
-        self._jumpCount = 15
-        self._isJumping = False
+        self._jumpCount = jump_height
 
         self._sprites = {
             'stand_left': self._sheet.sprite(0, 20, 24, 32),
@@ -59,11 +59,7 @@ class Mario(GameObject):
             'stand_right'
         ], 10)
 
-        self.x = 60
-        self.y = 550
-        self.state = PlayerState.IDLE
-        self._isAtLadder = False
-        self._isOnGround = False
+        self._setInitialState()
         self.ticks = 0
 
         InputManager.subscribe(
@@ -81,7 +77,7 @@ class Mario(GameObject):
         self._isAtLadder = False
 
         if self._isJumping:
-            if self._jumpCount >= -15:
+            if self._jumpCount >= -jump_height:
                 neg = 1
                 if self._jumpCount < 0:
                     neg = -1
@@ -89,7 +85,7 @@ class Mario(GameObject):
                 self._jumpCount = self._jumpCount - 1
             else:
                 self._isJumping = False
-                self._jumpCount = 15
+                self._jumpCount = jump_height
             self._isOnGround = False
 
         if self.state == PlayerState.MOVELEFT:
@@ -194,10 +190,7 @@ class Mario(GameObject):
             elif self.ticks == 100:
                 self.spriteManager.useSprites(['death6'])
             elif self.ticks == 150:
-                self.x = 60
-                self.y = 540
-                self.state = PlayerState.IDLE
-                self.isDying = False
+                self._setInitialState()
 
                 print("Lives Left: " + str(self.lives))
                 if self.lives == 0:
@@ -218,3 +211,12 @@ class Mario(GameObject):
         for i in range(self.lives):
             screen.draw(self._sprites['life'], 10 + (i * 20), 10)
 
+    def _setInitialState(self):
+        self.x = 60
+        self.y = 540
+        self.state = PlayerState.IDLE
+        self.isDying = False
+        self._isAtLadder = False
+        self._isJumping = False
+        self._isOnGround = True
+        self._jumpCount = jump_height
