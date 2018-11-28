@@ -75,11 +75,16 @@ class Goo(GameCollectible):
         self.x = platform.x
         self.y = platform.y
         self.rand = rand
+
         self._sprites = {
-            'Goo_1': self._sheet.sprite(0,1,32,16)
+            'Goo_1': self._sheet.sprite(0, 1, 32, 16),
+            'Goo_2': self._sheet.sprite(33, 1, 32, 16),
+            'Goo_3': self._sheet.sprite(99, 1, 32, 16),
+            'Goo_4': self._sheet.sprite(66, 1, 32, 16)
         }
+
         self.spriteManager = SpriteManager(self._sprites)
-        self.spriteManager.useSprites(['Goo_1'])
+        self.spriteManager.useSprites(['Goo_1', 'Goo_2', 'Goo_3', 'Goo_4', 'Goo_3', 'Goo_2'], 30)
 
     def update(self):
         self.spriteManager.animate()
@@ -88,7 +93,7 @@ class Goo(GameCollectible):
             self.kill()
 
     def getSprite(self):
-        return self.spriteManager.currentSprite()
+        return self.spriteManager.animate()
 
     def onCollect(self, hit, collectionType):
         pass
