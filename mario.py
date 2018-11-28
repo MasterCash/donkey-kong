@@ -158,7 +158,6 @@ class Mario(GameObject):
             if not obj.isTopOfLadder:
                 self.bottom = obj.top
         elif collisionType == CollisionTypes.Wall:
-            print("wall")
             self.state = PlayerState.IDLE
             if obj.isLeftWall:
                 self.left = obj.right
