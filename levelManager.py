@@ -125,7 +125,7 @@ class LevelManager(GameLevelManager):
                 y = y - 1
                 lastX = x
 
-            self.immovables.add(InvisiblePlatform(x-w, y+1, self._invisiblePlatform))
+            self.immovables.add(InvisiblePlatform(x-w, y+2, self._invisiblePlatform))
 
             for i in range(0, len(platformsThisTime)):
                 if i > 0:
@@ -149,7 +149,7 @@ class LevelManager(GameLevelManager):
                 y = y - 1
                 lastX = x
 
-            self.immovables.add(InvisiblePlatform(0, y+1, self._invisiblePlatform))
+            self.immovables.add(InvisiblePlatform(0, y+2, self._invisiblePlatform))
 
             for i in range(0, len(platformsThisTime)):
                 if i > 0:
@@ -177,7 +177,7 @@ class LevelManager(GameLevelManager):
             y = y - 1
             lastX = x
 
-        self.immovables.add(InvisiblePlatform(lastX, y+1, self._invisiblePlatform))
+        self.immovables.add(InvisiblePlatform(lastX, y+2, self._invisiblePlatform))
 
         drawLadder(lastX - (2*w), y) # Ladder from first platform
 
