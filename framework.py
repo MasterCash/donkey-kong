@@ -259,10 +259,16 @@ class GameObject(GameSprite):
 
     @staticmethod
     def DeathMethod(func):
+        def noOp():
+            pass
+
         def wrapper(self, *args, **kwargs):
-            self.__isDying = True
-            self.__lives = self.__lives - 1
-            return func(self, *args, **kwargs)
+            if not self.__isDying:
+                self.__isDying = True
+                self.__lives = self.__lives - 1
+                return func(self, *args, **kwargs)
+
+            return noOp
 
         return wrapper
 
