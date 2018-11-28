@@ -125,6 +125,8 @@ class LevelManager(GameLevelManager):
                 y = y - 1
                 lastX = x
 
+            self.immovables.add(InvisiblePlatform(x-w, y+1, self._invisiblePlatform))
+
             for i in range(0, len(platformsThisTime)):
                 if i > 0:
                     platformsThisTime[i].previousPlatform = platformsThisTime[i-1]
@@ -146,6 +148,8 @@ class LevelManager(GameLevelManager):
                 platformsThisTime.append(Platform(x, y, self._platform))
                 y = y - 1
                 lastX = x
+
+            self.immovables.add(InvisiblePlatform(x, y+1, self._invisiblePlatform))
 
             for i in range(0, len(platformsThisTime)):
                 if i > 0:
