@@ -124,6 +124,7 @@ class GameManager:
         CollisionDetector.check(self._enemies, self._levelManager.ladders, CollisionTypes.Ladder)
         CollisionDetector.check(self._enemies, self._levelManager.platforms, CollisionTypes.Platform)
         CollisionDetector.check(self._enemies, self._levelManager.immovables, CollisionTypes.Immovable)
+        CollisionDetector.check(self._enemies, self._levelManager.walls, CollisionTypes.Wall )
 
     def _draw(self):
         """ Draws everything on the window """
