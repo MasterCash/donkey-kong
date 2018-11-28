@@ -263,5 +263,6 @@ class Barrel(GameObject):
 
     # Called if item collected. Used to despawn barrels when they reach the end.
     def collectedItem(self, collectible, collectionType):
-        self.state = BarrelState.DEAD
-        self.kill()
+        if collectible.name == 'flamingOilContainer':
+            self.state = BarrelState.DEAD
+            self.kill()

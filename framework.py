@@ -286,11 +286,25 @@ class GameCollectible(GameObject):
     """ Something Collectible, like a hammer or the flaming oil can """
     def __init__(self):
         super().__init__()
+        self.__isClearable = False
 
     @DefaultMethod
     def onCollect(self, collectedBy, collectionType):
         collectedBy.collectedItem(self)
         self.kill()
+
+    @property
+    def canBeCleared(self):
+        return self.__isClearable
+
+    @staticmethod
+    def IsClearable():
+        def decorator(func):
+            def wrapper(self, *args, **kwargs):
+                self.__isClearable = True
+                return func(self, *args, **kwargs)
+            return wrapper
+        return decorator
 
 
 class GameLevelManager:
