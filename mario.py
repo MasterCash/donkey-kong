@@ -67,7 +67,7 @@ class Mario(GameObject):
         self.ticks = 0
 
         InputManager.subscribe(
-            [Keys.LEFT, Keys.RIGHT, Keys.DOWN, Keys.UP, Keys.SPACE],
+            [Keys.LEFT, Keys.RIGHT, Keys.DOWN, Keys.UP, Keys.SPACE, Keys.R],
             self._marioKeyPress
         )
 
@@ -168,7 +168,10 @@ class Mario(GameObject):
         def __str__(self):
             return "MarioKeyPress"
 
-        if (key == Keys.LEFT or key == Keys.A) and self.state not in (PlayerState.LADDER_IDLE, PlayerState.LADDER_DOWN, PlayerState.LADDER_UP):
+        if key == Keys.R:
+            self.die()
+
+        elif (key == Keys.LEFT or key == Keys.A) and self.state not in (PlayerState.LADDER_IDLE, PlayerState.LADDER_DOWN, PlayerState.LADDER_UP):
             self.state = PlayerState.MOVELEFT
         elif (key == Keys.RIGHT or key == Keys.D) and self.state != PlayerState.LADDER_IDLE:
             self.state = PlayerState.MOVERIGHT
