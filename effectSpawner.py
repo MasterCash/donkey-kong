@@ -11,10 +11,10 @@ class EffectSpawner:
         self.__game = GameManager()
 
     def spawnExplosion(self, barrel):
-        rand = randint(10, 30)
+        rand = randint(5, 10)
         self.__game.addEnemy(Explosion(barrel, rand))
     def spawnGoo(self, platform):
-        rand = randint(200, 500)
+        rand = randint(500, 1000)
         if platform.nextPlatform is not None:
             self.__game.addEnemy(Goo(platform.nextPlatform, rand))
         self.__game.addEnemy(Goo(platform, rand))

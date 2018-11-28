@@ -210,8 +210,6 @@ class Barrel(GameObject):
             self.hitWall = True
             if self.x <= obj.x:
                 self.right = obj.left - 1
-            else:
-                self.left = obj.right + 1
             if not self.isFalling:
                 self.dirChanged = True
                 self.isFalling = True
