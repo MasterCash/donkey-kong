@@ -1,6 +1,6 @@
 
 from game import GameManager
-from framework import GameObject, SpriteSheet, Clock, GameSprite
+from framework import GameObject, SpriteSheet, Clock, GameSprite, GameCollectible
 from spriteManager import SpriteManager
 from utils import Singleton
 from random import randint
@@ -13,13 +13,17 @@ class EffectSpawner:
     def spawnExplosion(self, barrel):
         rand = randint(5, 10)
         self.__game.addEnemy(Explosion(barrel, rand))
+
     def spawnGoo(self, platform):
         rand = randint(500, 1000)
+
         if platform.nextPlatform is not None:
-            self.__game.addEnemy(Goo(platform.nextPlatform, rand))
-        self.__game.addEnemy(Goo(platform, rand))
+            self.__game.addCollectible(Goo(platform.nextPlatform, rand))
+
+        self.__game.addCollectible(Goo(platform, rand))
+
         if platform.previousPlatform is not None:
-            self.__game.addEnemy(Goo(platform.previousPlatform, rand))
+            self.__game.addCollectible(Goo(platform.previousPlatform, rand))
 
 
 class Explosion(GameObject):
@@ -49,6 +53,7 @@ class Explosion(GameObject):
         for i in range(0,self.len):
             sprites.append('explosion_'+str(i))
         self.spriteManager.useSprites(sprites, rand)
+
     def update(self):
         self.centerX = self._barrel.centerX
         self.bottom = self._barrel.bottom
@@ -56,11 +61,13 @@ class Explosion(GameObject):
         self.spriteManager.animate()
         if self.getSprite() == self._sprites['explosion_'+ str(self.len - 1)]:
             self.kill()
+
     def getSprite(self):
         return self.spriteManager.currentSprite()
 
 
-class Goo(GameObject):
+class Goo(GameCollectible):
+    @GameCollectible.IsClearable()
     def __init__(self, platform, rand):
         GameObject.__init__(self)
         self._sheet = SpriteSheet('goo')
@@ -73,6 +80,7 @@ class Goo(GameObject):
         }
         self.spriteManager = SpriteManager(self._sprites)
         self.spriteManager.useSprites(['Goo_1'])
+
     def update(self):
         self.spriteManager.animate()
         self.tick += 1
@@ -81,3 +89,6 @@ class Goo(GameObject):
 
     def getSprite(self):
         return self.spriteManager.currentSprite()
+
+    def onCollect(self, hit, collectionType):
+        pass

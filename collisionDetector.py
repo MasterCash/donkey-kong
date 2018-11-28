@@ -42,7 +42,7 @@ class __CollisionDetectorClass:
         for hit in hits:
             direction = self._detectDirection(obj1, hit)
             obj1.collision(collisionType, direction, hit)
-            
+
     def checkCollection(self, collectible, objectGroup, collectionType):
         """ Check if a collectible was collected """
         if isinstance(collectible, SpriteGroup):
@@ -53,12 +53,13 @@ class __CollisionDetectorClass:
         if not isinstance(collectible, GameCollectible):
             return
 
+        collectible.name = type(collectible).__name__
+
         hits = SpriteCollision(collectible, objectGroup)
         for hit in hits:
             if isinstance(hit, GameObject):
                 collectible.onCollect(hit, collectionType)
                 hit.collectedItem(collectible, collectionType)
-
 
     def _detectDirection(self, obj1, obj2):
         """ Gets the direction of the collision """

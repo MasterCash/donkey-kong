@@ -158,6 +158,11 @@ class GameManager:
             self.state = GameState.DeathScreen
             if len(self._players) == 1:
                 self._enemies.empty()
+
+                # Remove clearable collectibles
+                for collectible in self._collectibles:
+                    if collectible.canBeCleared:
+                        collectible.kill()
         else:
             self.state = GameState.Playing
 
