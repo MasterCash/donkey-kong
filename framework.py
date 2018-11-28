@@ -479,6 +479,7 @@ class Keys(Enum):
     A = pygame.K_a
     S = pygame.K_s
     D = pygame.K_d
+    R = pygame.K_r
     Num_1 = pygame.K_1
     Num_2 = pygame.K_2
     Num_3 = pygame.K_3
