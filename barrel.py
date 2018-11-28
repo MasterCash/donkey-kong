@@ -265,5 +265,3 @@ class Barrel(GameObject):
     def collectedItem(self, collectible, collectionType):
         self.state = BarrelState.DEAD
         self.kill()
-        # If fire type, spawn a fire ball.
-        if self.type == BarrelType.FIRE:
