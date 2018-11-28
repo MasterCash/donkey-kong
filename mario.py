@@ -22,7 +22,7 @@ class PlayerState(Enum):
 
 
 movement = 100.0
-jump_height = 30
+jump_height = 16
 jump_speed = 300 # Actually 100
 
 
@@ -32,7 +32,7 @@ class Mario(GameObject):
         super().__init__()
 
         self._sheet = SpriteSheet('mario')
-        self._jumpCount = 15
+        self._jumpCount = jump_height
         self._isJumping = False
 
         self._sprites = {
@@ -81,7 +81,7 @@ class Mario(GameObject):
         self._isAtLadder = False
 
         if self._isJumping:
-            if self._jumpCount >= -15:
+            if self._jumpCount >= -jump_height:
                 neg = 1
                 if self._jumpCount < 0:
                     neg = -1
@@ -89,7 +89,7 @@ class Mario(GameObject):
                 self._jumpCount = self._jumpCount - 1
             else:
                 self._isJumping = False
-                self._jumpCount = 15
+                self._jumpCount = jump_height
             self._isOnGround = False
 
         if self.state == PlayerState.MOVELEFT:
@@ -158,6 +158,7 @@ class Mario(GameObject):
             if not obj.isTopOfLadder:
                 self.bottom = obj.top
         elif collisionType == CollisionTypes.Wall:
+            print("wall")
             self.state = PlayerState.IDLE
             if obj.isLeftWall:
                 self.left = obj.right

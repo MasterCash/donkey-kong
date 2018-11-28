@@ -30,7 +30,7 @@ class BarrelDir(Enum):
 class Barrel(GameObject):
     def __init__(self, barrelType):
         GameObject.__init__(self)
-        self._speed = 10
+        self._speed = 5
         self._sheet = SpriteSheet('barrel')
         # Type of barrel being handled. Given when Created.
         self.type = barrelType

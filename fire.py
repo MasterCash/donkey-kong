@@ -1,10 +1,11 @@
 """
 Class for fire
 """
-from framework import GameObject, SpriteSheet
+from framework import GameObject, SpriteSheet, Clock
 from spriteManager import SpriteManager
 from enum import Enum
 from collisionDetector import CollisionTypes
+import random
 
 # Different type of fires
 class FireType(Enum):
@@ -27,8 +28,8 @@ class FireDir(Enum):
 class Fire(GameObject):
     def __init__(self, fireType):
         GameObject.__init__(self)
-
         # speed of fire sprite
+        self.level = 0
         self._speed = 2
         self._sheet = SpriteSheet('fireball')
         self.type = fireType
@@ -52,17 +53,26 @@ class Fire(GameObject):
         self.y = 550
         self.state = FireState.MOVE
         self.dir = FireDir.RIGHT
-
+        self.tick = 100
         self.isLadder = False
+        self.randDir = random.randint(0,1)
 
     def update(self):
+        if not self.isLadder:
+            self.y += 1
+        else:
+            self.tick -= 1
         if self.state == FireState.MOVE:
-
             # TODO: make fire sprites move randomly
+            # random direction after after exit the ladder
             if self.isLadder:
-                if self.dir == FireDir.LEFT:
+                if self.tick <= 0:
+                    self.randDir = random.randint(0,1)
+                    self.tick = 20
+                print(self.randDir)
+                if self.randDir == 0:
                     self.dir = FireDir.RIGHT
-                elif self.dir == FireDir.RIGHT:
+                elif self.randDir == 1:
                     self.dir = FireDir.LEFT
                 
                 self.state = FireState.ON_LADDER
@@ -73,7 +83,7 @@ class Fire(GameObject):
                 else:
                     self.x -= self._speed
                     self.setSprites()
-                self.y += 1
+
         elif self.state == FireState.ON_LADDER:
             if not self.isLadder:
                 self.state = FireState.MOVE
@@ -108,18 +118,28 @@ class Fire(GameObject):
     def collision(self, collisionType, direction, obj):
         # If we are hitting a platform.
         if collisionType == CollisionTypes.Platform:
-            # And we are not on a ladder, stop falling.
             if not self.isLadder:
                 self.bottom = obj.top + 1
+                
         # IF we are on a ladder, set ladder flag.
         elif collisionType == CollisionTypes.Ladder:
             self.isLadder = True
+
         # If we hit a Immovable, Boundary for Platforms and Ladders.
         elif collisionType == CollisionTypes.Immovable:
-            # Stop moving down.
-            self.bottom = obj.top + 1
-            # No Longer on a Ladder.
+            self.state = FireState.MOVE
             self.isLadder = False
+            if not obj.isTopOfLadder:
+                self.bottom = obj.top
+
+        # collision with wall
+        elif collisionType == CollisionTypes.Wall:
+            print("hit wall")
+            self.state = FireState.MOVE
+            if obj.isLeftWall:
+                self.dir = FireDir.RIGHT
+            else:
+                self.dir = FireDir.LEFT
     def getSprite(self):
         """ Returns the current sprite for the game object """
         return self.spriteManager.currentSprite()
