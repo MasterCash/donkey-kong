@@ -132,9 +132,9 @@ class Barrel(GameObject):
 
     def animationSpeed(self):
         if self.state == BarrelState.MOVE:
-            return math.ceil((2000/((1/3*self._speed)**2))+2)
+            return math.ceil((2500/((1/3*self._speed)**2))+2)
         else:
-            return 5
+            return 10
 
 
     def move(self):
@@ -144,7 +144,7 @@ class Barrel(GameObject):
                 if self._ladderIgnore > 0 and not self.hitWall:
                     self.isFalling = False
                     self._ladderIgnore -= 1
-                elif random.randint(1, 100) > 0 and not self.hitWall:
+                elif random.randint(1, 100) > 50 and not self.hitWall:
                     self._ladderIgnore = 6
                     self.isFalling = False
                 elif self.hitWall:
