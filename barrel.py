@@ -144,7 +144,7 @@ class Barrel(GameObject):
                 if self._ladderIgnore > 0 and not self.hitWall:
                     self.isFalling = False
                     self._ladderIgnore -= 1
-                elif random.randint(1, 100) > 60 and not self.hitWall:
+                elif random.randint(1, 100) > 0 and not self.hitWall:
                     self._ladderIgnore = 6
                     self.isFalling = False
                 elif self.hitWall:
@@ -180,6 +180,7 @@ class Barrel(GameObject):
         if self.dirChanged:
             self.setSprites()
             self.dirChanged = False
+            self.hitWall = False
 
     # Collision Handling.
     def collision(self, collisionType, direction, obj):
@@ -198,18 +199,23 @@ class Barrel(GameObject):
                 self.dirChanged = True
                 self.isFalling = True
         # If we hit a Immovable, Boundary for Platforms.
-        elif collisionType == CollisionTypes.Immovable and direction == CollisionDirection.Bottom:
+        elif collisionType == CollisionTypes.Immovable:
             # Stop moving down.
             self.bottom = obj.top + 1
             # No Longer on a Ladder. update flags if they are not updated.
             if self.isFalling:
                 self.dirChanged = True
                 self.isFalling = False
+
         elif collisionType == CollisionTypes.Wall:
             self._ladderIgnore = 0
             self.hitWall = True
-            if self.x <= obj.x:
-                self.right = obj.left - 1
+
+            if abs(self.x) < obj.x:
+                self.right = obj.left - 3
+            else:
+                self.left = obj.right + 3
+
             if not self.isFalling:
                 self.dirChanged = True
                 self.isFalling = True
@@ -261,4 +267,3 @@ class Barrel(GameObject):
         self.kill()
         # If fire type, spawn a fire ball.
         if self.type == BarrelType.FIRE:
-            print("Fire Spawned")
