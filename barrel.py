@@ -5,6 +5,7 @@ from framework import GameObject, SpriteSheet
 from spriteManager import SpriteManager
 from enum import Enum
 from collisionDetector import CollisionTypes
+import enemySpawner
 
 # Enum to represent the type of code.
 class BarrelType(Enum):
@@ -29,7 +30,7 @@ class BarrelDir(Enum):
 class Barrel(GameObject):
     def __init__(self, barrelType):
         GameObject.__init__(self)
-        self._speed = 2
+        self._speed = 10
         self._sheet = SpriteSheet('barrel')
         # Type of barrel being handled. Given when Created.
         self.type = barrelType
@@ -234,4 +235,6 @@ class Barrel(GameObject):
         self.kill()
         # If fire type, spawn a fire ball.
         if self.type == BarrelType.FIRE:
+            self.fireType = 0
+            enemySpawner.EnemySpawner().spawnFire(self.fireType)
             print("Fire Spawned")
