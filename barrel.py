@@ -206,9 +206,12 @@ class Barrel(GameObject):
                 self.dirChanged = True
                 self.isFalling = False
         elif collisionType == CollisionTypes.Wall:
-            print("Hit wall")
             self._ladderIgnore = 0
             self.hitWall = True
+            if self.x <= obj.x:
+                self.right = obj.left - 1
+            else:
+                self.left = obj.right + 1
             if not self.isFalling:
                 self.dirChanged = True
                 self.isFalling = True
@@ -245,13 +248,11 @@ class Barrel(GameObject):
             return
         # TODO: add explosion AOE
         if self.type == BarrelType.EXPLOSIVE:
-            print("Exploding!!")
             EffectSpawner().spawnExplosion(self)
             self.state = BarrelState.DEAD
             self.kill()
         # TODO: change current platform state.
         elif self.type == BarrelType.GOO:
-            print("Gooing!!")
             EffectSpawner().spawnGoo(self._lastPlatform)
             self.state = BarrelState.DEAD
             self.kill()
