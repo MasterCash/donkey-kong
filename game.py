@@ -42,6 +42,9 @@ class GameManager:
         if self._levelManager is None:
            raise Exception("No Level Manager")
 
+        for player in self._players:
+            player.spawn(60, 540)
+
         while self._playing:
             Clock.forceFPS(60)
 
