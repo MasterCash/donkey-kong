@@ -42,6 +42,7 @@ class GameManager:
         if self._levelManager is None:
            raise Exception("No Level Manager")
 
+        # Set the players spawn locations
         for player in self._players:
             player.spawn(60, 540)
 
