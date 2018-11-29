@@ -58,6 +58,12 @@ class GameManager:
             self._collisionCheck()
             self._draw()
 
+        # Clear everything
+        self._players.empty()
+        self._collectibles.empty()
+        self._enemies.empty()
+        self._objects.empty()
+
         return self._victory
 
     def addPlayer(self, player):
