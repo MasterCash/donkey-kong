@@ -91,6 +91,8 @@ class SpriteSheet(object):
     """ Used for loading sprites from a sprite sheet """
     def __init__(self, filename):
         self.invisible = pygame.image.load('assets/sprites/invisible_sheet.png')
+        #self.invisible = pygame.image.load('assets/sprites/white_sheet.png')
+
         self.sheet = pygame.image.load('assets/sprites/{0}_sheet.png'.format(filename))
 
     def sprite(self, x, y, width, height):
@@ -498,6 +500,38 @@ class __ClockClass:
 
 Clock = __ClockClass() # Only instance of the clock class
 
+@Singleton
+class __MusicPlayer:
+    def __init__(self):
+        self._backgroundName = ""
+        self._background = ""
+        self.backgroundPlaying = False
+        
+    def newBackground(self, filename):
+        self.backgroundPlaying = True
+        self._backgroundName = filename
+        self._background = Sound(filename)
+        self._background.loop()
+    
+    def playBackground(self):
+        if self.backgroundPlaying == False:
+            self.backgroundPlaying = True
+            self._background.loop()
+    def stopBackground(self):
+        self.backgroundPlaying = False
+        self._background.stop()
+        
+    def playEffect(self, filename):
+        self._effectName = filename
+        self._effect = Sound(filename)
+        self._effect.play()
+    def playOnTop(self, filename):
+        self.backgroundPlaying = False
+        self._background.stop()
+        self.newEffect = Sound(filename)
+        self.newEffect.play()
+
+Music = __MusicPlayer()
 
 class Keys(Enum):
     """ Enum wrapper for pygame keys """

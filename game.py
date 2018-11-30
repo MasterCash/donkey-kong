@@ -7,7 +7,7 @@ from enum import Enum
 from utils import AbstractMethod, DefaultMethod, Singleton
 from inputManager import InputManager
 from collisionDetector import CollisionDetector, CollisionTypes, CollectionTypes
-from framework import SpriteGroup, Window, Clock, GameLevelManager, Events, Sound, GameCollectible
+from framework import SpriteGroup, Window, Clock, Music, GameLevelManager, Events, Sound, GameCollectible
 
 class GameState(Enum):
     MainMenu = 0
@@ -29,8 +29,7 @@ class GameManager:
 
         self._levelManager = None
 
-        self._backgroundMusic = Sound('06_Stage_1_BGM')
-        self._backgroundMusic.loop()
+        Music.newBackground('06_Stage_1_BGM')
 
         self.state = GameState.Playing
 
