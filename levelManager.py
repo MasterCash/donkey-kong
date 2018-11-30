@@ -16,6 +16,7 @@ class Platform(GameSprite):
         self._next = None
         self._previous = None
         self.isTopOfLadder = False
+        self.isBroken = False
 
     @property
     def nextPlatform(self):
@@ -49,14 +50,15 @@ class InvisiblePlatform(GameSprite):
         self.y = y
         self.image = sprite
         self.isTopOfLadder = isTopOfLadder
+        self.isBroken = False
 
 class InvisibleLadder(GameSprite):
-    def __init__(self, x, y, sprite, broken=False):
+    def __init__(self, x, y, sprite, isTop=False, broken=False):
         super().__init__()
         self.x = x
         self.y = y
         self.image = sprite
-        self.isTopOfLadder = True
+        self.isTopOfLadder = isTop
         self.isBroken = broken
 
 class InvisibleWall(GameSprite):
@@ -66,6 +68,7 @@ class InvisibleWall(GameSprite):
         self.y = y
         self.image = sprite
         self.isLeftWall = isLeft
+        self.isBroken = False
 
 
 @Singleton
@@ -169,7 +172,7 @@ class LevelManager(GameLevelManager):
                 targetY = otherBlock.y + self._platform.height
                 break
 
-        self.immovables.add(InvisiblePlatform(x, y, self._invisibleLadder)) # Invisible platform at bottom of the ladder
+        self.immovables.add(InvisibleLadder(x, y, self._invisibleLadder, False, not ladder.isCompleteLadder)) # Invisible platform at bottom of the ladder
 
         if ladder.isCompleteLadder:
             # Full Ladder
@@ -181,7 +184,7 @@ class LevelManager(GameLevelManager):
             self.ladders.add(Ladder(x, y-2*h, self._ladder, True))
             self.ladders.add(Ladder(x, targetY, self._ladder, True))
 
-        self.ladders.add(InvisibleLadder(x, targetY-17, self._invisibleLadder, not ladder.isCompleteLadder))
+        self.ladders.add(InvisibleLadder(x, targetY-17, self._invisibleLadder, True, not ladder.isCompleteLadder))
 
         if ladder.isCompleteLadder:
             self.immovables.add(InvisiblePlatform(x-8, targetY - 6*h, self._invisibleTopOfLadder, True)) # Invisible platform at top of the ladder
@@ -204,7 +207,9 @@ class LevelManager(GameLevelManager):
                 if (x == width - 2*w):
                     block.addLadder()
             else:
-                base.addLevelBlock(x)
+                block = base.addLevelBlock(x)
+                if x == 4*w:
+                    block.addLadder().makeBroken()
 
         # Next Platform
         y = y - (5 * h) + 3
@@ -213,11 +218,11 @@ class LevelManager(GameLevelManager):
         for x in range(width - 3*w, neg(w), neg(w)):
             block = platform.addInclinedBlock(x)
             if x == w:
-                block.addLadder(True)
+                block.addLadder().alignRight()
             elif x == 6*w:
                 block.addLadder().makeBroken()
             elif x == 12*w:
-                block.addLadder().makeBroken()
+                block.addLadder()
             y = block.y
 
         # Next Platform
@@ -228,6 +233,8 @@ class LevelManager(GameLevelManager):
             block = platform.addInclinedBlock(x)
             if x == width - 2*w:
                 block.addLadder()
+            elif x == width - 8*w:
+                block.addLadder()
             y = block.y
 
         # Next Platform
@@ -237,7 +244,11 @@ class LevelManager(GameLevelManager):
         for x in range(width - 3*w, neg(w), neg(w)):
             block = platform.addInclinedBlock(x)
             if x == w:
-                block.addLadder(True)
+                block.addLadder().alignRight()
+            elif x == 5*w:
+                block.addLadder().makeBroken()
+            elif x == 12*w:
+                block.addLadder()
             y = block.y
 
          # Next Platform
@@ -248,6 +259,8 @@ class LevelManager(GameLevelManager):
             block = platform.addInclinedBlock(x)
             if x == width - 2*w:
                 block.addLadder()
+            elif x == width - 10*w:
+                block.addLadder().makeBroken()
             y = block.y
 
         # Top Platform
@@ -259,10 +272,9 @@ class LevelManager(GameLevelManager):
                 block.addLadder()
 
             if x == width-12*w:
-                block.addLadder(True, -8)
+                block.addLadder().alignRight(-8)
             if x == width-13*w:
-                block.addLadder(True, -8)
-
+                block.addLadder().alignRight(-8)
 
         # Princess Platform
         y = y - (4 * h)
@@ -328,11 +340,8 @@ class BlockBuilder():
         self.ladder = None
         self.startingBlock = False
 
-    def addLadder(self, right=False, offset=0):
-        if not right:
-            self.ladder = LadderBuilder(self.x + offset, self.y)
-        else:
-            self.ladder = LadderBuilder(self.x + 24 + offset, self.y) # 24 is width of platform minus half width of ladder
+    def addLadder(self, offset=0):
+        self.ladder = LadderBuilder(self.x + offset, self.y)
         return self.ladder
 
     def makeStartingBlock(self):
@@ -350,6 +359,10 @@ class LadderBuilder():
         self.x = x
         self.y = y
         self.isCompleteLadder = True
+
+    def alignRight(self, offset=0):
+        self.x = self.x + 24 + offset # 24 is width of platform minus half width of ladder
+        return self
 
     def makeBroken(self):
         self.isCompleteLadder = False

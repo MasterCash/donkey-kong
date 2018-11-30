@@ -82,8 +82,8 @@ class Image(object):
 class SpriteSheet(object):
     """ Used for loading sprites from a sprite sheet """
     def __init__(self, filename):
-        #self.invisible = pygame.image.load('assets/sprites/invisible_sheet.png')
-        self.invisible = pygame.image.load('assets/sprites/white_sheet.png')
+        self.invisible = pygame.image.load('assets/sprites/invisible_sheet.png')
+        #self.invisible = pygame.image.load('assets/sprites/white_sheet.png')
         self.sheet = pygame.image.load('assets/sprites/{0}_sheet.png'.format(filename))
 
     def sprite(self, x, y, width, height):
