@@ -161,6 +161,53 @@ class MenuBuilder:
 def play(onPlay):
     def wrapper(window):
         onPlay(window)
+
+    return wrapper
+
+def subPlay(onPlay):
+    def wrapper(window):
+        menu = MenuBuilder(140)
+        menu.addOption("1 Player", onePlay(onPlay))
+        menu.addOption("2 Player", twoPlay(onPlay))
+        menu.show(window)
+        print("subPlay")
+
+    return wrapper
+
+def onePlay(onPlay):
+    def wrapper(window):
+        menu = MenuBuilder(140)
+        menu.addOption("Easy", easy(onPlay))
+        menu.addOption("Medium", medium(onPlay))
+        menu.addOption("Hard", hard(onPlay))
+        # menu.addOption("Go back...", )
+        menu.show(window)
+        print("onePlay")
+
+    return wrapper
+
+def twoPlay(onPlay):
+    def wrapper(window):
+        pass
+
+    return wrapper
+
+def easy(onPlay):
+    def wrapper(window):
+        pass
+
+    return wrapper
+
+def medium(onPlay):
+    def wrapper(window):
+        pass
+
+    return wrapper
+
+def hard(onPlay):
+    def wrapper(window):
+        pass
+
     return wrapper
 
 def controls(window):
@@ -199,7 +246,7 @@ def showMainMenu(onPlay):
     menu = MenuBuilder(240)
     menu.addTitle("Donkey")
     menu.addTitle("Kong")
-    menu.addOption("Play", play(onPlay))
+    menu.addOption("Play", subPlay(onPlay))
     menu.addOption("Controls", controls)
     menu.addOption("Credits", credits)
     menu.addOption("Exit", exit)
