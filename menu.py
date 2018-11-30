@@ -6,12 +6,12 @@ from framework import Window, Text, Keys, Clock, Events
 from inputManager import InputManager
 import time
 from mario import Mario
+from donkeyKong import DonkeyKong
 
 class MenuResult:
     def __init__(self):
-        self.player1 = None
-        self.player2 = None
-        self.UseAI = True
+        self.players = []
+        self.UseAI = False
         self.Difficulty = 0
 
 result = MenuResult()
@@ -19,12 +19,11 @@ result = MenuResult()
 window = Window(544, 600).setTitle('Donkey Kong').setIcon('assets/icon.png')
 
 
-
 def AIDifficultySelect(onPlay, difficulty):
     def wrapper(window):
         result.useAI = True
         result.Difficulty = difficulty
-        #onPlay()
+        onPlay(window, result)
     return wrapper
 
 def showOnePlayerOptions(onPlay):
@@ -36,23 +35,38 @@ def showOnePlayerOptions(onPlay):
         menu.show(window)
     return wrapper
 
-def showPlayer1Select(onPlay):
+def savePlayerSelection(onPlay, nextFunc, result, done=False):
     def wrapper(window):
-        pass
+        if result != type(DonkeyKong):
+            result.players.append(result)
+
+        if not done:
+            return nextFunc(onPlay)(window)
+        else:
+            return onPlay(window, result)
     return wrapper
 
-def showPlayer2Select(onPlay):
+def showPlayerSelect(onPlay, nextFunc):
     def wrapper(window):
-        pass
+        menu = MenuBuilder()
+        menu.addOption("Mario", savePlayerSelection(onPlay, nextFunc, Mario))
+        menu.show(window)
     return wrapper
+
+def showSecondPlayerSelection(onPlay):
+    def wrapper(window):
+        menu = MenuBuilder()
+        menu.addOption("Donkey Kong", savePlayerSelection(onPlay, None, DonkeyKong, True))
+        menu.show(window)
+    return wrapper
+
 
 def showPlayOptions(onPlay):
     def wrapper(window):
         menu = MenuBuilder()
-        menu.addOption("1 Player", showOnePlayerOptions(onPlay))
-        menu.addOption("2 Players", showPlayer1Select(onPlay))
+        menu.addOption("1 Player", showPlayerSelect(onPlay, showOnePlayerOptions))
+        menu.addOption("2 Players", showPlayerSelect(onPlay, showSecondPlayerSelection))
         menu.show(window)
-
     return wrapper
 
 def play(onPlay):

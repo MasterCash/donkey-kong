@@ -13,7 +13,8 @@ from flamingOilContainer import FlamingOilContainer
 import menu
 
 
-def play(window):
+def play(window, result):
+    print("YAY")
     game = Game.GameManager(window)
     game.addPlayer(Mario())
     game.addObject(Princess())
