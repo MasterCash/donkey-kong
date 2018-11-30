@@ -36,13 +36,14 @@ class Platform(GameSprite):
 
 
 class Ladder(GameSprite):
-    def __init__(self, x, y, sprite, broken=False):
+    def __init__(self, x, y, sprite, broken=False, isTop=False):
         super().__init__()
         self.x = x
         self.y = y
         self.image = sprite
         self.isBroken = broken
-        self.isTopOfLadder = False
+        self.isTopOfLadder = isTop
+        self.isBrokenLadderTop = False
 
 class InvisiblePlatform(GameSprite):
     def __init__(self, x, y, sprite, isTopOfLadder = False, isEndOfPlatform=False):
@@ -55,13 +56,14 @@ class InvisiblePlatform(GameSprite):
         self.isEndOfPlatform = isEndOfPlatform
 
 class InvisibleLadder(GameSprite):
-    def __init__(self, x, y, sprite, isTop=False, broken=False):
+    def __init__(self, x, y, sprite, isTop=False, broken=False, isIncompleteTop=False):
         super().__init__()
         self.x = x
         self.y = y
         self.image = sprite
         self.isTopOfLadder = isTop
         self.isBroken = broken
+        self.isBrokenLadderTop = isIncompleteTop
 
 class InvisibleWall(GameSprite):
     def __init__(self, x, y, sprite, isLeft):
@@ -187,7 +189,7 @@ class LevelManager(GameLevelManager):
             self.ladders.add(Ladder(x, y-2*h, self._ladder, True))
             self.ladders.add(Ladder(x, targetY, self._ladder, True))
 
-        self.ladders.add(InvisibleLadder(x, targetY-17, self._invisibleLadder, True, not ladder.isCompleteLadder))
+        self.ladders.add(InvisibleLadder(x, targetY-17, self._invisibleLadder, True, not ladder.isCompleteLadder, not ladder.isCompleteLadder))
 
         #if ladder.isCompleteLadder:
         self.immovables.add(InvisiblePlatform(x-8, targetY - 6*h, self._invisibleTopOfLadder, True)) # Invisible platform at top of the ladder

@@ -26,7 +26,7 @@ class PlayerSubState(Enum):
 
 goo_speed = 50
 player_speed = 100.0
-jump_height = 16
+jump_height = 17
 jump_speed = 300 # Actually 100
 
 
