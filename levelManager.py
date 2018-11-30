@@ -181,11 +181,11 @@ class LevelManager(GameLevelManager):
             for ladderY in range(y-h, targetY-h, neg(h)):
                 self.ladders.add(Ladder(x, ladderY, self._ladder))
         else:
-            #Broken Ladder
+            # Broken Ladder
             self.ladders.add(Ladder(x, y-h, self._ladder, True))
             self.ladders.add(Ladder(x, y-2*h, self._ladder, True))
             self.ladders.add(Ladder(x, targetY, self._ladder, True))
-            
+
         self.ladders.add(InvisibleLadder(x, targetY-17, self._invisibleLadder, True, not ladder.isCompleteLadder))
 
         #if ladder.isCompleteLadder:

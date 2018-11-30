@@ -22,7 +22,7 @@ def play(window, result):
             game.addPlayer(Mario())
         if player.__name__ == "Luigi":
             game.addPlayer(Luigi())
-        
+
     game.addObject(Princess())
     if result.UseAI:
         game.addObject(DonkeyKong().getAI(result.Difficulty))
