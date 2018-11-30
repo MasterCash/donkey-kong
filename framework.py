@@ -67,8 +67,8 @@ class Image(object):
 
     def scale(self, factor):
         """ Scales an image """
-        newWidth = self.width * factor
-        newHeight = self.height * factor
+        newWidth = int(self.width * factor)
+        newHeight = int(self.height * factor)
         self._image = pygame.transform.scale(self._image, (newWidth, newHeight))
         self.rect = self._image.get_rect()
         return self

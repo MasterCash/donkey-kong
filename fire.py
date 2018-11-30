@@ -16,8 +16,8 @@ class FireType(Enum):
 # Fire states
 class FireState(Enum):
     MOVE = 0
-    ON_LADDER = 1
-    FALLING = 2
+    FALLING = 1
+    AT_LADDER = 2
 
 # Fire directions
 class FireDir(Enum):
@@ -37,10 +37,10 @@ class Fire(GameObject):
 
         #list spite states
         self._sprites = {
-            'red_left1' : self._sheet.sprite(0, 2, 26, 30),
-            'red_left2' : self._sheet.sprite(46, 0, 30, 32),
-            'red_right1' : self._sheet.sprite(94, 2, 26, 30),
-            'red_right2' : self._sheet.sprite(140, 0, 30, 32),
+            'red_left1' : self._sheet.sprite(0, 2, 26, 30).scale(.9),
+            'red_left2' : self._sheet.sprite(46, 0, 30, 32).scale(.9),
+            'red_right1' : self._sheet.sprite(94, 2, 26, 30).scale(.9),
+            'red_right2' : self._sheet.sprite(140, 0, 30, 32).scale(.9),
         }
 
         self.spriteManager = SpriteManager(self._sprites)
@@ -50,76 +50,48 @@ class Fire(GameObject):
         ], 10)
         
         # fire starting position, state, and dir
-        self.x = 250
-        self.y = 200
-        '''self.x = 60
-        self.y = 550'''
+        '''self.x = 250
+        self.y = 200'''
+        self.isFalling = False
+        self.x = 60
+        self.y = 550
         self.top_level = 165
         self.state = FireState.MOVE
         self.dir = FireDir.RIGHT
-        self.tick = 100
+        self.dir_tick = 1000
         self.isLadder = False
-        self.randDir = random.randint(0,1)
+        self.randDir = 0
 
     def update(self):
+        self.dir_tick -= 1
+        if self.dir_tick <= 0:
+            self.randDir = random.randint(0,1)
+            self.dir_tick = 1000
+        
+        if self.randDir == 0:
+            self.dir = FireDir.RIGHT
+        else:
+            self.dir = FireDir.LEFT
+
         if not self.isLadder:
             self.y += (self._speed * 1.5) * Clock.timeDelta
+            self.state = FireState.MOVE
         else:
-            self.tick -= 1
-        if self.state == FireState.MOVE:
-            # TODO: make fire sprites move randomly
-            # random direction after after exit the ladder
-            if self.isLadder:
-                if self.tick <= 0:
-                    self.randDir = random.randint(0,1)
-                    self.tick = 20
-                print(self.randDir)
-                if self.randDir == 0:
-                    self.dir = FireDir.RIGHT
-                elif self.randDir == 1:
-                    self.dir = FireDir.LEFT
-                
-                self.state = FireState.ON_LADDER
-            else:
-                if self.dir == FireDir.RIGHT:
-                    self.x += self._speed * Clock.timeDelta
-                    self.setSprites()
-                else:
-                    self.x -= self._speed * Clock.timeDelta
-                    self.setSprites()
+            self.state = FireState.AT_LADDER
 
-        elif self.state == FireState.ON_LADDER:
-            if not self.isLadder:
-                self.state = FireState.MOVE
-            else:
-                self.y -= 1
-                print(self.y)
-                self.getSprite()
+        if self.state == FireState.MOVE:
+            if self.dir == FireDir.RIGHT:
+                self.x += self._speed * Clock.timeDelta
+                self.setSprites()
+            elif self.dir == FireDir.LEFT:
+                self.x -= self._speed * Clock.timeDelta
+                self.setSprites()
+        elif self.state == FireState.AT_LADDER:
+            self.y -= 1
+            self.getSprite()
 
         self.spriteManager.animate()
 
-    def setSprites(self):
-        if self.state == FireState.MOVE:
-            if self.dir == FireDir.RIGHT:
-                self.spriteManager.useSprites([
-                    'red_right1',
-                    'red_right2'
-                    ], 8)
-            elif self.dir == FireDir.LEFT:
-                self.spriteManager.useSprites([
-                    'red_left1',
-                    'red_left2'
-                    ], 8)
-        elif self.state == FireState.ON_LADDER:
-            if self.dir == FireDir.LEFT:
-                self.spriteManager.useSprites([
-                    'red_left1',
-                ], 8)
-
-            elif self.dir == FireDir.RIGHT:
-                self.spriteManager.useSprites([
-                    'red_right1',
-                ], 8)
     def collision(self, collisionType, direction, obj):
         # If we are hitting a platform.
         if collisionType == CollisionTypes.Platform:
@@ -134,23 +106,38 @@ class Fire(GameObject):
 
         # If we hit a Immovable, Boundary for Platforms and Ladders.
         elif collisionType == CollisionTypes.Immovable:
-            self.state = FireState.MOVE
-            self.isLadder = False
             if not obj.isTopOfLadder:
                 self.bottom = obj.top
+            else:
+                self.isLadder = False
 
         # collision with wall
         elif collisionType == CollisionTypes.Wall:
-            print("hit wall")
             self.state = FireState.FALLING
+            self.isLadder = False
             if obj.isLeftWall:
-                self.dir = FireDir.RIGHT
+                self.randDir = 0
             else:
-                self.dir = FireDir.LEFT
+                self.randDir = 1
+
             if abs(self.x) < obj.x:
                 self.right = obj.left - 3
             else:
                 self.left = obj.right + 3
+    
+    def setSprites(self):
+        if self.state == FireState.MOVE:
+            if self.dir == FireDir.RIGHT:
+                self.spriteManager.useSprites([
+                    'red_right1',
+                    'red_right2'
+                    ], 8)
+            elif self.dir == FireDir.LEFT:
+                self.spriteManager.useSprites([
+                    'red_left1',
+                    'red_left2'
+                    ], 8)
+
     def getSprite(self):
         """ Returns the current sprite for the game object """
         return self.spriteManager.currentSprite()

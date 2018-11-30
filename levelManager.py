@@ -114,7 +114,7 @@ class LevelManager(GameLevelManager):
             for y1 in range(lastY - 6, targetY, -8):
                 self.ladders.add(InvisibleLadder(x, y1, self._invisibleLadder))
 
-            self.immovables.add(InvisiblePlatform(x, targetY - 32, self._invisiblePlatform, True)) # Invisible platform on top of the ladder
+            self.immovables.add(InvisiblePlatform(x, targetY - 32, self._platform, True)) # Invisible platform on top of the ladder
 
         def drawLtoRPlatform(y):
             platformsThisTime = []
