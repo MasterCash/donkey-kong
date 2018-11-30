@@ -4,6 +4,7 @@ This is the file that should be ran when wanting to launch the game
 import os
 import game as Game
 from mario import Mario
+from luigi import Luigi
 from barrel import Barrel
 from princess import Princess
 from levelManager import LevelManager
@@ -12,6 +13,7 @@ from flamingOilContainer import FlamingOilContainer
 
 game = Game.GameManager()
 game.addPlayer(Mario())
+game.addPlayer(Luigi())
 game.addObject(Princess())
 game.addObject(DonkeyKong())
 game.addCollectible(FlamingOilContainer())

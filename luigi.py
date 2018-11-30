@@ -1,9 +1,8 @@
 """
-Class to control mario
+Class to control luigi
 """
 from spriteManager import SpriteManager
-from framework import PlayableWithLives, GameObject, Clock, SpriteSheet, Keys, Sound, Music
-
+from framework import PlayableWithLives, Clock, SpriteSheet, Keys, Sound, Music
 from inputManager import InputManager
 from enum import Enum
 from collisionDetector import CollisionTypes, CollisionDirection
@@ -31,11 +30,11 @@ jump_speed = 300 # Actually 100
 
 
 
-class Mario(PlayableWithLives):
+class Luigi(PlayableWithLives):
     def __init__(self):
         super().__init__()
 
-        self._sheet = SpriteSheet('mario')
+        self._sheet = SpriteSheet('luigi')
         self._speed = player_speed
         self._jumpCount = jump_height
 
@@ -46,8 +45,8 @@ class Mario(PlayableWithLives):
             'run_left2': self._sheet.sprite(94, 21, 30, 32),
             'run_right1': self._sheet.sprite(45, 20, 31, 32).flip(),
             'run_right2': self._sheet.sprite(94, 21, 30, 32).flip(),
-            'ladder_up1': self._sheet.sprite(142, 20, 30, 32),
-            'ladder_up2': self._sheet.sprite(142, 20, 30, 32).flip(),
+            'ladder_up1': self._sheet.sprite(142, 20, 28, 32),
+            'ladder_up2': self._sheet.sprite(142, 20, 28, 32).flip(),
             'death1': self._sheet.sprite(716, 20, 32, 32),
             'death2': self._sheet.sprite(764, 20, 32, 32),
             'death3': self._sheet.sprite(764, 20, 32, 32).rotate(90),
@@ -66,8 +65,8 @@ class Mario(PlayableWithLives):
         self.ticks = 0
 
         InputManager.subscribe(
-            [Keys.LEFT, Keys.RIGHT, Keys.DOWN, Keys.UP, Keys.SPACE, Keys.R],
-            self._marioKeyPress
+            [Keys.A, Keys.D, Keys.S, Keys.W, Keys.Q, Keys.E],
+            self._luigiKeyPress
         )
 
         self._walkingSound = Sound('15_SFX_Walking')
@@ -152,20 +151,19 @@ class Mario(PlayableWithLives):
             self._walkingSound.stop()
 
     def collision(self, collisionType, direction, obj):
-        """ Mario collided with something """
+        """ Luigi collided with something """
         if collisionType == CollisionTypes.Enemy:
-            print("You killed Mario!!!!!")
+            print("You killed Luigi!!!!!")
             self.die()
 
         elif collisionType == CollisionTypes.Ladder:
-            if not obj.isBroken:
+             if not obj.isBroken:
                 self._isAtLadder = True
 
         elif collisionType == CollisionTypes.Platform:
             if self._isAtLadder == False and self.subState != PlayerSubState.JUMPING:
                 self._isOnGround = True
-                if not obj.isTopOfLadder:
-                    self.bottom = obj.top + 1
+                self.bottom = obj.top + 1
 
         elif collisionType == CollisionTypes.Immovable:
             self.state = PlayerState.IDLE
@@ -180,54 +178,53 @@ class Mario(PlayableWithLives):
                 self.right = obj.left
 
     def collectedItem(self, collectible, collectionType):
-        """ Mario collecting something """
+        """ Luigi collecting something """
         if collectible.name == 'Goo' and self.subState != PlayerSubState.JUMPING:
             self.subState = PlayerSubState.ON_GOO
 
-    def _marioKeyPress(self, key):
+    def _luigiKeyPress(self, key):
         def __str__(self):
-            return "MarioKeyPress"
+            return "LuigiKeyPress"
 
-        if key == Keys.R:
+        if key == Keys.E:
             self.die()
 
-        if (key == Keys.LEFT or key == Keys.A) and self.state not in (PlayerState.LADDER_IDLE, PlayerState.LADDER_DOWN, PlayerState.LADDER_UP):
+        if key == Keys.A and self.state not in (PlayerState.LADDER_IDLE, PlayerState.LADDER_DOWN, PlayerState.LADDER_UP):
             self.state = PlayerState.MOVELEFT
 
-        elif (key == Keys.RIGHT or key == Keys.D) and self.state != PlayerState.LADDER_IDLE:
+        elif key == Keys.D and self.state != PlayerState.LADDER_IDLE:
             self.state = PlayerState.MOVERIGHT
 
-        elif key == Keys.DOWN or key == Keys.S:
+        elif key == Keys.S:
             if self._isAtLadder:
                 self.state = PlayerState.LADDER_DOWN
 
-        elif key == Keys.UP:
+        elif key == Keys.W:
             if self._isAtLadder and self.subState != PlayerSubState.JUMPING:
                 self.state = PlayerState.LADDER_UP
 
-        elif key is Keys.SPACE and self.state not in (PlayerState.LADDER_IDLE, PlayerState.LADDER_DOWN, PlayerState.LADDER_UP):
+        elif key is Keys.Q and self.state not in (PlayerState.LADDER_IDLE, PlayerState.LADDER_DOWN, PlayerState.LADDER_UP):
             if self.subState not in (PlayerSubState.JUMPING, PlayerSubState.ON_GOO) and self._isOnGround:
                 self.subState = PlayerSubState.JUMPING
+                self._walkingSound.stop()
                 Music.playEffect("16_SFX_Jump")
 
+
     def getSprite(self):
-        """ Returns the current sprite for the game obje ct """
+        """ Returns the current sprite for the game object """
         if self.isDying:
             self.ticks = self.ticks + 1
             if self.ticks == 30:
                 self.spriteManager.useSprites(['death2', 'death3', 'death4', 'death5'], 10)
             elif self.ticks == 100:
                 self.spriteManager.useSprites(['death6'])
-
-            elif self.ticks == 220:
-               Music.playBackground()
+            elif self.ticks == 150:
                self.respawnIfPossible()
 
         return self.spriteManager.animate()
 
     def onDeath(self):
         """ Play the death animation """
-        Music.playOnTop("20_SFX_Miss")
         self.state = PlayerState.DEAD
         self.spriteManager.useSprites(['death1'], 10)
         self.ticks = 0
@@ -236,7 +233,7 @@ class Mario(PlayableWithLives):
     def drawExtra(self, screen):
         """ Draw the number of lives remaining """
         for i in range(self.lives):
-            screen.draw(self._sprites['life'], 10 + (i * 20), 10)
+            screen.draw(self._sprites['life'], 10 + (i * 20), 30)
 
     def onSpawn(self):
         self.state = PlayerState.IDLE

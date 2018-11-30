@@ -44,13 +44,14 @@ class Ladder(GameSprite):
         self.isBroken = broken
 
 class InvisiblePlatform(GameSprite):
-    def __init__(self, x, y, sprite, isTopOfLadder = False):
+    def __init__(self, x, y, sprite, isTopOfLadder = False, isEndOfPlatform=False):
         super().__init__()
         self.x = x
         self.y = y
         self.image = sprite
         self.isTopOfLadder = isTopOfLadder
         self.isBroken = False
+        self.isEndOfPlatform = isEndOfPlatform
 
 class InvisibleLadder(GameSprite):
     def __init__(self, x, y, sprite, isTop=False, broken=False):
@@ -144,7 +145,7 @@ class LevelManager(GameLevelManager):
                 self.platforms.add(block.build(self._platform))
                 if block.ladder is not None:
                     self._buildLadder(block, level, i)
-            self.immovables.add(block.buildImmovable(self._invisiblePlatform))
+            self.immovables.add(block.buildImmovable(self._invisiblePlatform, yOffset=2))
             i = i + 1
 
         self.walls.add(InvisibleWall(0, 0, self._invisibleSideWall, True))
@@ -350,8 +351,8 @@ class BlockBuilder():
     def build(self, sprite):
         return Platform(self.x, self.y, sprite)
 
-    def buildImmovable(self, sprite, offset=0):
-        return InvisiblePlatform(self.x + offset, self.y, sprite, False)
+    def buildImmovable(self, sprite, offset=0, yOffset=0):
+        return InvisiblePlatform(self.x + offset, self.y + yOffset, sprite, False)
 
 
 class LadderBuilder():
