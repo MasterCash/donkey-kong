@@ -36,12 +36,14 @@ class Platform(GameSprite):
 
 
 class Ladder(GameSprite):
-    def __init__(self, x, y, sprite, broken=False):
+    def __init__(self, x, y, sprite, broken=False, isTop=False):
         super().__init__()
         self.x = x
         self.y = y
         self.image = sprite
         self.isBroken = broken
+        self.isTopOfLadder = isTop
+        self.isBrokenLadderTop = False
 
 class InvisiblePlatform(GameSprite):
     def __init__(self, x, y, sprite, isTopOfLadder = False, isEndOfPlatform=False):
@@ -54,13 +56,14 @@ class InvisiblePlatform(GameSprite):
         self.isEndOfPlatform = isEndOfPlatform
 
 class InvisibleLadder(GameSprite):
-    def __init__(self, x, y, sprite, isTop=False, broken=False):
+    def __init__(self, x, y, sprite, isTop=False, broken=False, isIncompleteTop=False):
         super().__init__()
         self.x = x
         self.y = y
         self.image = sprite
         self.isTopOfLadder = isTop
         self.isBroken = broken
+        self.isBrokenLadderTop = isIncompleteTop
 
 class InvisibleWall(GameSprite):
     def __init__(self, x, y, sprite, isLeft):
@@ -90,7 +93,8 @@ class LevelManager(GameLevelManager):
         self._invisiblePlatform = self._sheet.invisibleSprite(20, 16)
         self._invisibleTopOfLadder = self._sheet.invisibleSprite(32, 8)
         self._invisibleSideWall = self._sheet.invisibleSprite(1, 600)
-        self._winningHeight = 120
+        self._winningX = 120
+        self._winningY = 120
 
         self._windowHeight = 0
         self._windowWidth = 0
@@ -121,7 +125,7 @@ class LevelManager(GameLevelManager):
 
     def isLevelCompleted(self, player):
         """ Checks if the level has been completed """
-        if player.bottom <= self._winningHeight:
+        if player.bottom <= self._winningY and player.centerX <= self._winningX:
             return True
 
         return False
@@ -181,12 +185,12 @@ class LevelManager(GameLevelManager):
             for ladderY in range(y-h, targetY-h, neg(h)):
                 self.ladders.add(Ladder(x, ladderY, self._ladder))
         else:
-            #Broken Ladder
+            # Broken Ladder
             self.ladders.add(Ladder(x, y-h, self._ladder, True))
             self.ladders.add(Ladder(x, y-2*h, self._ladder, True))
             self.ladders.add(Ladder(x, targetY, self._ladder, True))
-            
-        self.ladders.add(InvisibleLadder(x, targetY-17, self._invisibleLadder, True, not ladder.isCompleteLadder))
+
+        self.ladders.add(InvisibleLadder(x, targetY-17, self._invisibleLadder, True, not ladder.isCompleteLadder, not ladder.isCompleteLadder))
 
         #if ladder.isCompleteLadder:
         self.immovables.add(InvisiblePlatform(x-8, targetY - 6*h, self._invisibleTopOfLadder, True)) # Invisible platform at top of the ladder
@@ -267,11 +271,13 @@ class LevelManager(GameLevelManager):
 
         # Top Platform
         y = y - (4 * h) + 2
+        self._winningY = y
         platform = level.addPlatform(y)
         for x in range(width-2*w, neg(w), neg(w)):
             block = platform.addLevelBlock(x)
             if x == 9*w:
                 block.addLadder() # Princess ladder
+                self._winningX = x
             if x == 5*w:
                 block.addLadder().alignRight(-8)
             if x == 4*w:

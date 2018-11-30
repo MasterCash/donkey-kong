@@ -6,11 +6,11 @@ of barrel to the game. As well as the barrels generating a fire sprite
 """
 import barrel
 from fire import Fire, FireType
-from game import GameManager
+import game
 
 class EnemySpawner:
     def __init__(self):
-        self.__game = GameManager() # GameManager is a singleton so this works
+        self.__game = game.GameManager() # GameManager is a singleton so this works
 
     # Spawns a barrel based on the type given by Donkey Kong.
     def spawnBarrel(self, barrelType):
@@ -24,12 +24,12 @@ class EnemySpawner:
         elif barrelType == 4:
             self.__game.addEnemy(barrel.Barrel(barrel.BarrelType.GOO))
 
-    def spawnFire(self, fireType):
+    def spawnFire(self, fireType, x, y):
         """ Spawns a fire sprite to TERMINATE Mario once and for all """
         print("before")
         if fireType == 0:
-            self.__game.addEnemy(Fire(FireType.FIRE))
-            
-        
+            self.__game.addEnemy(Fire(fireType, x, y))
+
+
 
 
