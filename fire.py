@@ -50,70 +50,83 @@ class Fire(GameObject):
         ], 10)
         
         # fire starting position, state, and dir
-        '''self.x = 250
-        self.y = 200'''
+        self.x = 250
+        self.y = 300
         self.isFalling = False
-        self.x = 60
-        self.y = 550
-        self.top_level = 165
+        #self.x = 60
+        #self.y = 550
+        self.top_level = 170
         self.state = FireState.MOVE
         self.dir = FireDir.RIGHT
-        self.dir_tick = 60
+        self.dir_tick = 100
         self.isLadder = False
         self.randDir = 0
+        self.isTop = False
+        self.hitWall = False
 
     def update(self):
         self.dir_tick -= 1
         if self.dir_tick <= 0:
             self.randDir = random.randint(0,1)
-            self.dir_tick = 60
+            self.dir_tick = 100
         
+        # set direction 
         if self.randDir == 0:
             self.dir = FireDir.RIGHT
         else:
             self.dir = FireDir.LEFT
 
+        # if not at ladder, apply gravity
         if not self.isLadder:
             self.y += (self._speed * 1.5) * Clock.timeDelta
             self.state = FireState.MOVE
         else:
             self.state = FireState.AT_LADDER
 
-        if self.state == FireState.MOVE:
+        # fire move left or right
+        if self.state == FireState.MOVE and self.hitWall == False:
             if self.dir == FireDir.RIGHT:
                 self.x += self._speed * Clock.timeDelta
                 self.setSprites()
             elif self.dir == FireDir.LEFT:
                 self.x -= self._speed * Clock.timeDelta
                 self.setSprites()
-        elif self.state == FireState.AT_LADDER:
-            self.y -= 1
-            self.getSprite()
-
+        # go up ladder when see it
+        if self.y > 160:
+            self.dir = FireDir.UP
+        if self.state == FireState.AT_LADDER and self.dir == FireDir.UP:
+                self.y -= 1
+                self.getSprite()
+        print(self.y)
         self.spriteManager.animate()
 
     def collision(self, collisionType, direction, obj):
         # If we are hitting a platform.
         if collisionType == CollisionTypes.Platform:
+            self.state = FireState.MOVE
+            self.hitWall = False
             if not self.isLadder:
                 self.bottom = obj.top + 1
                 
         # IF we are on a ladder, set ladder flag.
         elif collisionType == CollisionTypes.Ladder:
             # won't go up ladder if at top level
-            if self.y > self.top_level:
+            if not self.isTop:
                 self.isLadder = True
 
         # If we hit a Immovable, Boundary for Platforms and Ladders.
         elif collisionType == CollisionTypes.Immovable:
             if not obj.isTopOfLadder:
                 self.bottom = obj.top
+                self.isLadder = True
+                self.isTop = False
             else:
+                self.isTop = True
                 self.isLadder = False
 
         # collision with wall
         elif collisionType == CollisionTypes.Wall:
-            self.state = FireState.FALLING
+            self.hitWall = True
             self.isLadder = False
             if obj.isLeftWall:
                 self.randDir = 0
@@ -124,9 +137,6 @@ class Fire(GameObject):
                 self.right = obj.left - 3
             else:
                 self.left = obj.right + 3
-        else:
-            self.isLadder = False
-            self.state = FireState.MOVE
     
     def setSprites(self):
         if self.state == FireState.MOVE:
