@@ -7,7 +7,7 @@ from enum import Enum
 from utils import AbstractMethod, DefaultMethod, Singleton
 from inputManager import InputManager
 from collisionDetector import CollisionDetector, CollisionTypes, CollectionTypes
-from framework import SpriteGroup, Window, Clock, GameLevelManager, Events, Sound, GameCollectible
+from framework import SpriteGroup, Window, Clock, Music, GameLevelManager, Events, Sound, GameCollectible
 
 class GameState(Enum):
     MainMenu = 0
@@ -28,8 +28,7 @@ class GameManager:
 
         self._levelManager = None
 
-        self._backgroundMusic = Sound('06_Stage_1_BGM')
-        self._backgroundMusic.loop()
+        Music.newBackground('06_Stage_1_BGM')
 
         self.state = GameState.Playing
 
@@ -41,11 +40,7 @@ class GameManager:
         if self._levelManager is None:
            raise Exception("No Level Manager")
 
-        Clock.resetDelta() # Fix large time delta
-
-        # Set the players spawn locations
-        for player in self._players:
-            player.spawn(60, 540)
+        self._spawnPlayers()
 
         while self._playing:
             Clock.forceFPS(60)
@@ -201,3 +196,14 @@ class GameManager:
         self._window.close()
         os._exit(0)
 
+
+
+    def _spawnPlayers(self):
+        # Set the players spawn locations
+        locations = self._levelManager.getSpawnLocations()
+        i = 0
+        for player in self._players:
+            player.spawn(locations[i][0], locations[i][1])
+            i = i + 1
+            if i >= len(locations):
+                i = 0

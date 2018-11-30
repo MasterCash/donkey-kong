@@ -1,8 +1,11 @@
 import json
+import random
 from utils import Singleton
 from game import GameLevelManager
-#from utils import SpriteSheet
 from framework import GameSprite, SpriteGroup, SpriteSheet
+
+def neg(x):
+    return -1 * x
 
 class Platform(GameSprite):
     def __init__(self, x, y, sprite):
@@ -12,6 +15,8 @@ class Platform(GameSprite):
         self.image = sprite
         self._next = None
         self._previous = None
+        self.isTopOfLadder = False
+        self.isBroken = False
 
     @property
     def nextPlatform(self):
@@ -31,26 +36,31 @@ class Platform(GameSprite):
 
 
 class Ladder(GameSprite):
-    def __init__(self, x, y, sprite):
+    def __init__(self, x, y, sprite, broken=False):
         super().__init__()
         self.x = x
         self.y = y
         self.image = sprite
+        self.isBroken = broken
 
 class InvisiblePlatform(GameSprite):
-    def __init__(self, x, y, sprite, isTopOfLadder = False):
+    def __init__(self, x, y, sprite, isTopOfLadder = False, isEndOfPlatform=False):
         super().__init__()
         self.x = x
         self.y = y
         self.image = sprite
         self.isTopOfLadder = isTopOfLadder
+        self.isBroken = False
+        self.isEndOfPlatform = isEndOfPlatform
 
 class InvisibleLadder(GameSprite):
-    def __init__(self, x, y, sprite):
+    def __init__(self, x, y, sprite, isTop=False, broken=False):
         super().__init__()
         self.x = x
         self.y = y
         self.image = sprite
+        self.isTopOfLadder = isTop
+        self.isBroken = broken
 
 class InvisibleWall(GameSprite):
     def __init__(self, x, y, sprite, isLeft):
@@ -59,6 +69,8 @@ class InvisibleWall(GameSprite):
         self.y = y
         self.image = sprite
         self.isLeftWall = isLeft
+        self.isBroken = False
+
 
 @Singleton
 class LevelManager(GameLevelManager):
@@ -75,10 +87,9 @@ class LevelManager(GameLevelManager):
         self._platform = self._sheet.sprite(0, 1, 32, 16)
         self._ladder = self._sheet.sprite(33, 1, 16, 8)
         self._invisibleLadder = self._sheet.invisibleSprite(16, 8)
-        self._invisiblePlatform = self._sheet.invisibleSprite(16, 8)
+        self._invisiblePlatform = self._sheet.invisibleSprite(20, 16)
+        self._invisibleTopOfLadder = self._sheet.invisibleSprite(32, 8)
         self._invisibleSideWall = self._sheet.invisibleSprite(1, 600)
-        self._invisibleEdgeWall = self._sheet.invisibleSprite(1,8) # Currently not used
-
         self._winningHeight = 0
 
         self._windowHeight = 0
@@ -88,164 +99,19 @@ class LevelManager(GameLevelManager):
         """ Set information about the window """
         self._windowWidth = width
         self._windowHeight = height
+        self._invisibleSideWall = self._sheet.invisibleSprite(1, height)
+
         self.buildLevel()
 
     def update(self):
         """ Update method just like other game objects """
         self.platforms.update()
 
-    def buildLevel(self):
-        height = self._windowHeight
-        width = self._windowWidth
-
-        w = self._platform.width
-        h = self._platform.height
-
-        def drawLadder(x, y):
-            targetY = y - (int((4*h)/8) * 8) + h-2
-            lastY = 0
-            self.immovables.add(InvisiblePlatform(x, y-1, self._invisiblePlatform)) # Invisible platform on bottom of ladder
-            for y1 in range(y-9, targetY, -8):
-                self.ladders.add(Ladder(x, y1, self._ladder))
-                lastY = y1
-
-            # Invisible ladder hitbox on top of the platform
-            targetY = lastY - (int((2.5*h)/8) * 8) + h-2
-            for y1 in range(lastY - 6, targetY, -8):
-                self.ladders.add(InvisibleLadder(x, y1, self._invisibleLadder))
-
-            self.immovables.add(InvisiblePlatform(x, targetY - 32, self._invisiblePlatform, True)) # Invisible platform on top of the ladder
-
-        def drawLtoRPlatform(y):
-            platformsThisTime = []
-
-            lastX = 0
-            for x in range(w, width + w, w):
-                platformsThisTime.append(Platform(x, y, self._platform))
-                y = y - 1
-                lastX = x
-
-            self.immovables.add(InvisiblePlatform(x-w, y+2, self._invisiblePlatform))
-
-            for i in range(0, len(platformsThisTime)):
-                if i > 0:
-                    platformsThisTime[i].previousPlatform = platformsThisTime[i-1]
-                if i < (len(platformsThisTime) - 1):
-                    platformsThisTime[i].nextPlatform = platformsThisTime[i+1]
-
-                self.platforms.add(platformsThisTime[i])
-
-            # Add ladder to next platform
-            x = lastX - 2*w
-            drawLadder(x, y+3)
-            return y
-
-        def drawRtoLPlatform(y):
-            platformsThisTime = []
-
-            lastX = 0
-            for x in range(width - (2 * w), 0 - w, w * -1):
-                platformsThisTime.append(Platform(x, y, self._platform))
-                y = y - 1
-                lastX = x
-
-            self.immovables.add(InvisiblePlatform(0, y+2, self._invisiblePlatform))
-
-            for i in range(0, len(platformsThisTime)):
-                if i > 0:
-                    platformsThisTime[i].previousPlatform = platformsThisTime[i-1]
-                if i < (len(platformsThisTime) - 1):
-                    platformsThisTime[i].nextPlatform = platformsThisTime[i+1]
-
-                self.platforms.add(platformsThisTime[i])
-
-            # Add ladder to next platform
-            x = lastX + 1.5*w
-            drawLadder(x, y+3)
-            return y
-
-        def drawFirstPlatform(y):
-            platformsThisTime = []
-
-            # Flat section of first platform
-            lastX = 0
-            for x in range(0, int(width/2), w):
-                platformsThisTime.append(Platform(x, y, self._platform))
-                lastX = x
-
-            # Angled section of first platform
-            for x in range(lastX + w, width, w):
-                platformsThisTime.append(Platform(x, y, self._platform))
-                y = y - 1
-                lastX = x
-
-            self.immovables.add(InvisiblePlatform(lastX, y+2, self._invisiblePlatform))
-
-            for i in range(0, len(platformsThisTime)):
-                if i > 0:
-                    platformsThisTime[i].previousPlatform = platformsThisTime[i-1]
-                if i < (len(platformsThisTime) - 1):
-                    platformsThisTime[i].nextPlatform = platformsThisTime[i+1]
-
-                self.platforms.add(platformsThisTime[i])
-
-            drawLadder(lastX - (2*w), y) # Ladder from first platform
-
-            return y
-
-        y = height - 2 * h
-        y = drawFirstPlatform(y)
-
-        # Draw other platforms
-        y = y - (4 * h) + 2
-        y = drawRtoLPlatform(y)
-
-        y = y - (4* h) + 2
-        y = drawLtoRPlatform(y)
-
-        y = y - (4 * h) + 2
-        y = drawRtoLPlatform(y)
-
-        y = y - (4 * h) + 2
-        y = drawLtoRPlatform(y)
-
-        # Draw Left Inv. Wall
-        self.walls.add(InvisibleWall(0, 0, self._invisibleSideWall, True))
-        # Draw Right Inv. Wall
-        self.walls.add(InvisibleWall(544, 0, self._invisibleSideWall, False))
-
-        # Top platform
-        y = y - (4 * h) + 2
-        for x in range(0 - w, width - w, w):
-            self.platforms.add(Platform(x, y, self._platform))
-
-        # Princess Peach Platform
-        y = y - (4 * h)
-        for x in range(int(width/2.5), int(width/2.5) + (3 * w), w):
-            self.platforms.add(Platform(x, y, self._platform))
-            lastX = x
-
-        self._winningHeight = y # Player must be at the peach platform to win
-
-        # Ladder to Princess Peach
-        x = lastX
-        drawLadder(x, y + (4 * h) - 2)
-
-        # Next Level ladders
-        x = width/4 + w
-        drawLadder(x, y + (4 * h) - 2)
-        drawLadder(x,  y + h - 2)
-        drawLadder(x, y - (2 * h) - 2)
-        x = x + w
-        drawLadder(x, y + (4 * h) - 2)
-        drawLadder(x,  y + h - 2)
-        drawLadder(x, y - (2 * h) - 2)
-
     def draw(self, screen):
         """ Draw method just like other game sprites """
         screen.fill((1, 1, 1)) # Background color
-        self.platforms.draw(screen)
         self.ladders.draw(screen)
+        self.platforms.draw(screen)
         self.immovables.draw(screen)
         self.walls.draw(screen)
 
@@ -260,9 +126,243 @@ class LevelManager(GameLevelManager):
 
         return False
 
+    def getSpawnLocations(self):
+        """ Returns valid spawn locations for the current level """
+        return [[60, 540], [60, 480]]
+
     @property
     def currentLevel(self):
         """ Returns the current level """
         return self.__currentLevel
 
+    def buildLevel(self):
+        level = self._generateLevel()
 
+        # i is index in platform list, j is index in block part of level
+        i = 0
+        for platform in level:
+            for block in platform:
+                self.platforms.add(block.build(self._platform))
+                if block.ladder is not None:
+                    self._buildLadder(block, level, i)
+            self.immovables.add(block.buildImmovable(self._invisiblePlatform, yOffset=2))
+            i = i + 1
+
+        self.walls.add(InvisibleWall(0, 0, self._invisibleSideWall, True))
+        self.walls.add(InvisibleWall(self._windowWidth, 0, self._invisibleSideWall, False))
+
+    def _buildLadder(self, block, levelBuilder, platformIndex):
+        """ Builds a ladder at a certain point """
+        ladder = block.ladder
+        if ladder is None:
+            return
+
+        h = self._ladder.height
+
+        y = ladder.y
+        x = ladder.x
+
+        if ((platformIndex + 1) >= len(levelBuilder)):
+            return
+
+        targetY = -1
+        # Find block in next platform with the same x coordinates
+        nextPlatform = levelBuilder[platformIndex + 1]
+        for otherBlock in nextPlatform:
+            if otherBlock.x == block.x:
+                targetY = otherBlock.y + self._platform.height
+                break
+
+        self.immovables.add(InvisibleLadder(x, y, self._invisibleLadder, False, not ladder.isCompleteLadder)) # Invisible platform at bottom of the ladder
+
+        if ladder.isCompleteLadder:
+            # Full Ladder
+            for ladderY in range(y-h, targetY-h, neg(h)):
+                self.ladders.add(Ladder(x, ladderY, self._ladder))
+        else:
+            # Broken Ladder
+            self.ladders.add(Ladder(x, y-h, self._ladder, True))
+            self.ladders.add(Ladder(x, y-2*h, self._ladder, True))
+            self.ladders.add(Ladder(x, targetY, self._ladder, True))
+
+        self.ladders.add(InvisibleLadder(x, targetY-17, self._invisibleLadder, True, not ladder.isCompleteLadder))
+
+        if ladder.isCompleteLadder:
+            self.immovables.add(InvisiblePlatform(x-8, targetY - 6*h, self._invisibleTopOfLadder, True)) # Invisible platform at top of the ladder
+
+    def _generateLevel(self):
+        """ Construct the actual level """
+        height = self._windowHeight
+        width = self._windowWidth
+
+        w = self._platform.width
+        h = self._platform.height
+        level = LevelBuilder()
+
+        # Base platform
+        y = height - 2 * h
+        base = level.addPlatform(y)
+        for x in range(0, width, w):
+            if x >= int(width/2):
+                block = base.addInclinedBlock(x)
+                if (x == width - 2*w):
+                    block.addLadder()
+            else:
+                block = base.addLevelBlock(x)
+                if x == 4*w:
+                    block.addLadder().makeBroken()
+
+        # Next Platform
+        y = y - (5 * h) + 3
+        platform = level.addPlatform(y)
+        platform.addLevelBlock(width - 2*w)
+        for x in range(width - 3*w, neg(w), neg(w)):
+            block = platform.addInclinedBlock(x)
+            if x == w:
+                block.addLadder().alignRight()
+            elif x == 8*w:
+                block.addLadder().makeBroken()
+            elif x == 12*w:
+                block.addLadder()
+            y = block.y
+
+        # Next Platform
+        y = y - (4 * h) + 3
+        platform = level.addPlatform(y)
+        platform.addLevelBlock(w)
+        for x in range(2*w, width, w):
+            block = platform.addInclinedBlock(x)
+            if x == width - 2*w:
+                block.addLadder()
+            elif x == width - 10*w:
+                block.addLadder()
+            y = block.y
+
+        # Next Platform
+        y = y - (4 * h) + 3
+        platform = level.addPlatform(y)
+        platform.addLevelBlock(width - 2*w)
+        for x in range(width - 3*w, neg(w), neg(w)):
+            block = platform.addInclinedBlock(x)
+            if x == w:
+                block.addLadder().alignRight()
+            elif x == 5*w:
+                block.addLadder().makeBroken()
+            elif x == 12*w:
+                block.addLadder()
+            y = block.y
+
+         # Next Platform
+        y = y - (4 * h) + 3
+        platform = level.addPlatform(y)
+        platform.addLevelBlock(w)
+        for x in range(2*w, width, w):
+            block = platform.addInclinedBlock(x)
+            if x == width - 2*w:
+                block.addLadder()
+            elif x == width - 10*w:
+                block.addLadder().makeBroken()
+            y = block.y
+
+        # Top Platform
+        y = y - (4 * h) + 2
+        platform = level.addPlatform(y)
+        for x in range(width-2*w, neg(w), neg(w)):
+            block = platform.addLevelBlock(x)
+            if x == 9*w:
+                block.addLadder() # Princess ladder
+            if x == 5*w:
+                block.addLadder().alignRight(-8)
+            if x == 4*w:
+                block.addLadder().alignRight(-8)
+
+        # Princess Platform
+        y = y - (4 * h)
+        platform = level.addPlatform(y)
+        for x in range(width - 11*w, width - 7*w, w):
+            platform.addLevelBlock(x)
+
+
+        return level
+
+
+class LevelBuilder():
+    def __init__(self):
+        self._platforms = []
+
+    def __iter__(self):
+        """ Iterator """
+        return iter(self._platforms)
+
+    def __getitem__(self, i):
+        return self._platforms[i]
+
+    def __len__(self):
+        return len(self._platforms)
+
+    def addPlatform(self, y):
+        """ Create a new platform """
+        self._platforms.append(PlatformBuilder(y))
+        return self._platforms[len(self._platforms) - 1]
+
+
+class PlatformBuilder():
+    def __init__(self, y):
+        self._blocks = []
+        self.y = y
+
+    def __iter__(self):
+        """ Iterator """
+        return iter(self._blocks)
+
+    def __getitem__(self, i):
+        return self._blocks[i]
+
+    def __len__(self):
+        return len(self._blocks)
+
+    def addLevelBlock(self, x):
+        """ Block that is not angled """
+        self._blocks.append(BlockBuilder(x, self.y))
+        i = len(self._blocks) - 1
+        return self._blocks[i]
+
+    def addInclinedBlock(self, x):
+        """ Block that is angled """
+        self.y = self.y - 1
+        return self.addLevelBlock(x)
+
+
+class BlockBuilder():
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.ladder = None
+        self.startingBlock = False
+
+    def addLadder(self, offset=0):
+        self.ladder = LadderBuilder(self.x + offset, self.y)
+        return self.ladder
+
+    def makeStartingBlock(self):
+        self.startingBlock = True
+
+    def build(self, sprite):
+        return Platform(self.x, self.y, sprite)
+
+    def buildImmovable(self, sprite, offset=0, yOffset=0):
+        return InvisiblePlatform(self.x + offset, self.y + yOffset, sprite, False)
+
+
+class LadderBuilder():
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.isCompleteLadder = True
+
+    def alignRight(self, offset=0):
+        self.x = self.x + 24 + offset # 24 is width of platform minus half width of ladder
+        return self
+
+    def makeBroken(self):
+        self.isCompleteLadder = False
