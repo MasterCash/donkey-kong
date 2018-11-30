@@ -53,7 +53,7 @@ class Fire(GameObject):
         self.y = 200
         '''self.x = 60
         self.y = 550'''
-        self.top_level = 150
+        self.top_level = 165
         self.state = FireState.MOVE
         self.dir = FireDir.RIGHT
         self.tick = 100
