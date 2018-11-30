@@ -243,11 +243,14 @@ class LevelManager(GameLevelManager):
 
         return False
 
+    def getSpawnLocations(self):
+        """ Returns valid spawn locations for the current level """
+        pass
+
     @property
     def currentLevel(self):
         """ Returns the current level """
         return self.__currentLevel
-
 
     def buildLevel(self):
         level = self._generateLevel()
@@ -270,8 +273,8 @@ class LevelManager(GameLevelManager):
 
         h = self._ladder.height
 
-        y = block.y
-        x = block.x
+        y = ladder.y
+        x = ladder.x
 
         if ((platformIndex + 1) >= len(levelBuilder)):
             return
@@ -294,7 +297,7 @@ class LevelManager(GameLevelManager):
             # Broken Ladder
             pass
 
-        self.ladders.add(InvisibleLadder(x, targetY-2*h, self._ladder))
+        self.ladders.add(InvisibleLadder(x, targetY-2*h, self._invisibleLadder))
 
         self.immovables.add(InvisiblePlatform(x, targetY - 20, self._invisiblePlatform, True)) # Invisible platform at top of the ladder
     """
@@ -320,7 +323,6 @@ class LevelManager(GameLevelManager):
 
         w = self._platform.width
         h = self._platform.height
-
         level = LevelBuilder()
 
         # Base platform
@@ -339,39 +341,56 @@ class LevelManager(GameLevelManager):
         platform = level.addPlatform(y)
         platform.addLevelBlock(width - 2*w)
         for x in range(width - 3*w, neg(w), neg(w)):
-            y = platform.addInclinedBlock(x).y
+            block = platform.addInclinedBlock(x)
+            if x == w:
+                block.addLadder(True)
+            y = block.y
 
         # Next Platform
         y = y - (4 * h) + 3
         platform = level.addPlatform(y)
         platform.addLevelBlock(w)
         for x in range(2*w, width + w, w):
-            y = platform.addInclinedBlock(x).y
+            block = platform.addInclinedBlock(x)
+            if x == width - 2*w:
+                block.addLadder()
+            y = block.y
 
         # Next Platform
         y = y - (4 * h) + 3
         platform = level.addPlatform(y)
         platform.addLevelBlock(width - 2*w)
         for x in range(width - 3*w, neg(w), neg(w)):
-            y = platform.addInclinedBlock(x).y
+            block = platform.addInclinedBlock(x)
+            if x == w:
+                block.addLadder(True)
+            y = block.y
 
          # Next Platform
         y = y - (4 * h) + 3
         platform = level.addPlatform(y)
         platform.addLevelBlock(w)
         for x in range(2*w, width + w, w):
-            y = platform.addInclinedBlock(x).y
+            block = platform.addInclinedBlock(x)
+            if x == width - 2*w:
+                block.addLadder()
+            y = block.y
 
         # Top Platform
         y = y - (4 * h) + 7
         platform = level.addPlatform(y)
         for x in range(0, width - w, w):
-            platform.addLevelBlock(x)
+            block = platform.addLevelBlock(x)
+            if x == width-8*w:
+                block.addLadder()
+            if x == width-12*w:
+                block.addLadder(True)
+
 
         # Princess Platform
         y = y - (4 * h)
         platform = level.addPlatform(y)
-        for x in range(int(width/2.5), int(width/2.5) + (3 * w), w):
+        for x in range(width - 10*w, width - 7*w, w):
             platform.addLevelBlock(x)
 
 
@@ -432,8 +451,11 @@ class BlockBuilder():
         self.ladder = None
         self.startingBlock = False
 
-    def addLadder(self):
-        self.ladder = LadderBuilder(self.x, self.y)
+    def addLadder(self, right=False):
+        if not right:
+            self.ladder = LadderBuilder(self.x, self.y)
+        else:
+            self.ladder = LadderBuilder(self.x + 24, self.y) # 24 is width of platform minus half width of ladder
         return self.ladder
 
     def makeStartingBlock(self):

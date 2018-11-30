@@ -302,6 +302,10 @@ class GameLevelManager:
     def advanceLevel(self):
         pass
 
+    @AbstractMethod
+    def getSpawnLocations(self):
+        pass
+
 
 class SpriteGroup:
     """ Group of Sprites (Wrapper around pygame sprite group) """
