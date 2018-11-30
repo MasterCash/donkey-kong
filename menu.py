@@ -5,8 +5,93 @@ import os
 from framework import Window, Text, Keys, Clock, Events
 from inputManager import InputManager
 import time
+from mario import Mario
+
+class MenuResult:
+    def __init__(self):
+        self.player1 = None
+        self.player2 = None
+        self.UseAI = True
+        self.Difficulty = 0
+
+result = MenuResult()
 
 window = Window(544, 600).setTitle('Donkey Kong').setIcon('assets/icon.png')
+
+
+
+def AIDifficultySelect(onPlay, difficulty):
+    def wrapper(window):
+        result.useAI = True
+        result.Difficulty = difficulty
+        #onPlay()
+    return wrapper
+
+def showOnePlayerOptions(onPlay):
+    def wrapper(window):
+        menu = MenuBuilder()
+        menu.addOption("Easy", AIDifficultySelect(onPlay, 10))
+        menu.addOption("Medium", AIDifficultySelect(onPlay, 100))
+        menu.addOption("Hard", AIDifficultySelect(onPlay, 600))
+        menu.show(window)
+    return wrapper
+
+def showPlayer1Select(onPlay):
+    def wrapper(window):
+        pass
+    return wrapper
+
+def showPlayer2Select(onPlay):
+    def wrapper(window):
+        pass
+    return wrapper
+
+def showPlayOptions(onPlay):
+    def wrapper(window):
+        menu = MenuBuilder()
+        menu.addOption("1 Player", showOnePlayerOptions(onPlay))
+        menu.addOption("2 Players", showPlayer1Select(onPlay))
+        menu.show(window)
+
+    return wrapper
+
+def play(onPlay):
+    def wrapper(window):
+        onPlay(window, result)
+    return wrapper
+
+def controls(window):
+    print("controls")
+
+def credits(window):
+    menu = MenuBuilder()
+    menu.addLabel("Michael Rouse")
+    menu.show(window)
+    print("credits")
+
+def exit(data):
+    window.close()
+    os._exit(0)
+
+
+def show(onPlay):
+    """ Creates the main menu """
+    Events.subscribe(Events.QUIT, exit)
+
+    menu = MenuBuilder()
+    menu.addOption("Play", showPlayOptions(onPlay))
+    menu.addOption("Controls", controls)
+    menu.addOption("Credits", credits)
+    menu.addExitOption('Exit')
+
+    menu.show(window)
+
+
+
+
+
+
+
 
 class MenuOption:
     def __init__(self, text, func, fontSize=30):
@@ -42,16 +127,21 @@ class MenuBuilder:
     def __init__(self):
         self.__options = []
         self.__selectedIndex = 0
+        self._open = False
+        self._debounce = 50
 
     def addOption(self, label, func):
         """ Adds an option to the menu """
         self.__options.append(MenuOption(label, func))
-
         return self
 
     def addLabel(self, label):
         """ Adds an option without a callback func """
         self.__options.append(MenuOption(label, None))
+        return self
+
+    def addExitOption(self, label):
+        self.__options.append(MenuOption(label, self.__close()))
         return self
 
     def show(self, win):
@@ -64,12 +154,15 @@ class MenuBuilder:
         self.__subscribe()
 
         while self._open:
-            Clock.forceFPS(20)
+            #Clock.forceFPS(10)
             Events.handleEvents()
             InputManager.handleInput()
             self.__draw()
 
-        self.__unsubscribe()
+            if self._debounce > 0:
+                self._debounce = self._debounce - 1
+
+        #self.__unsubscribe()
 
         return self
 
@@ -85,21 +178,29 @@ class MenuBuilder:
 
         self.__window.flip()
 
-
     def __handleKeyPress(self, key):
+        if not self._open:
+            return
+
+        if self._debounce > 0:
+            return
+
+        self._debounce = 50
+
         if key == Keys.UP:
             self.__findNextOptionWithCallback(-1)
 
         elif key == Keys.DOWN:
             self.__findNextOptionWithCallback(1)
 
-        elif key == Keys.ENTER:
+        elif key == Keys.ENTER and self._open == True:
             option = self.__options[self.__selectedIndex]
             if option.Callback is not None:
-                self.__unsubscribe()
+                ##self.__unsubscribe()
+                self._open = False
                 option.Callback(self.__window)
-                self.__subscribe()
-            #self._open = False
+                #del self
+                #self.__subscribe()
 
     def __findNextOptionWithCallback(self, increment):
         max = len(self.__options) - 1
@@ -124,6 +225,10 @@ class MenuBuilder:
         self.__selectedIndex = index
         self.__options[self.__selectedIndex].onFocus()
 
+    def __close(self):
+        def wrapper(self2):
+            self._open = False
+        return wrapper
 
     def __subscribe(self):
         InputManager.subscribe(
@@ -132,38 +237,10 @@ class MenuBuilder:
         )
 
     def __unsubscribe(self):
-        InputManager.unsubscribe(
-            [Keys.UP, Keys.DOWN, Keys.ENTER],
-            self.__handleKeyPress
-        )
-
-def play(onPlay):
-    def wrapper(window):
-        onPlay(window)
-    return wrapper
-
-def controls(window):
-    print("controls")
-
-def credits(window):
-    menu = MenuBuilder()
-    menu.addLabel("Michael Rouse")
-    menu.show(window)
-    print("credits")
-
-def exit(data):
-    window.close()
-    os._exit(0)
-
-
-def showMainMenu(onPlay):
-    """ Creates the main menu """
-    Events.subscribe(Events.QUIT, exit)
-
-    menu = MenuBuilder()
-    menu.addOption("Play", play(onPlay))
-    menu.addOption("Controls", controls)
-    menu.addOption("Credits", credits)
-    menu.addOption("Exit", exit)
-
-    menu.show(window)
+        try:
+            InputManager.unsubscribe(
+                [Keys.UP, Keys.DOWN, Keys.ENTER],
+                self.__handleKeyPress
+            )
+        except:
+            pass

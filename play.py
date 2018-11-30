@@ -22,6 +22,6 @@ def play(window):
     game.addLevelManager(LevelManager())
     game.play()
 
-menu.showMainMenu(play)
+menu.show(play)
 
 

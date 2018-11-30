@@ -32,14 +32,18 @@ class __InputManagerClass:
             print("Stop Listening Called", key, str(func))
 
     def handleInput(self):
-        for key in self.keysPressed:
-            self._keysQueued.append(key)
+        try:
+            for key in self.keysPressed:
+                self._keysQueued.append(key)
 
-        for key in self._keysQueued:
-            if key in self._keyFuncDict:
-                for func in self._keyFuncDict[key]:
-                    func(Keys(key)) # Convert the value back to an enum with Keys(#)
-        self._keysQueued.clear()
+            for key in self._keysQueued:
+                if key in self._keyFuncDict:
+                    for func in self._keyFuncDict[key]:
+                        func(Keys(key)) # Convert the value back to an enum with Keys(#)
+
+            self._keysQueued.clear()
+        except:
+            pass
 
     def addKey(self, key):
         if key not in self.keysPressed:
