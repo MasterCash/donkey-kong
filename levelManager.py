@@ -90,7 +90,7 @@ class LevelManager(GameLevelManager):
         self._invisiblePlatform = self._sheet.invisibleSprite(20, 16)
         self._invisibleTopOfLadder = self._sheet.invisibleSprite(32, 8)
         self._invisibleSideWall = self._sheet.invisibleSprite(1, 600)
-        self._winningHeight = 0
+        self._winningHeight = 120
 
         self._windowHeight = 0
         self._windowWidth = 0

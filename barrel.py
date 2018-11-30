@@ -196,11 +196,12 @@ class Barrel(GameObject):
                 self.bottom = obj.top + 1
         # IF we are on the top of a ladder, set ladder flag.
         elif collisionType == CollisionTypes.Ladder and direction == CollisionDirection.Bottom:
-            # IF we were not on a ladder before
-            if not self.isFalling:
-                # flag the falling and the direction changed flags
-                self.dirChanged = True
-                self.isFalling = True
+            if abs(self.bottom - 1) <= abs(obj.centerY):
+                # IF we were not on a ladder before
+                if not self.isFalling:
+                    # flag the falling and the direction changed flags
+                    self.dirChanged = True
+                    self.isFalling = True
         # If we hit a Immovable, Boundary for Platforms.
         elif collisionType == CollisionTypes.Immovable:
             # Stop moving down.

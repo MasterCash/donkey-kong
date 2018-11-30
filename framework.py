@@ -42,6 +42,12 @@ class Text(object):
     def setText(self, text):
         self._text = str(text)
 
+    def setColor(self, color):
+        self._color = color
+
+    def setBold(self):
+        self._font.set_bold(1)
+
     @property
     def image(self):
         return self._font.render(self._text, False, self._color)
@@ -496,6 +502,9 @@ class __ClockClass:
         t = self._clock.tick(self.fps)
         self._delta = t / 1000.0
 
+    def resetDelta(self):
+        self._delta = 0
+
     @property
     def timeDelta(self):
         """ Returns the detla time """
@@ -556,6 +565,7 @@ class Keys(Enum):
     Num_4 = pygame.K_4
     Num_5 = pygame.K_5
     Num_6 = pygame.K_6
+    ENTER = pygame.K_RETURN
 
 
 @Singleton
@@ -581,6 +591,11 @@ class __EventManagerClass:
             self._listeners[event] = [func]
         else:
             self._listeners[event].append(func)
+
+    def unsubscribe(self, event, func):
+        """ Unsubscribes from an event """
+        if event in self._listeners:
+            self._listeners.remove(func)
 
     def publish(self, event, *data):
         """ Dispatches an event and executes subscribers """

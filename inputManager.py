@@ -23,23 +23,27 @@ class __InputManagerClass:
             if self._keyFuncDict.get(key, False) is False:
                 self._keyFuncDict[key] = []
             self._keyFuncDict[key].append(func)
-            print("Listen For Called", key, str(func))
+            #print("Listen For Called", key, str(func))
 
     def unsubscribe(self, keys, func):
         for keyEnum in keys:
             key = keyEnum.value
             self._keyFuncDict[key].remove(func)
-            print("Stop Listening Called", key, str(func))
+            #print("Stop Listening Called", key, str(func))
 
     def handleInput(self):
-        for key in self.keysPressed:
-            self._keysQueued.append(key)
+        try:
+            for key in self.keysPressed:
+                self._keysQueued.append(key)
 
-        for key in self._keysQueued:
-            if key in self._keyFuncDict:
-                for func in self._keyFuncDict[key]:
-                    func(Keys(key)) # Convert the value back to an enum with Keys(#)
-        self._keysQueued.clear()
+            for key in self._keysQueued:
+                if key in self._keyFuncDict:
+                    for func in self._keyFuncDict[key]:
+                        func(Keys(key)) # Convert the value back to an enum with Keys(#)
+
+            self._keysQueued.clear()
+        except:
+            pass
 
     def addKey(self, key):
         if key not in self.keysPressed:
