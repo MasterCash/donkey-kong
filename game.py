@@ -175,9 +175,7 @@ class GameManager:
                     if collectible.canBeCleared:
                         collectible.kill()
         else:
-<<<<<<< HEAD
-            self.state = GameState.Playing
-=======
+
             self.state = GameState.Playing
 
     def _checkForVictory(self):
@@ -202,4 +200,4 @@ class GameManager:
         """ Closes the window """
         self._window.close()
         os._exit(0)
->>>>>>> master
+
