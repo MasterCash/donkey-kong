@@ -23,13 +23,13 @@ class __InputManagerClass:
             if self._keyFuncDict.get(key, False) is False:
                 self._keyFuncDict[key] = []
             self._keyFuncDict[key].append(func)
-            print("Listen For Called", key, str(func))
+            #print("Listen For Called", key, str(func))
 
     def unsubscribe(self, keys, func):
         for keyEnum in keys:
             key = keyEnum.value
             self._keyFuncDict[key].remove(func)
-            print("Stop Listening Called", key, str(func))
+            #print("Stop Listening Called", key, str(func))
 
     def handleInput(self):
         try:

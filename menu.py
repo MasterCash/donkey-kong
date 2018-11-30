@@ -32,12 +32,13 @@ def showOnePlayerOptions(onPlay):
         menu.addOption("Easy", AIDifficultySelect(onPlay, 10))
         menu.addOption("Medium", AIDifficultySelect(onPlay, 100))
         menu.addOption("Hard", AIDifficultySelect(onPlay, 600))
+        menu.addExitOption("Back")
         menu.show(window)
     return wrapper
 
-def savePlayerSelection(onPlay, nextFunc, result, done=False):
+def savePlayerSelection(onPlay, nextFunc, selected, done=False):
     def wrapper(window):
-        if result != type(DonkeyKong):
+        if selected.__name__ != DonkeyKong.__name__:
             result.players.append(result)
 
         if not done:
@@ -69,10 +70,6 @@ def showPlayOptions(onPlay):
         menu.show(window)
     return wrapper
 
-def play(onPlay):
-    def wrapper(window):
-        onPlay(window, result)
-    return wrapper
 
 def controls(window):
     print("controls")
@@ -142,7 +139,7 @@ class MenuBuilder:
         self.__options = []
         self.__selectedIndex = 0
         self._open = False
-        self._debounce = 50
+        self._debounce = 30
 
     def addOption(self, label, func):
         """ Adds an option to the menu """
@@ -199,12 +196,12 @@ class MenuBuilder:
         if self._debounce > 0:
             return
 
-        self._debounce = 50
-
         if key == Keys.UP:
+            self._debounce = 50
             self.__findNextOptionWithCallback(-1)
 
         elif key == Keys.DOWN:
+            self._debounce = 50
             self.__findNextOptionWithCallback(1)
 
         elif key == Keys.ENTER and self._open == True:
@@ -213,6 +210,7 @@ class MenuBuilder:
                 ##self.__unsubscribe()
                 self._open = False
                 option.Callback(self.__window)
+                self._open = True
                 #del self
                 #self.__subscribe()
 
