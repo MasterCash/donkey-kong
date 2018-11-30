@@ -159,12 +159,12 @@ class GameManager:
                 break
 
         # Check death of an enemy
-        if death == False:
+        """if death == False:
             for enemy in self._enemies:
                 if enemy.isDying:
                     death = True
                     break
-
+"""
         if death:
             self.state = GameState.DeathScreen
             if len(self._players) == 1:
