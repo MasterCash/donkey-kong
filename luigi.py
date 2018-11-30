@@ -157,6 +157,7 @@ class Luigi(PlayableWithLives):
             self.die()
 
         elif collisionType == CollisionTypes.Ladder:
+             if not obj.isBroken:
                 self._isAtLadder = True
 
         elif collisionType == CollisionTypes.Platform:
@@ -166,7 +167,7 @@ class Luigi(PlayableWithLives):
 
         elif collisionType == CollisionTypes.Immovable:
             self.state = PlayerState.IDLE
-            if not obj.isTopOfLadder:
+            if not obj.isTopOfLadder and not obj.isBroken:
                 self.bottom = obj.top
 
         elif collisionType == CollisionTypes.Wall:
@@ -178,7 +179,7 @@ class Luigi(PlayableWithLives):
 
     def collectedItem(self, collectible, collectionType):
         """ Luigi collecting something """
-        if collectible.name == 'Goo':
+        if collectible.name == 'Goo' and self.subState != PlayerSubState.JUMPING:
             self.subState = PlayerSubState.ON_GOO
 
     def _luigiKeyPress(self, key):

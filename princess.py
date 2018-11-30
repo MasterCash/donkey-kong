@@ -17,7 +17,7 @@ class Princess(GameObject):
         }
 
         self._currentSprite = self._sprites['standing']
-        self.x = 217
+        self.x = 200
         self.y = 76
         self.__isScreaming = False
 
