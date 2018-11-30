@@ -15,9 +15,7 @@ import menu
 
 
 def play(window, result):
-    print("YAY")
-    print(result.Difficulty)
-    print(result.players)
+
     game = Game.GameManager(window)
     for player in result.players:
         if player.__name__ == "Mario":

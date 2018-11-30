@@ -39,11 +39,9 @@ def showOnePlayerOptions(onPlay):
 
 def savePlayerSelection(onPlay, nextFunc, selected, done=False):
     def wrapper(window):
-        print(selected.__name__)
         if selected.__name__ != DonkeyKong.__name__:
             result.players.append(selected)
         if selected.__name__ == Luigi.__name__:
-            print("Luigi's a here")
             result.UseAI = True
             result.Difficulty = 15
 
@@ -84,6 +82,10 @@ def controls(window):
 def credits(window):
     menu = MenuBuilder()
     menu.addLabel("Michael Rouse")
+    menu.addLabel("Josh Cash")
+    menu.addLabel("Lucas Belshoff")
+    menu.addLabel("Quang Nguyen")
+    menu.addLabel("Daniel Golob")
     menu.show(window)
     print("credits")
 
@@ -98,7 +100,7 @@ def show(onPlay):
 
     menu = MenuBuilder()
     menu.addOption("Play", showPlayOptions(onPlay))
-    menu.addOption("Controls", controls)
+    # menu.addOption("Controls", controls)
     menu.addOption("Credits", credits)
     menu.addExitOption('Exit')
 
