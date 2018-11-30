@@ -16,12 +16,20 @@ import menu
 
 def play(window, result):
     print("YAY")
+    print(result.Difficulty)
+    print(result.players)
     game = Game.GameManager(window)
-    game.addPlayer(Mario())
-    game.addPlayer(Luigi())
-
+    for player in result.players:
+        if player.__name__ == "Mario":
+            game.addPlayer(Mario())
+        if player.__name__ == "Luigi":
+            game.addPlayer(Luigi())
+        
     game.addObject(Princess())
-    game.addObject(DonkeyKong())
+    if result.UseAI:
+        game.addObject(DonkeyKong().getAI(result.Difficulty))
+    else:
+        game.addObject(DonkeyKong())
     game.addCollectible(FlamingOilContainer())
     game.addLevelManager(LevelManager())
     game.play()

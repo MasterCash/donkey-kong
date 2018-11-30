@@ -6,6 +6,7 @@ from framework import Window, Text, Keys, Clock, Events
 from inputManager import InputManager
 import time
 from mario import Mario
+from luigi import Luigi
 from donkeyKong import DonkeyKong
 
 class MenuResult:
@@ -21,7 +22,7 @@ window = Window(544, 600).setTitle('Donkey Kong').setIcon('assets/icon.png')
 
 def AIDifficultySelect(onPlay, difficulty):
     def wrapper(window):
-        result.useAI = True
+        result.UseAI = True
         result.Difficulty = difficulty
         onPlay(window, result)
     return wrapper
@@ -30,7 +31,7 @@ def showOnePlayerOptions(onPlay):
     def wrapper(window):
         menu = MenuBuilder()
         menu.addOption("Easy", AIDifficultySelect(onPlay, 10))
-        menu.addOption("Medium", AIDifficultySelect(onPlay, 100))
+        menu.addOption("Medium", AIDifficultySelect(onPlay, 30))
         menu.addOption("Hard", AIDifficultySelect(onPlay, 600))
         menu.addExitOption("Back")
         menu.show(window)
@@ -38,8 +39,13 @@ def showOnePlayerOptions(onPlay):
 
 def savePlayerSelection(onPlay, nextFunc, selected, done=False):
     def wrapper(window):
+        print(selected.__name__)
         if selected.__name__ != DonkeyKong.__name__:
-            result.players.append(result)
+            result.players.append(selected)
+        if selected.__name__ == Luigi.__name__:
+            print("Luigi's a here")
+            result.UseAI = True
+            result.Difficulty = 15
 
         if not done:
             return nextFunc(onPlay)(window)
@@ -57,6 +63,7 @@ def showPlayerSelect(onPlay, nextFunc):
 def showSecondPlayerSelection(onPlay):
     def wrapper(window):
         menu = MenuBuilder()
+        menu.addOption("Luigi", savePlayerSelection(onPlay, None, Luigi, True))
         menu.addOption("Donkey Kong", savePlayerSelection(onPlay, None, DonkeyKong, True))
         menu.show(window)
     return wrapper

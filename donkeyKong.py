@@ -74,14 +74,14 @@ class DonkeyKong(GameObject):
     def updateAI(self):
         if not self._isAI:
             return
-        print("<<<<<<<Donkey Kong>>>>>>>")
-        print("spawn timer:" + str(self._barrelSpawnTimer))
-        print("speedup time:" + str(self._barrelSpawningSpeedUp))
-        print("min timer:" + str(self._barrelMinTimer))
-        print("max timer:" + str(self._barrelMaxTimer))
-        print("animate speed:" + str(self._barrelAnimateSpeed))
-        print("speedup tick:" + str(self._barrelSpeedupTicks))
-        print("timer dec:" + str(self._barrelTimerDecrementer))
+        # print("<<<<<<<Donkey Kong>>>>>>>")
+        # print("spawn timer:" + str(self._barrelSpawnTimer))
+        # print("speedup time:" + str(self._barrelSpawningSpeedUp))
+        # print("min timer:" + str(self._barrelMinTimer))
+        # print("max timer:" + str(self._barrelMaxTimer))
+        # print("animate speed:" + str(self._barrelAnimateSpeed))
+        # print("speedup tick:" + str(self._barrelSpeedupTicks))
+        # print("timer dec:" + str(self._barrelTimerDecrementer))
         if self._barrelSpawnTimer == 0:
             self._rollBarrelType = random.randint(1, 4)
             self._isRollingBarrel = True
@@ -185,6 +185,8 @@ class DonkeyKong(GameObject):
 
     @staticmethod
     def getAI(diff = 1):
+        print("donkAI Level: ")
+        print(diff)
         dk = DonkeyKong()
         if diff <= 0:
             diff = 1
