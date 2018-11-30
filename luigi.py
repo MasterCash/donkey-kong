@@ -2,7 +2,7 @@
 Class to control luigi
 """
 from spriteManager import SpriteManager
-from framework import PlayableWithLives, Clock, SpriteSheet, Keys, Sound
+from framework import PlayableWithLives, Clock, SpriteSheet, Keys, Sound, Music
 from inputManager import InputManager
 from enum import Enum
 from collisionDetector import CollisionTypes, CollisionDirection
@@ -205,6 +205,9 @@ class Luigi(PlayableWithLives):
         elif key is Keys.Q and self.state not in (PlayerState.LADDER_IDLE, PlayerState.LADDER_DOWN, PlayerState.LADDER_UP):
             if self.subState not in (PlayerSubState.JUMPING, PlayerSubState.ON_GOO) and self._isOnGround:
                 self.subState = PlayerSubState.JUMPING
+                self._walkingSound.stop()
+                Music.playEffect("16_SFX_Jump")
+
 
     def getSprite(self):
         """ Returns the current sprite for the game object """
