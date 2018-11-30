@@ -2,7 +2,7 @@
 Class to control mario
 """
 from spriteManager import SpriteManager
-from framework import GameObject, Clock, SpriteSheet, Keys, Sound
+from framework import PlayableWithLives, Clock, SpriteSheet, Keys, Sound
 from inputManager import InputManager
 from enum import Enum
 from collisionDetector import CollisionTypes, CollisionDirection
@@ -30,8 +30,7 @@ jump_speed = 300 # Actually 100
 
 
 
-class Mario(GameObject):
-    @GameObject.HasLives(3)
+class Mario(PlayableWithLives):
     def __init__(self):
         super().__init__()
 
@@ -63,7 +62,6 @@ class Mario(GameObject):
             'stand_right'
         ], 10)
 
-        self._setInitialState()
         self.ticks = 0
 
         InputManager.subscribe(
@@ -217,16 +215,11 @@ class Mario(GameObject):
             elif self.ticks == 100:
                 self.spriteManager.useSprites(['death6'])
             elif self.ticks == 150:
-                self._setInitialState()
-
-                print("Lives Left: " + str(self.lives))
-                if self.lives == 0:
-                    self.kill()
+               self.respawnIfPossible()
 
         return self.spriteManager.animate()
 
-    @GameObject.DeathMethod
-    def die(self):
+    def onDeath(self):
         """ Play the death animation """
         self.state = PlayerState.DEAD
         self.spriteManager.useSprites(['death1'], 10)
@@ -238,12 +231,11 @@ class Mario(GameObject):
         for i in range(self.lives):
             screen.draw(self._sprites['life'], 10 + (i * 20), 10)
 
-    def _setInitialState(self):
-        self.x = 60
-        self.y = 540
+    def onSpawn(self):
         self.state = PlayerState.IDLE
         self.subState = PlayerSubState.NONE
-        self.isDying = False
         self._isAtLadder = False
         self._isOnGround = True
         self._jumpCount = jump_height
+        self.ticks = 0
+
