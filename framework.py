@@ -30,10 +30,10 @@ class Sound(object):
         self._sound.stop()
 
 class Text(object):
-    def __init__(self, text, fontFamily='Courier New', fontSize=20, color=(255, 255, 255)):
+    def __init__(self, text, fontSize=20, color=(255, 255, 255)):
         self._text = str(text)
         self._color = color
-        self._font = pygame.font.SysFont(fontFamily, fontSize)
+        self._font = pygame.font.Font("assets/Players.ttf", fontSize)
 
     @property
     def text(self):
