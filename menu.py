@@ -9,11 +9,12 @@ import time
 window = Window(544, 600).setTitle('Donkey Kong').setIcon('assets/icon.png')
 
 class MenuOption:
-    def __init__(self, text, func, fontSize=30):
+    def __init__(self, text, func, fontSize=30, isTitle = False):
         self.Label = text
         self.Callback = func
         self.__selected = False
         self.__fontSize = fontSize
+        self.__isTitle = isTitle
 
     def onFocus(self):
         self.__selected = True
@@ -26,11 +27,19 @@ class MenuOption:
         return self.__selected
 
     @property
+    def isTitle(self):
+        return self.__isTitle
+
+    @property
     def image(self):
         text = Text(self.Label, fontSize=self.__fontSize)
         text.setBold()
-        if self.isSelected and self.Callback is not None:
-            text.setColor((255, 0, 0))
+        if self.isTitle:
+            text.setColor((31, 81, 255))
+        elif self.isSelected and self.Callback is not None:
+            text.setColor((227, 73, 221))
+        else:
+            text.setColor((237, 135, 35))
 
         return text.image
 
@@ -39,9 +48,11 @@ class MenuOption:
 The menu builder class is used for quickly rendering menus
 """
 class MenuBuilder:
-    def __init__(self):
+    def __init__(self, startingPos=80):
         self.__options = []
+        self.__title = []
         self.__selectedIndex = 0
+        self.__menuPos = startingPos
 
     def addOption(self, label, func):
         """ Adds an option to the menu """
@@ -52,6 +63,10 @@ class MenuBuilder:
     def addLabel(self, label):
         """ Adds an option without a callback func """
         self.__options.append(MenuOption(label, None))
+        return self
+
+    def addTitle(self, label):
+        self.__title.append(MenuOption(label, None, 90, True))
         return self
 
     def show(self, win):
@@ -78,9 +93,15 @@ class MenuBuilder:
         i = 1
         width = self.__window.width
 
+        for title in self.__title:
+            x = (width - title.image.get_width())/2
+            self.__window.draw(title, x, 20 + 80 * i)
+            i = i + 1
+
+        i = 1
         for option in self.__options:
             x = (width - option.image.get_width())/2 # Puts label in the center
-            self.__window.draw(option, x, 100 + 60*i)
+            self.__window.draw(option, x, self.__menuPos + 60*i)
             i = i + 1
 
         self.__window.flip()
@@ -143,11 +164,26 @@ def play(onPlay):
     return wrapper
 
 def controls(window):
+    Events.subscribe(Events.QUIT, exit)
+    menu = MenuBuilder(80)
+    menu.addLabel("Move right - Right arrow")
+    menu.addLabel("Move left  - Left Arrow")
+    menu.addLabel("Climb ladder - Up Arrow")
+    menu.addLabel("Go down ladder - Down Arrow")
+    menu.addLabel("Jump - Space")
+    menu.addOption("Go back...", exit)
+    menu.show(window)
     print("controls")
 
 def credits(window):
-    menu = MenuBuilder()
+    Events.subscribe(Events.QUIT, exit)
+    menu = MenuBuilder(80)
+    menu.addLabel("Lucas Belshoff")
+    menu.addLabel("Joshua Cash")
+    menu.addLabel("Daniel Golob")
+    menu.addLabel("Quang Nguyen")
     menu.addLabel("Michael Rouse")
+    menu.addOption("Go back...", exit)
     menu.show(window)
     print("credits")
 
@@ -160,7 +196,9 @@ def showMainMenu(onPlay):
     """ Creates the main menu """
     Events.subscribe(Events.QUIT, exit)
 
-    menu = MenuBuilder()
+    menu = MenuBuilder(240)
+    menu.addTitle("Donkey")
+    menu.addTitle("Kong")
     menu.addOption("Play", play(onPlay))
     menu.addOption("Controls", controls)
     menu.addOption("Credits", credits)
