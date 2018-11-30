@@ -156,7 +156,7 @@ class Mario(PlayableWithLives):
             print("You killed Mario!!!!!")
             self.die()
 
-        elif collisionType == CollisionTypes.Ladder:
+        elif collisionType == CollisionTypes.Ladder and not obj.isBroken:
                 self._isAtLadder = True
 
         elif collisionType == CollisionTypes.Platform:

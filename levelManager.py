@@ -35,11 +35,12 @@ class Platform(GameSprite):
 
 
 class Ladder(GameSprite):
-    def __init__(self, x, y, sprite):
+    def __init__(self, x, y, sprite, broken=False):
         super().__init__()
         self.x = x
         self.y = y
         self.image = sprite
+        self.isBroken = broken
 
 class InvisiblePlatform(GameSprite):
     def __init__(self, x, y, sprite, isTopOfLadder = False):
@@ -50,12 +51,13 @@ class InvisiblePlatform(GameSprite):
         self.isTopOfLadder = isTopOfLadder
 
 class InvisibleLadder(GameSprite):
-    def __init__(self, x, y, sprite):
+    def __init__(self, x, y, sprite, broken=False):
         super().__init__()
         self.x = x
         self.y = y
         self.image = sprite
         self.isTopOfLadder = True
+        self.isBroken = broken
 
 class InvisibleWall(GameSprite):
     def __init__(self, x, y, sprite, isLeft):
@@ -175,11 +177,14 @@ class LevelManager(GameLevelManager):
                 self.ladders.add(Ladder(x, ladderY, self._ladder))
         else:
             # Broken Ladder
-            pass
+            self.ladders.add(Ladder(x, y-h, self._ladder, True))
+            self.ladders.add(Ladder(x, y-2*h, self._ladder, True))
+            self.ladders.add(Ladder(x, targetY, self._ladder, True))
 
-        self.ladders.add(InvisibleLadder(x, targetY-17, self._invisibleLadder))
+        self.ladders.add(InvisibleLadder(x, targetY-17, self._invisibleLadder, not ladder.isCompleteLadder))
 
-        self.immovables.add(InvisiblePlatform(x-8, targetY - 6*h, self._invisibleTopOfLadder, True)) # Invisible platform at top of the ladder
+        if ladder.isCompleteLadder:
+            self.immovables.add(InvisiblePlatform(x-8, targetY - 6*h, self._invisibleTopOfLadder, True)) # Invisible platform at top of the ladder
 
     def _generateLevel(self):
         """ Construct the actual level """
@@ -209,6 +214,10 @@ class LevelManager(GameLevelManager):
             block = platform.addInclinedBlock(x)
             if x == w:
                 block.addLadder(True)
+            elif x == 6*w:
+                block.addLadder().makeBroken()
+            elif x == 12*w:
+                block.addLadder().makeBroken()
             y = block.y
 
         # Next Platform
