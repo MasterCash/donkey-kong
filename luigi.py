@@ -217,13 +217,15 @@ class Luigi(PlayableWithLives):
                 self.spriteManager.useSprites(['death2', 'death3', 'death4', 'death5'], 10)
             elif self.ticks == 100:
                 self.spriteManager.useSprites(['death6'])
-            elif self.ticks == 150:
-               self.respawnIfPossible()
+            elif self.ticks == 220:
+                Music.playBackground()
+                self.respawnIfPossible()
 
         return self.spriteManager.animate()
 
     def onDeath(self):
         """ Play the death animation """
+        Music.playOnTop("20_SFX_Miss")
         self.state = PlayerState.DEAD
         self.spriteManager.useSprites(['death1'], 10)
         self.ticks = 0
