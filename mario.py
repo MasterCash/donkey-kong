@@ -207,6 +207,7 @@ class Mario(GameObject):
         elif key is Keys.SPACE and self.state not in (PlayerState.LADDER_IDLE, PlayerState.LADDER_DOWN, PlayerState.LADDER_UP):
             if self.subState not in (PlayerSubState.JUMPING, PlayerSubState.ON_GOO) and self._isOnGround:
                 self.subState = PlayerSubState.JUMPING
+                Music.playEffect("16_SFX_Jump")
 
     def getSprite(self):
         """ Returns the current sprite for the game object """
