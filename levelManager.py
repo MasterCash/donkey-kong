@@ -221,7 +221,7 @@ class LevelManager(GameLevelManager):
             block = platform.addInclinedBlock(x)
             if x == w:
                 block.addLadder().alignRight()
-            elif x == 6*w:
+            elif x == 8*w:
                 block.addLadder().makeBroken()
             elif x == 12*w:
                 block.addLadder()
@@ -235,7 +235,7 @@ class LevelManager(GameLevelManager):
             block = platform.addInclinedBlock(x)
             if x == width - 2*w:
                 block.addLadder()
-            elif x == width - 8*w:
+            elif x == width - 10*w:
                 block.addLadder()
             y = block.y
 
@@ -268,14 +268,13 @@ class LevelManager(GameLevelManager):
         # Top Platform
         y = y - (4 * h) + 2
         platform = level.addPlatform(y)
-        for x in range(0, width - w, w):
+        for x in range(width-2*w, neg(w), neg(w)):
             block = platform.addLevelBlock(x)
-            if x == width-8*w:
-                block.addLadder()
-
-            if x == width-12*w:
+            if x == 9*w:
+                block.addLadder() # Princess ladder
+            if x == 5*w:
                 block.addLadder().alignRight(-8)
-            if x == width-13*w:
+            if x == 4*w:
                 block.addLadder().alignRight(-8)
 
         # Princess Platform
