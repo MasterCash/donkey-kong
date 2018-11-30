@@ -162,7 +162,8 @@ class Mario(PlayableWithLives):
         elif collisionType == CollisionTypes.Platform:
             if self._isAtLadder == False and self.subState != PlayerSubState.JUMPING:
                 self._isOnGround = True
-                self.bottom = obj.top + 1
+                if not obj.isTopOfLadder:
+                    self.bottom = obj.top + 1
 
         elif collisionType == CollisionTypes.Immovable:
             self.state = PlayerState.IDLE
