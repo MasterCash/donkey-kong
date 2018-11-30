@@ -124,7 +124,7 @@ class Fire(GameObject):
                 self.isTop = True
                 self.isLadder = False
 
-        # collision with wall
+        # collision with wall aa
         elif collisionType == CollisionTypes.Wall:
             self.hitWall = True
             self.isLadder = False
