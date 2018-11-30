@@ -58,7 +58,7 @@ class Fire(GameObject):
         self.top_level = 165
         self.state = FireState.MOVE
         self.dir = FireDir.RIGHT
-        self.dir_tick = 1000
+        self.dir_tick = 60
         self.isLadder = False
         self.randDir = 0
 
@@ -66,7 +66,7 @@ class Fire(GameObject):
         self.dir_tick -= 1
         if self.dir_tick <= 0:
             self.randDir = random.randint(0,1)
-            self.dir_tick = 1000
+            self.dir_tick = 60
         
         if self.randDir == 0:
             self.dir = FireDir.RIGHT
