@@ -33,7 +33,8 @@ class GameManager:
 
         self.state = GameState.Playing
 
-        self.__playing = True
+        self._playing = True
+        self._victory = False
 
     def play(self):
         """ Main Game Loop """
@@ -42,16 +43,30 @@ class GameManager:
 
         Clock.resetDelta() # Fix large time delta
 
-        while self.__playing:
+        # Set the players spawn locations
+        for player in self._players:
+            player.spawn(60, 540)
+
+        while self._playing:
             Clock.forceFPS(60)
 
             # Game Routine
             self._checkForDeath()
+            self._checkForVictory()
+            self._checkForLoss()
+
             self._handleEvents()
             self._update()
             self._collisionCheck()
             self._draw()
-            self._window.flip()
+
+        # Clear everything
+        self._players.empty()
+        self._collectibles.empty()
+        self._enemies.empty()
+        self._objects.empty()
+
+        return self._victory
 
     def addPlayer(self, player):
         """ Adds a player to the game """
@@ -112,6 +127,7 @@ class GameManager:
         CollisionDetector.check(self._players, self._levelManager.ladders, CollisionTypes.Ladder)
         CollisionDetector.check(self._players, self._levelManager.platforms, CollisionTypes.Platform)
         CollisionDetector.check(self._players, self._levelManager.immovables, CollisionTypes.Immovable)
+        CollisionDetector.check(self._players, self._levelManager.walls, CollisionTypes.Wall )
         CollisionDetector.check(self._players, self._enemies, CollisionTypes.Enemy)
 
         CollisionDetector.checkCollection(self._collectibles, self._players, CollectionTypes.Player)
@@ -119,7 +135,7 @@ class GameManager:
         CollisionDetector.check(self._enemies, self._levelManager.ladders, CollisionTypes.Ladder)
         CollisionDetector.check(self._enemies, self._levelManager.platforms, CollisionTypes.Platform)
         CollisionDetector.check(self._enemies, self._levelManager.immovables, CollisionTypes.Immovable)
-
+        CollisionDetector.check(self._enemies, self._levelManager.walls, CollisionTypes.Wall )
 
     def _draw(self):
         """ Draws everything on the window """
@@ -130,6 +146,8 @@ class GameManager:
 
         if self.state != GameState.DeathScreen:
             self._enemies.draw(self._window)
+
+        self._window.flip()
 
     def _checkForDeath(self):
         death = False
@@ -149,6 +167,39 @@ class GameManager:
 
         if death:
             self.state = GameState.DeathScreen
-            self._enemies.empty()
+            if len(self._players) == 1:
+                self._enemies.empty()
+
+                # Remove clearable collectibles
+                for collectible in self._collectibles:
+                    if collectible.canBeCleared:
+                        collectible.kill()
         else:
+<<<<<<< HEAD
             self.state = GameState.Playing
+=======
+            self.state = GameState.Playing
+
+    def _checkForVictory(self):
+        self._victory = False
+
+        for player in self._players:
+            self._victory = self._levelManager.isLevelCompleted(player)
+
+            if self._victory:
+                break
+
+        self._playing = not self._victory
+
+        return self._victory
+
+    def _checkForLoss(self):
+        if len(self._players) == 0:
+            self._victory = False
+            self._playing = False
+
+    def _quit(self, data):
+        """ Closes the window """
+        self._window.close()
+        os._exit(0)
+>>>>>>> master

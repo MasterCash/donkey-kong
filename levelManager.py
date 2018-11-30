@@ -10,6 +10,24 @@ class Platform(GameSprite):
         self.x = x
         self.y = y
         self.image = sprite
+        self._next = None
+        self._previous = None
+
+    @property
+    def nextPlatform(self):
+        return self._next
+
+    @nextPlatform.setter
+    def nextPlatform(self, next):
+        self._next = next
+
+    @property
+    def previousPlatform(self):
+        return self._previous
+
+    @previousPlatform.setter
+    def previousPlatform(self, prev):
+        self._previous = prev
 
 
 class Ladder(GameSprite):
@@ -35,13 +53,12 @@ class InvisibleLadder(GameSprite):
         self.image = sprite
 
 class InvisibleWall(GameSprite):
-    # I don't know why i'm making this
-    def __init__(self, x, y, sprite):
+    def __init__(self, x, y, sprite, isLeft):
         super().__init__()
         self.x = x
         self.y = y
         self.image = sprite
-
+        self.isLeftWall = isLeft
 
 @Singleton
 class LevelManager(GameLevelManager):
@@ -52,17 +69,17 @@ class LevelManager(GameLevelManager):
         self.platforms = SpriteGroup()
         self.ladders = SpriteGroup()
         self.immovables = SpriteGroup()
+        self.walls = SpriteGroup()
 
         self._sheet = SpriteSheet('level')
         self._platform = self._sheet.sprite(0, 1, 32, 16)
         self._ladder = self._sheet.sprite(33, 1, 16, 8)
         self._invisibleLadder = self._sheet.invisibleSprite(16, 8)
         self._invisiblePlatform = self._sheet.invisibleSprite(16, 8)
-        self._invisibleWall = self._sheet.invisibleSprite(10, 600)
+        self._invisibleSideWall = self._sheet.invisibleSprite(1, 600)
+        self._invisibleEdgeWall = self._sheet.invisibleSprite(1,8) # Currently not used
 
-        # Read levels from the levels file
-        with open('assets/levels.json', 'r') as f:
-            self._levels = json.load(f)
+        self._winningHeight = 0
 
         self._windowHeight = 0
         self._windowWidth = 0
@@ -91,19 +108,32 @@ class LevelManager(GameLevelManager):
             for y1 in range(y-9, targetY, -8):
                 self.ladders.add(Ladder(x, y1, self._ladder))
                 lastY = y1
-                
+
             # Invisible ladder hitbox on top of the platform
             targetY = lastY - (int((2.5*h)/8) * 8) + h-2
             for y1 in range(lastY - 6, targetY, -8):
                 self.ladders.add(InvisibleLadder(x, y1, self._invisibleLadder))
-                
+
             self.immovables.add(InvisiblePlatform(x, targetY - 32, self._invisiblePlatform, True)) # Invisible platform on top of the ladder
+
         def drawLtoRPlatform(y):
+            platformsThisTime = []
+
             lastX = 0
             for x in range(w, width + w, w):
-                self.platforms.add(Platform(x, y, self._platform))
+                platformsThisTime.append(Platform(x, y, self._platform))
                 y = y - 1
                 lastX = x
+
+            self.immovables.add(InvisiblePlatform(x-w, y+2, self._invisiblePlatform))
+
+            for i in range(0, len(platformsThisTime)):
+                if i > 0:
+                    platformsThisTime[i].previousPlatform = platformsThisTime[i-1]
+                if i < (len(platformsThisTime) - 1):
+                    platformsThisTime[i].nextPlatform = platformsThisTime[i+1]
+
+                self.platforms.add(platformsThisTime[i])
 
             # Add ladder to next platform
             x = lastX - 2*w
@@ -111,31 +141,60 @@ class LevelManager(GameLevelManager):
             return y
 
         def drawRtoLPlatform(y):
+            platformsThisTime = []
+
             lastX = 0
             for x in range(width - (2 * w), 0 - w, w * -1):
-                self.platforms.add(Platform(x, y, self._platform))
+                platformsThisTime.append(Platform(x, y, self._platform))
                 y = y - 1
                 lastX = x
+
+            self.immovables.add(InvisiblePlatform(0, y+2, self._invisiblePlatform))
+
+            for i in range(0, len(platformsThisTime)):
+                if i > 0:
+                    platformsThisTime[i].previousPlatform = platformsThisTime[i-1]
+                if i < (len(platformsThisTime) - 1):
+                    platformsThisTime[i].nextPlatform = platformsThisTime[i+1]
+
+                self.platforms.add(platformsThisTime[i])
 
             # Add ladder to next platform
             x = lastX + 1.5*w
             drawLadder(x, y+3)
             return y
 
-        # Flat section of first platform
+        def drawFirstPlatform(y):
+            platformsThisTime = []
+
+            # Flat section of first platform
+            lastX = 0
+            for x in range(0, int(width/2), w):
+                platformsThisTime.append(Platform(x, y, self._platform))
+                lastX = x
+
+            # Angled section of first platform
+            for x in range(lastX + w, width, w):
+                platformsThisTime.append(Platform(x, y, self._platform))
+                y = y - 1
+                lastX = x
+
+            self.immovables.add(InvisiblePlatform(lastX, y+2, self._invisiblePlatform))
+
+            for i in range(0, len(platformsThisTime)):
+                if i > 0:
+                    platformsThisTime[i].previousPlatform = platformsThisTime[i-1]
+                if i < (len(platformsThisTime) - 1):
+                    platformsThisTime[i].nextPlatform = platformsThisTime[i+1]
+
+                self.platforms.add(platformsThisTime[i])
+
+            drawLadder(lastX - (2*w), y) # Ladder from first platform
+
+            return y
+
         y = height - 2 * h
-        lastX = 0
-        for x in range(0, int(width/2), w):
-            self.platforms.add(Platform(x, y, self._platform))
-            lastX = x
-
-        # Angled section of first platform
-        for x in range(lastX + w, width, w):
-            self.platforms.add(Platform(x, y, self._platform))
-            y = y - 1
-            lastX = x
-
-        drawLadder(lastX - (2*w), y) # Ladder from first platform
+        y = drawFirstPlatform(y)
 
         # Draw other platforms
         y = y - (4 * h) + 2
@@ -150,6 +209,11 @@ class LevelManager(GameLevelManager):
         y = y - (4 * h) + 2
         y = drawLtoRPlatform(y)
 
+        # Draw Left Inv. Wall
+        self.walls.add(InvisibleWall(0, 0, self._invisibleSideWall, True))
+        # Draw Right Inv. Wall
+        self.walls.add(InvisibleWall(544, 0, self._invisibleSideWall, False))
+
         # Top platform
         y = y - (4 * h) + 2
         for x in range(0 - w, width - w, w):
@@ -160,6 +224,8 @@ class LevelManager(GameLevelManager):
         for x in range(int(width/2.5), int(width/2.5) + (3 * w), w):
             self.platforms.add(Platform(x, y, self._platform))
             lastX = x
+
+        self._winningHeight = y # Player must be at the peach platform to win
 
         # Ladder to Princess Peach
         x = lastX
@@ -181,6 +247,7 @@ class LevelManager(GameLevelManager):
         self.platforms.draw(screen)
         self.ladders.draw(screen)
         self.immovables.draw(screen)
+        self.walls.draw(screen)
 
     def advanceLevel(self):
         """ Moves to the next level """
@@ -188,7 +255,10 @@ class LevelManager(GameLevelManager):
 
     def isLevelCompleted(self, player):
         """ Checks if the level has been completed """
-        pass
+        if player.bottom <= self._winningHeight:
+            return True
+
+        return False
 
     @property
     def currentLevel(self):

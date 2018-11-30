@@ -1,10 +1,13 @@
 """
 Class for barrels
 """
-from framework import GameObject, SpriteSheet
+import math
+import random
+from framework import GameObject, SpriteSheet, Clock
 from spriteManager import SpriteManager
 from enum import Enum
-from collisionDetector import CollisionTypes
+from collisionDetector import CollisionTypes, CollisionDirection
+from effectSpawner import EffectSpawner
 
 # Enum to represent the type of code.
 class BarrelType(Enum):
@@ -29,13 +32,16 @@ class BarrelDir(Enum):
 class Barrel(GameObject):
     def __init__(self, barrelType):
         GameObject.__init__(self)
-        self._speed = 2
+        self._speed = 80
         self._sheet = SpriteSheet('barrel')
         # Type of barrel being handled. Given when Created.
         self.type = barrelType
         # Counter for Barrel actions.
         self.tick = 0
-
+        self.dirChanged = False
+        self.hitWall = False
+        self._lastPlatform = {}
+        self._ladderIgnore = 0
         # List of all sprite states for animations.
         self._sprites = {
             'normal_roll1': self._sheet.sprite(112, 0, 24, 20),
@@ -71,24 +77,18 @@ class Barrel(GameObject):
         # This Barrel's Sprite Manager.
         self.spriteManager = SpriteManager(self._sprites)
 
-        # Loading up the first Animation.
-        self.spriteManager.useSprites([
-            str(self.type) + '_fall1',
-            str(self.type) + '_fall2'
-        ], 10)
-
         # Initial Spawning Position.
-        # TODO: make it so DK can change spawning location.
-        self.x = 320
-        self.y = 130
+        self.x = 127
+        self.y = 160
 
         # Initalizing the state of the Barrel.
-        self.state = BarrelState.FALL
+        self.state = BarrelState.MOVE
         self.dir = BarrelDir.RIGHT
         # Hasn't Collided with a Ladder yet.
-        self.isLadder = False
+        self.isFalling = False
         # Set the starting tick Value.
         self.setTick()
+        self.setSprites()
 
     # Update, Called each game loop update.
     def update(self):
@@ -97,48 +97,10 @@ class Barrel(GameObject):
         self.tick -= 1
         # Handle any behaviors of the barrel for each type.
         self.handleBehavior()
-
-        # TODO: Clean this up and optimize.
-        # TODO: make random chances to go down ladders.
-        # TODO: optimize the setting of spites so it isn't done every update.
-        # If the barrel is moving
-        if self.state == BarrelState.MOVE:
-            # If the barrel is on a ladder.
-            if self.isLadder:
-                # Change the direction so that when we stop falling,
-                # we are heading the oposite direction as before.
-                # Adjust the position to make it so the sprite actually looks like
-                # it is falling down the ladder.
-                if self.dir == BarrelDir.LEFT:
-
-                    self.x -= self._sprites[str(self.type) + '_fall1'].height
-                    self.dir = BarrelDir.RIGHT
-                elif self.dir == BarrelDir.RIGHT:
-                    self.x += self._speed
-                    self.dir = BarrelDir.LEFT
-                # Change the state to falling because we are on a ladder.
-                self.state = BarrelState.FALL
-            # Barrel is moving right, move right.
-            elif self.dir == BarrelDir.RIGHT:
-                self.x += self._speed
-                self.setSprites()
-            else:
-                self.x -= self._speed
-                self.setSprites()
-            # Gravity, always falling down.
-            self.y += 1
-        # If Falling.
-        elif self.state == BarrelState.FALL:
-            # If not on a ladder anymore.
-            if not self.isLadder:
-                # Change state to move.
-                self.state = BarrelState.MOVE
-            else:
-                # Start Falling.
-                self.y += 1
-                self.setSprites()
-        # Animate.
+        # Animate
         self.spriteManager.animate()
+
+        self.move()
 
     # Set the sprites for each action.
     def setSprites(self):
@@ -148,49 +110,115 @@ class Barrel(GameObject):
                     str(self.type) + '_roll1',
                     str(self.type) + '_roll2',
                     str(self.type) + '_roll3'
-                    ], 10)
+                    ], self.animationSpeed())
             elif self.dir == BarrelDir.LEFT:
                 self.spriteManager.useSprites([
                     str(self.type) + '_roll3',
                     str(self.type) + '_roll2',
                     str(self.type) + '_roll1'
-                    ], 10)
+                    ],self.animationSpeed())
         elif self.state == BarrelState.FALL:
             if self.dir == BarrelDir.LEFT:
                 self.spriteManager.useSprites([
                     str(self.type) + '_fall1',
                     str(self.type) + '_fall2',
-                ], 10)
+                ], self.animationSpeed())
 
             elif self.dir == BarrelDir.RIGHT:
                 self.spriteManager.useSprites([
                     str(self.type) + '_fall3',
                     str(self.type) + '_fall4',
-                ], 10)
+                ], self.animationSpeed())
+
+    def animationSpeed(self):
+        if self.state == BarrelState.MOVE:
+            return math.ceil((2500/((1/3*self._speed)**2))+2)
+        else:
+            return 10
+
+
+    def move(self):
+        if self.state == BarrelState.MOVE:
+            # If the barrel is on a ladder.
+            if self.isFalling:
+                if self._ladderIgnore > 0 and not self.hitWall:
+                    self.isFalling = False
+                    self._ladderIgnore -= 1
+                elif random.randint(1, 100) > 50 and not self.hitWall:
+                    self._ladderIgnore = 6
+                    self.isFalling = False
+                elif self.hitWall:
+                    if self.dir == BarrelDir.LEFT:
+                        self.dir = BarrelDir.RIGHT
+                    elif self.dir == BarrelDir.RIGHT:
+                        self.dir = BarrelDir.LEFT
+                    self.state = BarrelState.FALL
+                else:
+                    # Change the direction so that when we stop falling,
+                    # we are heading the oposite direction as before.
+                    # it is falling down the ladder.
+                    if self.dir == BarrelDir.LEFT:
+                        self.dir = BarrelDir.RIGHT
+                    elif self.dir == BarrelDir.RIGHT:
+                        self.dir = BarrelDir.LEFT
+                    # Adjust the position to make it so the sprite actually looks like
+                    self.x -= 8
+                    # Change the state to falling because we are on a ladder.
+                    self.hitWall = False
+                    self.state = BarrelState.FALL
+            # Barrel is moving right, move right.
+            self.x += (self._speed if self.dir == BarrelDir.RIGHT else -self._speed) * Clock.timeDelta
+
+        # If Falling.
+        elif self.state == BarrelState.FALL:
+            # If not on a ladder anymore.
+            if not self.isFalling:
+                # Change state to move.
+                self.state = BarrelState.MOVE
+                # self.setSprites()
+        self.y += (self._speed * 1.5) * Clock.timeDelta
+        if self.dirChanged:
+            self.setSprites()
+            self.dirChanged = False
+            self.hitWall = False
 
     # Collision Handling.
     def collision(self, collisionType, direction, obj):
         """ Checks for collision with another spirte """
         # If we are hitting a platform.
         if collisionType == CollisionTypes.Platform:
+            self._lastPlatform = obj
             # And we are not on a ladder, stop falling.
-            if not self.isLadder:
+            if not self.isFalling:
                 self.bottom = obj.top + 1
-        # IF we are on a ladder, set ladder flag.
-        elif collisionType == CollisionTypes.Ladder:
-            self.isLadder = True
-        # If we hit a Immovable, Boundary for Platforms and Ladders.
+        # IF we are on the top of a ladder, set ladder flag.
+        elif collisionType == CollisionTypes.Ladder and direction == CollisionDirection.Bottom:
+            # IF we were not on a ladder before
+            if not self.isFalling:
+                # flag the falling and the direction changed flags
+                self.dirChanged = True
+                self.isFalling = True
+        # If we hit a Immovable, Boundary for Platforms.
         elif collisionType == CollisionTypes.Immovable:
             # Stop moving down.
             self.bottom = obj.top + 1
-            # No Longer on a Ladder.
-            self.isLadder = False
+            # No Longer on a Ladder. update flags if they are not updated.
+            if self.isFalling:
+                self.dirChanged = True
+                self.isFalling = False
 
-    # Returns the position and size.
-    # TODO: Ask Michael if this is still nessisary.
-    def getPositionAndSize(self):
-        """ Returns the current position, and dimension of the thing """
-        return (self.x, self.y, 0, 0)
+        elif collisionType == CollisionTypes.Wall:
+            self._ladderIgnore = 0
+            self.hitWall = True
+
+            if abs(self.x) < obj.x:
+                self.right = obj.left - 3
+            else:
+                self.left = obj.right + 3
+
+            if not self.isFalling:
+                self.dirChanged = True
+                self.isFalling = True
 
     # Handles behavior for each barrel type.
     def handleBehavior(self):
@@ -211,27 +239,30 @@ class Barrel(GameObject):
     def setTick(self):
         # TODO: make randomize ranges.
         if self.type == BarrelType.EXPLOSIVE:
-            self.tick = 200
+            self.tick = random.randint(300, 1900)
         elif self.type == BarrelType.GOO:
-            self.tick = 500
+            self.tick = random.randint(300, 1900)
         else:
             self.tick = 0
 
     # Action to do for each type of barrel.
     def action(self):
+        if self.isFalling:
+            self.tick = 1
+            return
         # TODO: add explosion AOE
         if self.type == BarrelType.EXPLOSIVE:
+            EffectSpawner().spawnExplosion(self)
             self.state = BarrelState.DEAD
             self.kill()
         # TODO: change current platform state.
         elif self.type == BarrelType.GOO:
+            EffectSpawner().spawnGoo(self._lastPlatform)
             self.state = BarrelState.DEAD
             self.kill()
 
     # Called if item collected. Used to despawn barrels when they reach the end.
     def collectedItem(self, collectible, collectionType):
-        self.state = BarrelState.DEAD
-        self.kill()
-        # If fire type, spawn a fire ball.
-        if self.type == BarrelType.FIRE:
-            print("Fire Spawned")
+        if collectible.name == 'flamingOilContainer':
+            self.state = BarrelState.DEAD
+            self.kill()

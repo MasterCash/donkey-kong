@@ -2,7 +2,7 @@
 Class to control mario
 """
 from spriteManager import SpriteManager
-from framework import GameObject, Clock, SpriteSheet, Keys, Sound
+from framework import PlayableWithLives, Clock, SpriteSheet, Keys, Sound
 from inputManager import InputManager
 from enum import Enum
 from collisionDetector import CollisionTypes, CollisionDirection
@@ -12,28 +12,31 @@ class PlayerState(Enum):
     LADDER_DOWN = 1
     MOVELEFT = 2
     MOVERIGHT = 3
-    JUMP = 4
     DEAD = 5
     ERROR = 6
     LADDER_IDLE = 7
     LADDER_UP = 8
-    DEAD1 = 9
+
+class PlayerSubState(Enum):
+    NONE = 0
     ON_GROUND = 10
+    ON_GOO = 1
+    JUMPING = 2
 
-
-movement = 100.0
-jump_height = 30
+goo_speed = 50
+player_speed = 100.0
+jump_height = 15
 jump_speed = 300 # Actually 100
 
 
-class Mario(GameObject):
-    @GameObject.HasLives(3)
+
+class Mario(PlayableWithLives):
     def __init__(self):
         super().__init__()
 
         self._sheet = SpriteSheet('mario')
-        self._jumpCount = 15
-        self._isJumping = False
+        self._speed = player_speed
+        self._jumpCount = jump_height
 
         self._sprites = {
             'stand_left': self._sheet.sprite(0, 20, 24, 32),
@@ -59,15 +62,10 @@ class Mario(GameObject):
             'stand_right'
         ], 10)
 
-        self.x = 60
-        self.y = 550
-        self.state = PlayerState.IDLE
-        self._isAtLadder = False
-        self._isOnGround = False
         self.ticks = 0
 
         InputManager.subscribe(
-            [Keys.LEFT, Keys.RIGHT, Keys.DOWN, Keys.UP, Keys.SPACE],
+            [Keys.LEFT, Keys.RIGHT, Keys.DOWN, Keys.UP, Keys.SPACE, Keys.R],
             self._marioKeyPress
         )
 
@@ -75,25 +73,33 @@ class Mario(GameObject):
 
     def update(self):
         """ Method used for updating state of a sprite/object """
-        if self._isAtLadder != True and not self._isJumping:
-            self.y = self.y + (movement * 2) * Clock.timeDelta # Gravity
+        if self._isAtLadder != True and self.subState != PlayerSubState.JUMPING:
+            self.y = self.y + (self._speed * 2) * Clock.timeDelta # Gravity
 
         self._isAtLadder = False
 
-        if self._isJumping:
-            if self._jumpCount >= -15:
+        if self.subState == PlayerSubState.ON_GOO:
+            self._speed = goo_speed
+            self.subState = PlayerSubState.NONE
+        else:
+            self._speed = player_speed
+
+        if self.subState == PlayerSubState.JUMPING:
+            if self._jumpCount >= -jump_height:
                 neg = 1
                 if self._jumpCount < 0:
                     neg = -1
                 self.y = self.y - (self._jumpCount ** 2) * 0.025 * neg
                 self._jumpCount = self._jumpCount - 1
             else:
-                self._isJumping = False
-                self._jumpCount = 15
+                self.subState = PlayerSubState.NONE
+                self._jumpCount = jump_height
             self._isOnGround = False
+        else:
+            self._jumpCount = jump_height
 
         if self.state == PlayerState.MOVELEFT:
-            self.x -= movement * Clock.timeDelta
+            self.x -= self._speed * Clock.timeDelta
             self.state = PlayerState.IDLE
             self.spriteManager.useSprites([
                 'run_left1',
@@ -102,8 +108,9 @@ class Mario(GameObject):
             ], 8)
             self._walkingSound.stop()
             self._walkingSound.play()
+
         elif self.state == PlayerState.MOVERIGHT:
-            self.x += movement * Clock.timeDelta
+            self.x += self._speed * Clock.timeDelta
             self.state = PlayerState.IDLE
             self.spriteManager.useSprites([
                 'run_right1',
@@ -112,24 +119,28 @@ class Mario(GameObject):
             ], 8)
             self._walkingSound.stop()
             self._walkingSound.play()
+
         elif self.state == PlayerState.LADDER_DOWN:
-            self.y += movement * Clock.timeDelta
+            self.y += self._speed * Clock.timeDelta
             self.state = PlayerState.LADDER_IDLE
             self.spriteManager.useSprites([
                 'ladder_up1',
                 'ladder_up2'
             ], 10)
+
         elif self.state == PlayerState.LADDER_UP:
-            self.y -= movement * Clock.timeDelta
+            self.y -= self._speed * Clock.timeDelta
             self.state = PlayerState.LADDER_IDLE
             self.spriteManager.useSprites([
                 'ladder_up1',
                 'ladder_up2'
             ], 10)
+
         elif self.state == PlayerState.LADDER_IDLE:
             self.spriteManager.useSprites([
                 'ladder_up1'
             ], 10)
+
         else:
             self.state = PlayerState.IDLE
             if 'stand_left' in self.spriteManager.currentAnimation:
@@ -146,10 +157,10 @@ class Mario(GameObject):
             self.die()
 
         elif collisionType == CollisionTypes.Ladder:
-            self._isAtLadder = True
+                self._isAtLadder = True
 
         elif collisionType == CollisionTypes.Platform:
-            if self._isAtLadder == False and not self._isJumping:
+            if self._isAtLadder == False and self.subState != PlayerSubState.JUMPING:
                 self._isOnGround = True
                 self.bottom = obj.top + 1
 
@@ -158,23 +169,42 @@ class Mario(GameObject):
             if not obj.isTopOfLadder:
                 self.bottom = obj.top
 
+        elif collisionType == CollisionTypes.Wall:
+            self.state = PlayerState.IDLE
+            if obj.isLeftWall:
+                self.left = obj.right
+            else:
+                self.right = obj.left
+
+    def collectedItem(self, collectible, collectionType):
+        """ Mario collecting something """
+        if collectible.name == 'Goo':
+            self.subState = PlayerSubState.ON_GOO
+
     def _marioKeyPress(self, key):
         def __str__(self):
             return "MarioKeyPress"
 
+        if key == Keys.R:
+            self.die()
+
         if (key == Keys.LEFT or key == Keys.A) and self.state not in (PlayerState.LADDER_IDLE, PlayerState.LADDER_DOWN, PlayerState.LADDER_UP):
             self.state = PlayerState.MOVELEFT
+
         elif (key == Keys.RIGHT or key == Keys.D) and self.state != PlayerState.LADDER_IDLE:
             self.state = PlayerState.MOVERIGHT
+
         elif key == Keys.DOWN or key == Keys.S:
             if self._isAtLadder:
                 self.state = PlayerState.LADDER_DOWN
+
         elif key == Keys.UP:
-            if self._isAtLadder and not self._isJumping:
+            if self._isAtLadder and self.subState != PlayerSubState.JUMPING:
                 self.state = PlayerState.LADDER_UP
+
         elif key is Keys.SPACE and self.state not in (PlayerState.LADDER_IDLE, PlayerState.LADDER_DOWN, PlayerState.LADDER_UP):
-            if not self._isJumping and self._isOnGround:
-                self._isJumping = True
+            if self.subState not in (PlayerSubState.JUMPING, PlayerSubState.ON_GOO) and self._isOnGround:
+                self.subState = PlayerSubState.JUMPING
 
     def getSprite(self):
         """ Returns the current sprite for the game object """
@@ -185,19 +215,11 @@ class Mario(GameObject):
             elif self.ticks == 100:
                 self.spriteManager.useSprites(['death6'])
             elif self.ticks == 150:
-                self.x = 60
-                self.y = 540
-                self.state = PlayerState.IDLE
-                self.isDying = False
-
-                print("Lives Left: " + str(self.lives))
-                if self.lives == 0:
-                    self.kill()
+               self.respawnIfPossible()
 
         return self.spriteManager.animate()
 
-    @GameObject.DeathMethod
-    def die(self):
+    def onDeath(self):
         """ Play the death animation """
         self.state = PlayerState.DEAD
         self.spriteManager.useSprites(['death1'], 10)
@@ -208,4 +230,12 @@ class Mario(GameObject):
         """ Draw the number of lives remaining """
         for i in range(self.lives):
             screen.draw(self._sprites['life'], 10 + (i * 20), 10)
+
+    def onSpawn(self):
+        self.state = PlayerState.IDLE
+        self.subState = PlayerSubState.NONE
+        self._isAtLadder = False
+        self._isOnGround = True
+        self._jumpCount = jump_height
+        self.ticks = 0
 
