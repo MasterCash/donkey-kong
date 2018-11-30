@@ -297,7 +297,7 @@ class LevelManager(GameLevelManager):
             # Broken Ladder
             pass
 
-        self.ladders.add(InvisibleLadder(x, targetY-2*h, self._invisibleLadder))
+        self.ladders.add(InvisibleLadder(x, targetY-2*h, self._ladder))
 
         self.immovables.add(InvisiblePlatform(x, targetY - 20, self._invisiblePlatform, True)) # Invisible platform at top of the ladder
     """
@@ -377,20 +377,23 @@ class LevelManager(GameLevelManager):
             y = block.y
 
         # Top Platform
-        y = y - (4 * h) + 7
+        y = y - (4 * h) + 2
         platform = level.addPlatform(y)
         for x in range(0, width - w, w):
             block = platform.addLevelBlock(x)
             if x == width-8*w:
                 block.addLadder()
+
             if x == width-12*w:
-                block.addLadder(True)
+                block.addLadder(True, -8)
+            if x == width-13*w:
+                block.addLadder(True, -8)
 
 
         # Princess Platform
         y = y - (4 * h)
         platform = level.addPlatform(y)
-        for x in range(width - 10*w, width - 7*w, w):
+        for x in range(width - 11*w, width - 7*w, w):
             platform.addLevelBlock(x)
 
 
@@ -451,11 +454,11 @@ class BlockBuilder():
         self.ladder = None
         self.startingBlock = False
 
-    def addLadder(self, right=False):
+    def addLadder(self, right=False, offset=0):
         if not right:
-            self.ladder = LadderBuilder(self.x, self.y)
+            self.ladder = LadderBuilder(self.x + offset, self.y)
         else:
-            self.ladder = LadderBuilder(self.x + 24, self.y) # 24 is width of platform minus half width of ladder
+            self.ladder = LadderBuilder(self.x + 24 + offset, self.y) # 24 is width of platform minus half width of ladder
         return self.ladder
 
     def makeStartingBlock(self):
