@@ -178,7 +178,7 @@ class Mario(PlayableWithLives):
 
     def collectedItem(self, collectible, collectionType):
         """ Mario collecting something """
-        if collectible.name == 'Goo':
+        if collectible.name == 'Goo' and self.subState != PlayerSubState.JUMPING:
             self.subState = PlayerSubState.ON_GOO
 
     def _marioKeyPress(self, key):
