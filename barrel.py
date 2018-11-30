@@ -6,6 +6,7 @@ import random
 from framework import GameObject, SpriteSheet, Clock
 from spriteManager import SpriteManager
 from enum import Enum
+import enemySpawner
 from collisionDetector import CollisionTypes, CollisionDirection
 from effectSpawner import EffectSpawner
 
@@ -32,7 +33,9 @@ class BarrelDir(Enum):
 class Barrel(GameObject):
     def __init__(self, barrelType):
         GameObject.__init__(self)
-        self._speed = 80
+
+        self._speed = 160
+
         self._sheet = SpriteSheet('barrel')
         # Type of barrel being handled. Given when Created.
         self.type = barrelType
@@ -267,3 +270,9 @@ class Barrel(GameObject):
         if collectible.name == 'FlamingOilContainer':
             self.state = BarrelState.DEAD
             self.kill()
+
+            if self.type == BarrelType.FIRE:
+                self.fireType = 0
+                for x in range(5):
+                    enemySpawner.EnemySpawner().spawnFire(self.fireType)
+

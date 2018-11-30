@@ -93,7 +93,9 @@ class Mario(PlayableWithLives):
                 self.y = self.y - (self._jumpCount ** 2) * 0.025 * neg
                 self._jumpCount = self._jumpCount - 1
             else:
+
                 self.subState = PlayerSubState.NONE
+
                 self._jumpCount = jump_height
             self._isOnGround = False
         else:

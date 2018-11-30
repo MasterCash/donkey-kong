@@ -130,6 +130,7 @@ class LevelManager(GameLevelManager):
         """ Returns valid spawn locations for the current level """
         return [[60, 540], [60, 480]]
 
+
     @property
     def currentLevel(self):
         """ Returns the current level """
@@ -180,15 +181,15 @@ class LevelManager(GameLevelManager):
             for ladderY in range(y-h, targetY-h, neg(h)):
                 self.ladders.add(Ladder(x, ladderY, self._ladder))
         else:
-            # Broken Ladder
+            #Broken Ladder
             self.ladders.add(Ladder(x, y-h, self._ladder, True))
             self.ladders.add(Ladder(x, y-2*h, self._ladder, True))
             self.ladders.add(Ladder(x, targetY, self._ladder, True))
-
+            
         self.ladders.add(InvisibleLadder(x, targetY-17, self._invisibleLadder, True, not ladder.isCompleteLadder))
 
-        if ladder.isCompleteLadder:
-            self.immovables.add(InvisiblePlatform(x-8, targetY - 6*h, self._invisibleTopOfLadder, True)) # Invisible platform at top of the ladder
+        #if ladder.isCompleteLadder:
+        self.immovables.add(InvisiblePlatform(x-8, targetY - 6*h, self._invisibleTopOfLadder, True)) # Invisible platform at top of the ladder
 
     def _generateLevel(self):
         """ Construct the actual level """

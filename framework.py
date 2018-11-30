@@ -73,8 +73,8 @@ class Image(object):
 
     def scale(self, factor):
         """ Scales an image """
-        newWidth = self.width * factor
-        newHeight = self.height * factor
+        newWidth = int(self.width * factor)
+        newHeight = int(self.height * factor)
         self._image = pygame.transform.scale(self._image, (newWidth, newHeight))
         self.rect = self._image.get_rect()
         return self
@@ -96,8 +96,8 @@ class Image(object):
 class SpriteSheet(object):
     """ Used for loading sprites from a sprite sheet """
     def __init__(self, filename):
-        self.invisible = pygame.image.load('assets/sprites/invisible_sheet.png')
-        #self.invisible = pygame.image.load('assets/sprites/white_sheet.png')
+        #self.invisible = pygame.image.load('assets/sprites/invisible_sheet.png')
+        self.invisible = pygame.image.load('assets/sprites/white_sheet.png')
         self.sheet = pygame.image.load('assets/sprites/{0}_sheet.png'.format(filename))
 
     def sprite(self, x, y, width, height):
