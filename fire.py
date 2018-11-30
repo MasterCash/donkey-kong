@@ -124,6 +124,9 @@ class Fire(GameObject):
                 self.right = obj.left - 3
             else:
                 self.left = obj.right + 3
+        else:
+            self.isLadder = False
+            self.state = FireState.MOVE
     
     def setSprites(self):
         if self.state == FireState.MOVE:

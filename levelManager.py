@@ -126,13 +126,10 @@ class LevelManager(GameLevelManager):
 
         return False
 
-<<<<<<< HEAD
-            self.immovables.add(InvisiblePlatform(x, targetY - 32, self._platform, True)) # Invisible platform on top of the ladder
-=======
     def getSpawnLocations(self):
         """ Returns valid spawn locations for the current level """
         return [[60, 540], [60, 480]]
->>>>>>> master
+
 
     @property
     def currentLevel(self):
