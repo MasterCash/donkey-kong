@@ -125,6 +125,8 @@ class LevelManager(GameLevelManager):
                 y = y - 1
                 lastX = x
 
+            self.immovables.add(InvisiblePlatform(x-w, y+2, self._invisiblePlatform))
+
             for i in range(0, len(platformsThisTime)):
                 if i > 0:
                     platformsThisTime[i].previousPlatform = platformsThisTime[i-1]
@@ -147,6 +149,8 @@ class LevelManager(GameLevelManager):
                 y = y - 1
                 lastX = x
 
+            self.immovables.add(InvisiblePlatform(0, y+2, self._invisiblePlatform))
+
             for i in range(0, len(platformsThisTime)):
                 if i > 0:
                     platformsThisTime[i].previousPlatform = platformsThisTime[i-1]
@@ -160,20 +164,37 @@ class LevelManager(GameLevelManager):
             drawLadder(x, y+3)
             return y
 
-        # Flat section of first platform
+        def drawFirstPlatform(y):
+            platformsThisTime = []
+
+            # Flat section of first platform
+            lastX = 0
+            for x in range(0, int(width/2), w):
+                platformsThisTime.append(Platform(x, y, self._platform))
+                lastX = x
+
+            # Angled section of first platform
+            for x in range(lastX + w, width, w):
+                platformsThisTime.append(Platform(x, y, self._platform))
+                y = y - 1
+                lastX = x
+
+            self.immovables.add(InvisiblePlatform(lastX, y+2, self._invisiblePlatform))
+
+            for i in range(0, len(platformsThisTime)):
+                if i > 0:
+                    platformsThisTime[i].previousPlatform = platformsThisTime[i-1]
+                if i < (len(platformsThisTime) - 1):
+                    platformsThisTime[i].nextPlatform = platformsThisTime[i+1]
+
+                self.platforms.add(platformsThisTime[i])
+
+            drawLadder(lastX - (2*w), y) # Ladder from first platform
+
+            return y
+
         y = height - 2 * h
-        lastX = 0
-        for x in range(0, int(width/2), w):
-            self.platforms.add(Platform(x, y, self._platform))
-            lastX = x
-
-        # Angled section of first platform
-        for x in range(lastX + w, width, w):
-            self.platforms.add(Platform(x, y, self._platform))
-            y = y - 1
-            lastX = x
-
-        drawLadder(lastX - (2*w), y) # Ladder from first platform
+        y = drawFirstPlatform(y)
 
         # Draw other platforms
         y = y - (4 * h) + 2

@@ -218,7 +218,6 @@ class GameObject(GameSprite):
     def __init__(self):
         super().__init__()
         self.__id = uuid.uuid4() # Something to uniquely identify every game object
-        self.__isDying = False
 
     @DefaultMethod
     def update(self):
@@ -245,46 +244,76 @@ class GameObject(GameSprite):
     def id(self):
         return self.__id
 
+
+class PlayableWithLives(GameObject):
+    def __init__(self):
+        super().__init__()
+        self.__lives = 3
+        self.__isDying = False
+
     @property
     def isDying(self):
         return self.__isDying
-
-    @isDying.setter
-    def isDying(self, val):
-        self.__isDying = val
 
     @property
     def lives(self):
         return self.__lives
 
-    @staticmethod
-    def DeathMethod(func):
-        def wrapper(self, *args, **kwargs):
-            self.__isDying = True
-            self.__lives = self.__lives - 1
-            return func(self, *args, **kwargs)
+    def spawn(self, x, y):
+        self.onSpawn()
+        self.x = x
+        self.y = y
+        self.__startingX = x
+        self.__startingY = y
+        self.__isDying = False
 
-        return wrapper
+    def respawnIfPossible(self):
+        if self.__lives <= 0:
+            self.kill()
+        else:
+            self.spawn(self.__startingX, self.__startingY)
 
-    @staticmethod
-    def HasLives(numberOfLives):
-        def decorator(func):
-            def wrapper(self, *args, **kwargs):
-                self.__lives = numberOfLives
-                return func(self, *args, **kwargs)
-            return wrapper
-        return decorator
+    def die(self):
+        self.__lives = self.__lives - 1
+        self.__isDying = True
+        self.onDeath()
+
+    @DefaultMethod
+    def onReset(self):
+        pass
+
+    @DefaultMethod
+    def onSpawn(self):
+        pass
+
+    @DefaultMethod
+    def onDeath(self):
+        pass
 
 
 class GameCollectible(GameObject):
     """ Something Collectible, like a hammer or the flaming oil can """
     def __init__(self):
         super().__init__()
+        self.__isClearable = False
 
     @DefaultMethod
     def onCollect(self, collectedBy, collectionType):
         collectedBy.collectedItem(self)
         self.kill()
+
+    @property
+    def canBeCleared(self):
+        return self.__isClearable
+
+    @staticmethod
+    def IsClearable():
+        def decorator(func):
+            def wrapper(self, *args, **kwargs):
+                self.__isClearable = True
+                return func(self, *args, **kwargs)
+            return wrapper
+        return decorator
 
 
 class GameLevelManager:
@@ -473,6 +502,7 @@ class Keys(Enum):
     A = pygame.K_a
     S = pygame.K_s
     D = pygame.K_d
+    R = pygame.K_r
     Num_1 = pygame.K_1
     Num_2 = pygame.K_2
     Num_3 = pygame.K_3
