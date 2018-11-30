@@ -30,10 +30,10 @@ class Sound(object):
         self._sound.stop()
 
 class Text(object):
-    def __init__(self, text, fontFamily='Courier New', fontSize=20, color=(255, 255, 255)):
+    def __init__(self, text, fontSize=20, color=(255, 255, 255)):
         self._text = str(text)
         self._color = color
-        self._font = pygame.font.SysFont(fontFamily, fontSize)
+        self._font = pygame.font.Font("assets/Players.ttf", fontSize)
 
     @property
     def text(self):
@@ -96,8 +96,8 @@ class Image(object):
 class SpriteSheet(object):
     """ Used for loading sprites from a sprite sheet """
     def __init__(self, filename):
-        #self.invisible = pygame.image.load('assets/sprites/invisible_sheet.png')
-        self.invisible = pygame.image.load('assets/sprites/white_sheet.png')
+        self.invisible = pygame.image.load('assets/sprites/invisible_sheet.png')
+        #self.invisible = pygame.image.load('assets/sprites/white_sheet.png')
         self.sheet = pygame.image.load('assets/sprites/{0}_sheet.png'.format(filename))
 
     def sprite(self, x, y, width, height):

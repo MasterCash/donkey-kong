@@ -122,13 +122,15 @@ class Fire(GameObject):
         """ Mario collided with something """
         try:
             if collisionType == CollisionTypes.Ladder:
-                if self.state != FireState.LADDER_UP and self.state != FireState.LADDER_DOWN and self.subState == FireSubState.NONE:
+                """if self.state != FireState.LADDER_UP and self.state != FireState.LADDER_DOWN and self.subState == FireSubState.NONE:
                     self._isAtLadder = True
                     #self.centerX = obj.centerX
                     if obj.isTopOfLadder:
                         self.subState = FireSubState.LADDER_TOP
                     else:
                         self.subState = FireSubState.LADDER_BOTTOM
+                    """
+                pass
 
             elif collisionType == CollisionTypes.Platform:
                 if self._isAtLadder == False:
@@ -137,7 +139,7 @@ class Fire(GameObject):
                         self.bottom = obj.top + 1
 
             elif collisionType == CollisionTypes.Immovable:
-                if self.state not in (FireState.LADDER_UP, FireState.LADDER_DOWN) or self.ticks > 0:
+                """if self.state not in (FireState.LADDER_UP, FireState.LADDER_DOWN) or self.ticks > 0:
                     return
 
                 self.ticks = 60
@@ -147,7 +149,7 @@ class Fire(GameObject):
 
                 elif self.state == FireState.LADDER_DOWN and obj.isTopOfLadder:
                     self.state = FireState.MOVERIGHT
-
+"""
                 if not obj.isTopOfLadder:
                     self.bottom = obj.top
 

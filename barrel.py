@@ -34,7 +34,7 @@ class Barrel(GameObject):
     def __init__(self, barrelType):
         GameObject.__init__(self)
 
-        self._speed = 300#160
+        self._speed = 80
 
         self._sheet = SpriteSheet('barrel')
         # Type of barrel being handled. Given when Created.

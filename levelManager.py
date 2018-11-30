@@ -93,7 +93,8 @@ class LevelManager(GameLevelManager):
         self._invisiblePlatform = self._sheet.invisibleSprite(20, 16)
         self._invisibleTopOfLadder = self._sheet.invisibleSprite(32, 8)
         self._invisibleSideWall = self._sheet.invisibleSprite(1, 600)
-        self._winningHeight = 120
+        self._winningX = 120
+        self._winningY = 120
 
         self._windowHeight = 0
         self._windowWidth = 0
@@ -124,7 +125,7 @@ class LevelManager(GameLevelManager):
 
     def isLevelCompleted(self, player):
         """ Checks if the level has been completed """
-        if player.bottom <= self._winningHeight:
+        if player.bottom <= self._winningY and player.centerX <= self._winningX:
             return True
 
         return False
@@ -270,11 +271,13 @@ class LevelManager(GameLevelManager):
 
         # Top Platform
         y = y - (4 * h) + 2
+        self._winningY = y
         platform = level.addPlatform(y)
         for x in range(width-2*w, neg(w), neg(w)):
             block = platform.addLevelBlock(x)
             if x == 9*w:
                 block.addLadder() # Princess ladder
+                self._winningX = x
             if x == 5*w:
                 block.addLadder().alignRight(-8)
             if x == 4*w:

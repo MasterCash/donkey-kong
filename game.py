@@ -61,6 +61,7 @@ class GameManager:
         self._enemies.empty()
         self._objects.empty()
 
+        os._exit(-1)
         return self._victory
 
     def addPlayer(self, player):
