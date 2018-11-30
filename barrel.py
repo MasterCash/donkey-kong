@@ -202,7 +202,7 @@ class Barrel(GameObject):
         # If we hit a Immovable, Boundary for Platforms.
         elif collisionType == CollisionTypes.Immovable:
             # Stop moving down.
-            self.bottom = obj.top + 1
+            self.bottom = obj.top - 1
             # No Longer on a Ladder. update flags if they are not updated.
             if self.isFalling:
                 self.dirChanged = True
