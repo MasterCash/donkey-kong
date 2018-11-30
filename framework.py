@@ -65,6 +65,14 @@ class Image(object):
         self.rect = self._image.get_rect()
         return self
 
+    def scale(self, factor):
+        """ Scales an image """
+        newWidth = self.width * factor
+        newHeight = self.height * factor
+        self._image = pygame.transform.scale(self._image, (newWidth, newHeight))
+        self.rect = self._image.get_rect()
+        return self
+
     @property
     def image(self):
         return self._image
@@ -220,7 +228,6 @@ class GameObject(GameSprite):
     def __init__(self):
         super().__init__()
         self.__id = uuid.uuid4() # Something to uniquely identify every game object
-        self.__isDying = False
 
     @DefaultMethod
     def update(self):
@@ -247,41 +254,51 @@ class GameObject(GameSprite):
     def id(self):
         return self.__id
 
+
+class PlayableWithLives(GameObject):
+    def __init__(self):
+        super().__init__()
+        self.__lives = 3
+        self.__isDying = False
+
     @property
     def isDying(self):
         return self.__isDying
-
-    @isDying.setter
-    def isDying(self, val):
-        self.__isDying = val
 
     @property
     def lives(self):
         return self.__lives
 
-    @staticmethod
-    def DeathMethod(func):
-        def noOp():
-            pass
+    def spawn(self, x, y):
+        self.onSpawn()
+        self.x = x
+        self.y = y
+        self.__startingX = x
+        self.__startingY = y
+        self.__isDying = False
 
-        def wrapper(self, *args, **kwargs):
-            if not self.__isDying:
-                self.__isDying = True
-                self.__lives = self.__lives - 1
-                return func(self, *args, **kwargs)
+    def respawnIfPossible(self):
+        if self.__lives <= 0:
+            self.kill()
+        else:
+            self.spawn(self.__startingX, self.__startingY)
 
-            return noOp
+    def die(self):
+        self.__lives = self.__lives - 1
+        self.__isDying = True
+        self.onDeath()
 
-        return wrapper
+    @DefaultMethod
+    def onReset(self):
+        pass
 
-    @staticmethod
-    def HasLives(numberOfLives):
-        def decorator(func):
-            def wrapper(self, *args, **kwargs):
-                self.__lives = numberOfLives
-                return func(self, *args, **kwargs)
-            return wrapper
-        return decorator
+    @DefaultMethod
+    def onSpawn(self):
+        pass
+
+    @DefaultMethod
+    def onDeath(self):
+        pass
 
 
 class GameCollectible(GameObject):

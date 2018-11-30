@@ -41,6 +41,10 @@ class GameManager:
         if self._levelManager is None:
            raise Exception("No Level Manager")
 
+        # Set the players spawn locations
+        for player in self._players:
+            player.spawn(60, 540)
+
         while self._playing:
             Clock.forceFPS(60)
 
@@ -53,7 +57,13 @@ class GameManager:
             self._update()
             self._collisionCheck()
             self._draw()
-            
+
+        # Clear everything
+        self._players.empty()
+        self._collectibles.empty()
+        self._enemies.empty()
+        self._objects.empty()
+
         return self._victory
 
     def addPlayer(self, player):
@@ -147,12 +157,12 @@ class GameManager:
                 break
 
         # Check death of an enemy
-        if death == False:
+        """if death == False:
             for enemy in self._enemies:
                 if enemy.isDying:
                     death = True
                     break
-
+"""
         if death:
             self.state = GameState.DeathScreen
             if len(self._players) == 1:

@@ -2,7 +2,8 @@
 Class to control mario
 """
 from spriteManager import SpriteManager
-from framework import GameObject, Clock, SpriteSheet, Keys, Sound, Music
+from framework import PlayableWithLives, GameObject, Clock, SpriteSheet, Keys, Sound, Music
+
 from inputManager import InputManager
 from enum import Enum
 from collisionDetector import CollisionTypes, CollisionDirection
@@ -30,8 +31,7 @@ jump_speed = 300 # Actually 100
 
 
 
-class Mario(GameObject):
-    @GameObject.HasLives(3)
+class Mario(PlayableWithLives):
     def __init__(self):
         super().__init__()
 
@@ -63,7 +63,6 @@ class Mario(GameObject):
             'stand_right'
         ], 10)
 
-        self._setInitialState()
         self.ticks = 0
 
         InputManager.subscribe(
@@ -180,7 +179,7 @@ class Mario(GameObject):
 
     def collectedItem(self, collectible, collectionType):
         """ Mario collecting something """
-        if collectible.name == 'Goo':
+        if collectible.name == 'Goo' and self.subState != PlayerSubState.JUMPING:
             self.subState = PlayerSubState.ON_GOO
 
     def _marioKeyPress(self, key):
@@ -217,18 +216,14 @@ class Mario(GameObject):
                 self.spriteManager.useSprites(['death2', 'death3', 'death4', 'death5'], 10)
             elif self.ticks == 100:
                 self.spriteManager.useSprites(['death6'])
-            elif self.ticks == 220:
-                self._setInitialState()
 
-                print("Lives Left: " + str(self.lives))
-                Music.playBackground()
-                if self.lives == 0:
-                    self.kill()
+            elif self.ticks == 220:
+               Music.playBackground()
+               self.respawnIfPossible()
 
         return self.spriteManager.animate()
 
-    @GameObject.DeathMethod
-    def die(self):
+    def onDeath(self):
         """ Play the death animation """
         Music.playOnTop("20_SFX_Miss")
         self.state = PlayerState.DEAD
@@ -241,12 +236,11 @@ class Mario(GameObject):
         for i in range(self.lives):
             screen.draw(self._sprites['life'], 10 + (i * 20), 10)
 
-    def _setInitialState(self):
-        self.x = 60
-        self.y = 540
+    def onSpawn(self):
         self.state = PlayerState.IDLE
         self.subState = PlayerSubState.NONE
-        self.isDying = False
         self._isAtLadder = False
         self._isOnGround = True
         self._jumpCount = jump_height
+        self.ticks = 0
+
