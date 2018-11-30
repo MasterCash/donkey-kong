@@ -127,7 +127,7 @@ class LevelManager(GameLevelManager):
 
     def getSpawnLocations(self):
         """ Returns valid spawn locations for the current level """
-        pass
+        return [[60, 540], [60, 480]]
 
     @property
     def currentLevel(self):
