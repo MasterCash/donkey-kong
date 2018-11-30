@@ -1,6 +1,6 @@
 
 from game import GameManager
-from framework import GameObject, SpriteSheet, Clock, GameSprite, GameCollectible
+from framework import GameObject, SpriteSheet, Clock, GameSprite, GameCollectible, Music
 from spriteManager import SpriteManager
 from utils import Singleton
 from random import randint
@@ -13,6 +13,7 @@ class EffectSpawner:
     def spawnExplosion(self, barrel):
         rand = randint(5, 10)
         self.__game.addEnemy(Explosion(barrel, rand))
+        Music.playEffect("17_SFX_Stomp")
 
     def spawnGoo(self, platform):
         rand = randint(500, 1000)
@@ -24,6 +25,7 @@ class EffectSpawner:
 
         if platform.previousPlatform is not None:
             self.__game.addCollectible(Goo(platform.previousPlatform, rand))
+        Music.playEffect("02_Coin")
 
 
 class Explosion(GameObject):
