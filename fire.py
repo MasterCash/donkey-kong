@@ -49,8 +49,11 @@ class Fire(GameObject):
         ], 10)
         
         # fire starting position, state, and dir
-        self.x = 60
-        self.y = 550
+        self.x = 250
+        self.y = 200
+        '''self.x = 60
+        self.y = 550'''
+        self.top_level = 150
         self.state = FireState.MOVE
         self.dir = FireDir.RIGHT
         self.tick = 100
@@ -89,6 +92,7 @@ class Fire(GameObject):
                 self.state = FireState.MOVE
             else:
                 self.y -= 1
+                print(self.y)
                 self.getSprite()
 
         self.spriteManager.animate()
@@ -123,7 +127,9 @@ class Fire(GameObject):
                 
         # IF we are on a ladder, set ladder flag.
         elif collisionType == CollisionTypes.Ladder:
-            self.isLadder = True
+            # won't go up ladder if at top level
+            if self.y > self.top_level:
+                self.isLadder = True
 
         # If we hit a Immovable, Boundary for Platforms and Ladders.
         elif collisionType == CollisionTypes.Immovable:
