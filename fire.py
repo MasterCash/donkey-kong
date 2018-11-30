@@ -13,29 +13,41 @@ class FireType(Enum):
     def __str__(self):
         return self.value
 
-# Fire states
 class FireState(Enum):
-    MOVE = 0
-    FALLING = 1
-    AT_LADDER = 2
+    IDLE = 0
+    LADDER_DOWN = 1
+    MOVELEFT = 2
+    MOVERIGHT = 3
+    DEAD = 5
+    ERROR = 6
+    LADDER_IDLE = 7
+    LADDER_UP = 8
 
-# Fire directions
-class FireDir(Enum):
-    RIGHT = 0
-    LEFT = 1
-    UP = 2
-    DOWN = 3
+class FireSubState(Enum):
+    NONE = 0
+    ON_GROUND = 10
+    ON_GOO = 1
+    JUMPING = 2
+
+
+fire_speed = 80.0
+
 
 class Fire(GameObject):
-    def __init__(self, fireType):
-        GameObject.__init__(self)
-        # speed of fire sprite
-        self.level = 0
-        self._speed = 80
-        self._sheet = SpriteSheet('fireball')
-        self.type = fireType
+    def __init__(self, fireType, x, y):
+        super().__init__()
+
+        self._speed = fire_speed
+        self.x = x
+        self.y = y
+        self.state = FireState.MOVERIGHT
+        self.subState = FireSubState.NONE
+        self._isAtLadder = False
+        self._isOnGround = True
+        self.ticks = 0
 
         #list spite states
+        self._sheet = SpriteSheet('fireball')
         self._sprites = {
             'red_left1' : self._sheet.sprite(0, 2, 26, 30).scale(.9),
             'red_left2' : self._sheet.sprite(46, 0, 30, 32).scale(.9),
@@ -49,108 +61,62 @@ class Fire(GameObject):
             'red_right1'
         ], 10)
 
-        # fire starting position, state, and dir
-        self.x = 250
-        self.y = 300
-        self.isFalling = False
-        #self.x = 60
-        #self.y = 550
-        self.top_level = 170
-        self.state = FireState.MOVE
-        self.dir = FireDir.RIGHT
-        self.dir_tick = 100
-        self.isLadder = False
-        self.randDir = 0
-        self.isTop = False
-        self.hitWall = False
+        self.ticks = 0
+
 
     def update(self):
-        self.dir_tick -= 1
-        if self.dir_tick <= 0:
-            self.randDir = random.randint(0,1)
-            self.dir_tick = 100
+        """ Method used for updating state of a sprite/object """
+        if self._isAtLadder != True:
+            self.y = self.y + (self._speed * 2) * Clock.timeDelta # Gravity
 
-        # set direction
-        if self.randDir == 0:
-            self.dir = FireDir.RIGHT
-        else:
-            self.dir = FireDir.LEFT
+        self._isAtLadder = False
 
-        # if not at ladder, apply gravity
-        if not self.isLadder:
-            self.y += (self._speed * 1.5) * Clock.timeDelta
-            self.state = FireState.MOVE
-        else:
-            self.state = FireState.AT_LADDER
+        if self.state == FireState.MOVELEFT:
+            self.x -= self._speed * Clock.timeDelta
+            self.spriteManager.useSprites([
+                'red_left1',
+                'red_left2'
+            ], 8)
 
-        # fire move left or right
-        if self.state == FireState.MOVE and self.hitWall == False:
-            if self.dir == FireDir.RIGHT:
-                self.x += self._speed * Clock.timeDelta
-                self.setSprites()
-            elif self.dir == FireDir.LEFT:
-                self.x -= self._speed * Clock.timeDelta
-                self.setSprites()
-        # go up ladder when see it
-        if self.y > 160:
-            self.dir = FireDir.UP
-        if self.state == FireState.AT_LADDER and self.dir == FireDir.UP:
-                self.y -= 1
-                self.getSprite()
-        print(self.y)
-        self.spriteManager.animate()
+        elif self.state == FireState.MOVERIGHT:
+            self.x += self._speed * Clock.timeDelta
+            self.spriteManager.useSprites([
+                'red_right1',
+                'red_right2'
+            ], 8)
+
+        elif self.state == FireState.LADDER_DOWN:
+            self.y += self._speed * Clock.timeDelta
+
+        elif self.state == FireState.LADDER_UP:
+            self.y -= self._speed * Clock.timeDelta
 
     def collision(self, collisionType, direction, obj):
-        # If we are hitting a platform.
-        if collisionType == CollisionTypes.Platform:
-            self.state = FireState.MOVE
-            self.hitWall = False
-            if not self.isLadder:
-                self.bottom = obj.top + 1
+        """ Mario collided with something """
+        if collisionType == CollisionTypes.Ladder:
+            if not obj.isBroken:
+                self._isAtLadder = True
 
-        # IF we are on a ladder, set ladder flag.
-        elif collisionType == CollisionTypes.Ladder:
-            # won't go up ladder if at top level
-            if not self.isTop:
-                self.isLadder = True
+        elif collisionType == CollisionTypes.Platform:
+            if self._isAtLadder == False and self.subState != FireSubState.JUMPING:
+                self._isOnGround = True
+                if not obj.isTopOfLadder:
+                    self.bottom = obj.top + 1
 
-        # If we hit a Immovable, Boundary for Platforms and Ladders.
         elif collisionType == CollisionTypes.Immovable:
-            if not obj.isTopOfLadder:
+            if self.state == FireState.LADDER_UP:
+                self.state = FireState.MOVELEFT
+            if not obj.isTopOfLadder and not obj.isBroken:
                 self.bottom = obj.top
-                self.isLadder = True
-                self.isTop = False
-            else:
-                self.isTop = True
-                self.isLadder = False
 
-        # collision with wall aa
         elif collisionType == CollisionTypes.Wall:
-            self.hitWall = True
-            self.isLadder = False
             if obj.isLeftWall:
-                self.randDir = 0
+                self.left = obj.right
+                self.state = FireState.MOVERIGHT
             else:
-                self.randDir = 1
-
-            if abs(self.x) < obj.x:
-                self.right = obj.left - 3
-            else:
-                self.left = obj.right + 3
-
-    def setSprites(self):
-        if self.state == FireState.MOVE:
-            if self.dir == FireDir.RIGHT:
-                self.spriteManager.useSprites([
-                    'red_right1',
-                    'red_right2'
-                    ], 8)
-            elif self.dir == FireDir.LEFT:
-                self.spriteManager.useSprites([
-                    'red_left1',
-                    'red_left2'
-                    ], 8)
+                self.right = obj.left
+                self.state = FireState.MOVELEFT
 
     def getSprite(self):
         """ Returns the current sprite for the game object """
-        return self.spriteManager.currentSprite()
+        return self.spriteManager.animate()

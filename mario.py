@@ -26,7 +26,7 @@ class PlayerSubState(Enum):
 
 goo_speed = 50
 player_speed = 100.0
-jump_height = 15
+jump_height = 16
 jump_speed = 300 # Actually 100
 
 
@@ -171,7 +171,7 @@ class Mario(PlayableWithLives):
 
         elif collisionType == CollisionTypes.Immovable:
             self.state = PlayerState.IDLE
-            if not obj.isTopOfLadder and not obj.isBroken:
+            if not obj.isTopOfLadder and not obj.isBroken and self.subState != PlayerSubState.JUMPING:
                 self.bottom = obj.top
 
         elif collisionType == CollisionTypes.Wall:

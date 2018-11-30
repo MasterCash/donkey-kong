@@ -42,6 +42,7 @@ class Ladder(GameSprite):
         self.y = y
         self.image = sprite
         self.isBroken = broken
+        self.isTopOfLadder = False
 
 class InvisiblePlatform(GameSprite):
     def __init__(self, x, y, sprite, isTopOfLadder = False, isEndOfPlatform=False):

@@ -273,5 +273,5 @@ class Barrel(GameObject):
 
             if self.type == BarrelType.FIRE:
                 self.fireType = 0
-                nemySpawner.EnemySpawner().spawnFire(self.fireType)
+                enemySpawner.EnemySpawner().spawnFire(self.fireType, self.x, self.y)
 
