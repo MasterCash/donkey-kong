@@ -23,14 +23,9 @@ class PlayerSubState(Enum):
     ON_GOO = 1
     JUMPING = 2
 
-<<<<<<< HEAD
-movement = 100.0
-jump_height = 16
-=======
 goo_speed = 50
 player_speed = 100.0
 jump_height = 15
->>>>>>> master
 jump_speed = 300 # Actually 100
 
 
@@ -40,13 +35,8 @@ class Mario(PlayableWithLives):
         super().__init__()
 
         self._sheet = SpriteSheet('mario')
-<<<<<<< HEAD
-        self._jumpCount = jump_height
-        self._isJumping = False
-=======
         self._speed = player_speed
         self._jumpCount = jump_height
->>>>>>> master
 
         self._sprites = {
             'stand_left': self._sheet.sprite(0, 20, 24, 32),
@@ -88,9 +78,6 @@ class Mario(PlayableWithLives):
 
         self._isAtLadder = False
 
-<<<<<<< HEAD
-        if self._isJumping:
-=======
         if self.subState == PlayerSubState.ON_GOO:
             self._speed = goo_speed
             self.subState = PlayerSubState.NONE
@@ -98,7 +85,6 @@ class Mario(PlayableWithLives):
             self._speed = player_speed
 
         if self.subState == PlayerSubState.JUMPING:
->>>>>>> master
             if self._jumpCount >= -jump_height:
                 neg = 1
                 if self._jumpCount < 0:
@@ -106,11 +92,9 @@ class Mario(PlayableWithLives):
                 self.y = self.y - (self._jumpCount ** 2) * 0.025 * neg
                 self._jumpCount = self._jumpCount - 1
             else:
-<<<<<<< HEAD
-                self._isJumping = False
-=======
+
                 self.subState = PlayerSubState.NONE
->>>>>>> master
+
                 self._jumpCount = jump_height
             self._isOnGround = False
         else:

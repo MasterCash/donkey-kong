@@ -17,6 +17,7 @@ class FireType(Enum):
 class FireState(Enum):
     MOVE = 0
     ON_LADDER = 1
+    FALLING = 2
 
 # Fire directions
 class FireDir(Enum):
@@ -30,7 +31,7 @@ class Fire(GameObject):
         GameObject.__init__(self)
         # speed of fire sprite
         self.level = 0
-        self._speed = 2
+        self._speed = 80
         self._sheet = SpriteSheet('fireball')
         self.type = fireType
 
@@ -62,7 +63,7 @@ class Fire(GameObject):
 
     def update(self):
         if not self.isLadder:
-            self.y += 1
+            self.y += (self._speed * 1.5) * Clock.timeDelta
         else:
             self.tick -= 1
         if self.state == FireState.MOVE:
@@ -81,10 +82,10 @@ class Fire(GameObject):
                 self.state = FireState.ON_LADDER
             else:
                 if self.dir == FireDir.RIGHT:
-                    self.x += self._speed
+                    self.x += self._speed * Clock.timeDelta
                     self.setSprites()
                 else:
-                    self.x -= self._speed
+                    self.x -= self._speed * Clock.timeDelta
                     self.setSprites()
 
         elif self.state == FireState.ON_LADDER:
@@ -141,11 +142,15 @@ class Fire(GameObject):
         # collision with wall
         elif collisionType == CollisionTypes.Wall:
             print("hit wall")
-            self.state = FireState.MOVE
+            self.state = FireState.FALLING
             if obj.isLeftWall:
                 self.dir = FireDir.RIGHT
             else:
                 self.dir = FireDir.LEFT
+            if abs(self.x) < obj.x:
+                self.right = obj.left - 3
+            else:
+                self.left = obj.right + 3
     def getSprite(self):
         """ Returns the current sprite for the game object """
         return self.spriteManager.currentSprite()

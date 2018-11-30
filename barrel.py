@@ -6,13 +6,9 @@ import random
 from framework import GameObject, SpriteSheet, Clock
 from spriteManager import SpriteManager
 from enum import Enum
-<<<<<<< HEAD
-from collisionDetector import CollisionTypes
 import enemySpawner
-=======
 from collisionDetector import CollisionTypes, CollisionDirection
 from effectSpawner import EffectSpawner
->>>>>>> master
 
 # Enum to represent the type of code.
 class BarrelType(Enum):
@@ -37,11 +33,9 @@ class BarrelDir(Enum):
 class Barrel(GameObject):
     def __init__(self, barrelType):
         GameObject.__init__(self)
-<<<<<<< HEAD
-        self._speed = 5
-=======
-        self._speed = 80
->>>>>>> master
+
+        self._speed = 200
+
         self._sheet = SpriteSheet('barrel')
         # Type of barrel being handled. Given when Created.
         self.type = barrelType
@@ -219,7 +213,6 @@ class Barrel(GameObject):
         elif collisionType == CollisionTypes.Wall:
             self._ladderIgnore = 0
             self.hitWall = True
-
             if abs(self.x) < obj.x:
                 self.right = obj.left - 3
             else:
@@ -272,16 +265,11 @@ class Barrel(GameObject):
 
     # Called if item collected. Used to despawn barrels when they reach the end.
     def collectedItem(self, collectible, collectionType):
-<<<<<<< HEAD
-        self.state = BarrelState.DEAD
-        self.kill()
-        # If fire type, spawn a fire ball.
-        if self.type == BarrelType.FIRE:
-            self.fireType = 0
-            enemySpawner.EnemySpawner().spawnFire(self.fireType)
-            print("Fire Spawned")
-=======
-        if collectible.name == 'flamingOilContainer':
+        print(collectible.name)
+        if collectible.name == 'FlamingOilContainer':
             self.state = BarrelState.DEAD
             self.kill()
->>>>>>> master
+            if self.type  == BarrelType.FIRE:
+                self.fireType = 0
+                enemySpawner.EnemySpawner().spawnFire(self.fireType)
+                print("Fire Spawned")
