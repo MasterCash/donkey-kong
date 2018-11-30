@@ -2,7 +2,7 @@
 Class to control mario
 """
 from spriteManager import SpriteManager
-from framework import GameObject, Clock, SpriteSheet, Keys, Sound
+from framework import GameObject, Clock, SpriteSheet, Keys, Sound, Music
 from inputManager import InputManager
 from enum import Enum
 from collisionDetector import CollisionTypes, CollisionDirection
@@ -46,8 +46,8 @@ class Mario(GameObject):
             'run_left2': self._sheet.sprite(94, 21, 30, 32),
             'run_right1': self._sheet.sprite(45, 20, 31, 32).flip(),
             'run_right2': self._sheet.sprite(94, 21, 30, 32).flip(),
-            'ladder_up1': self._sheet.sprite(142, 20, 28, 32),
-            'ladder_up2': self._sheet.sprite(142, 20, 28, 32).flip(),
+            'ladder_up1': self._sheet.sprite(142, 20, 30, 32),
+            'ladder_up2': self._sheet.sprite(142, 20, 30, 32).flip(),
             'death1': self._sheet.sprite(716, 20, 32, 32),
             'death2': self._sheet.sprite(764, 20, 32, 32),
             'death3': self._sheet.sprite(764, 20, 32, 32).rotate(90),
@@ -216,10 +216,11 @@ class Mario(GameObject):
                 self.spriteManager.useSprites(['death2', 'death3', 'death4', 'death5'], 10)
             elif self.ticks == 100:
                 self.spriteManager.useSprites(['death6'])
-            elif self.ticks == 150:
+            elif self.ticks == 220:
                 self._setInitialState()
 
                 print("Lives Left: " + str(self.lives))
+                Music.playBackground()
                 if self.lives == 0:
                     self.kill()
 
@@ -228,6 +229,7 @@ class Mario(GameObject):
     @GameObject.DeathMethod
     def die(self):
         """ Play the death animation """
+        Music.playOnTop("20_SFX_Miss")
         self.state = PlayerState.DEAD
         self.spriteManager.useSprites(['death1'], 10)
         self.ticks = 0
