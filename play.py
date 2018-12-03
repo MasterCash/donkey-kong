@@ -15,7 +15,6 @@ import menu
 
 
 def play(window, result):
-
     game = Game.GameManager(window)
     for player in result.players:
         if player.__name__ == "Mario":

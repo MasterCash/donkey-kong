@@ -152,9 +152,10 @@ class GameSprite(pygame.sprite.Sprite):
         else:
             self._image = img
 
-        self.rect = self._image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+        if self._image is not None:
+            self.rect = self._image.get_rect()
+            self.rect.x = self.x
+            self.rect.y = self.y
 
     @property
     def width(self):
