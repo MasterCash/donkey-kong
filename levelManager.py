@@ -289,7 +289,6 @@ class LevelManager(GameLevelManager):
         for x in range(width - 11*w, width - 7*w, w):
             platform.addLevelBlock(x)
 
-
         return level
 
 
@@ -332,6 +331,12 @@ class PlatformBuilder():
         """ Block that is not angled """
         self._blocks.append(BlockBuilder(x, self.y))
         i = len(self._blocks) - 1
+
+        # Create linked list
+        if i > 0:
+            self._blocks[i-1].setNextPlatform(self._blocks[i])
+            self._blocks[i].setPreviousPlatform(self._blocks[i-1])
+
         return self._blocks[i]
 
     def addInclinedBlock(self, x):
@@ -346,6 +351,7 @@ class BlockBuilder():
         self.y = y
         self.ladder = None
         self.startingBlock = False
+        self.__platform = Platform(self.x, self.y, None)
 
     def addLadder(self, offset=0):
         self.ladder = LadderBuilder(self.x + offset, self.y)
@@ -354,8 +360,15 @@ class BlockBuilder():
     def makeStartingBlock(self):
         self.startingBlock = True
 
+    def setNextPlatform(self, next):
+        self.__platform.nextPlatform = next.__platform
+
+    def setPreviousPlatform(self, prev):
+        self.__platform.previousPlatform = prev.__platform
+
     def build(self, sprite):
-        return Platform(self.x, self.y, sprite)
+        self.__platform.image = sprite
+        return self.__platform
 
     def buildImmovable(self, sprite, offset=0, yOffset=0):
         return InvisiblePlatform(self.x + offset, self.y + yOffset, sprite, False)

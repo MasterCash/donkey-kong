@@ -129,7 +129,7 @@ class MenuOption:
     @property
     def isTitle(self):
         return self.__isTitle
-    
+
 
     @property
     def image(self):
@@ -276,10 +276,8 @@ class MenuBuilder:
         )
 
     def __unsubscribe(self):
-        try:
-            InputManager.unsubscribe(
-                [Keys.UP, Keys.DOWN, Keys.ENTER],
-                self.__handleKeyPress
-            )
-        except:
-            pass
+        InputManager.unsubscribe(
+            [Keys.UP, Keys.DOWN, Keys.ENTER],
+            self.__handleKeyPress
+        )
+
