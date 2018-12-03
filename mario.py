@@ -157,7 +157,7 @@ class Mario(PlayableWithLives):
         """ Mario collided with something """
         if collisionType == CollisionTypes.Enemy:
             print("You killed Mario!!!!!")
-            self.die()
+            #self.die()
 
         elif collisionType == CollisionTypes.Ladder:
             if not obj.isBroken:
