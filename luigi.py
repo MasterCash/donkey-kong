@@ -154,7 +154,7 @@ class Luigi(PlayableWithLives):
         """ Luigi collided with something """
         if collisionType == CollisionTypes.Enemy:
             print("You killed Luigi!!!!!")
-            #self.die()
+            self.die()
 
         elif collisionType == CollisionTypes.Ladder:
              if not obj.isBroken:
